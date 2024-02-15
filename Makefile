@@ -33,13 +33,14 @@ path_debug:
 	@echo
 	@echo TESTEXEC_OBJFILES:
 	@echo $(TESTEXEC_OBJFILES)
+	
 
 .PHONY: build
 build: $(OBJFILES)
 
 %.o: %.c
 $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR) Makefile
-	$(CC) -c $< $(CFLAGS) -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR):
 	mkdir $@
@@ -69,7 +70,7 @@ $(TESTEXEC): $(TEST_OBJFILES) $(TESTEXEC_OBJFILES)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 	
 $(TEST_OBJDIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJDIR) Makefile
-	$(CC) -c $< $(CFLAGS) -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TEST_OBJDIR):
 	mkdir $@
