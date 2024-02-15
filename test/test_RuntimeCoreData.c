@@ -1,5 +1,5 @@
 #include "test_RuntimeCoreData.h"
-#include "../src/RuntimeCoreData.h"
+#include "RuntimeCoreData.h"
 
 #include <stdio.h>
 #include <stdint.h>

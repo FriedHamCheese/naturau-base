@@ -8,7 +8,8 @@ OBJFILES := $(SRCFILES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 CC := gcc
 CFLAGS := -Wall -Wextra -g3 -I./include -I./include/ntrb
-LDFLAGS := -lportaudio
+LDFLAGS :=
+LDLIBS := -lportaudio
 
 .PHONY: all
 all: build build_test
@@ -62,11 +63,13 @@ TESTEXEC_OBJFILES := $(OBJFILES) $(TEST_OBJFILES)
 TESTEXEC := $(TEST_DIR)/test.exe
 
 build_test: $(TESTEXEC)
+	$(TESTEXEC)
 
-$(TESTEXEC): $(TEST_OBJFILES)
-	$(CC) $(LDFLAGS) $^ $(LDLIB) -o $@
+$(TESTEXEC): $(TEST_OBJFILES) $(TESTEXEC_OBJFILES)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 	
-$(TEST_OBJDIR)/%.o: $(TEST_DIR)/%.c | Makefile
+$(TEST_OBJDIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJDIR) Makefile
+	$(CC) -c $< $(CFLAGS) -o $@
 
 $(TEST_OBJDIR):
 	mkdir $@

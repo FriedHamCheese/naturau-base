@@ -1,5 +1,5 @@
 #include "test_audeng_wrapper.h"
-#include "../src/audeng_wrapper.h"
+#include "audeng_wrapper.h"
 
 #include <stdio.h>
 #include <stdint.h>

@@ -1,5 +1,5 @@
 #include "test_utils.h"
-#include "../src/utils.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <stdint.h>

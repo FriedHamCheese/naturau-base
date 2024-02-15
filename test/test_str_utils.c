@@ -1,5 +1,5 @@
 #include "test_str_utils.h"
-#include "../src/str_utils.h"
+#include "str_utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>

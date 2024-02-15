@@ -1,5 +1,5 @@
 #include "test_AudioDatapoints.h"
-#include "../src/AudioDatapoints.h"
+#include "AudioDatapoints.h"
 
 #include <assert.h>
 

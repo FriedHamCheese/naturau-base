@@ -1,9 +1,9 @@
 #include "test_wav_wrapper.h"
-#include "../src/wav_wrapper.h"
+#include "wav_wrapper.h"
 
-#include "../src/SpanU8.h"
-#include "../src/WAVheader.h"
-#include "../src/file_wrapper.h"
+#include "SpanU8.h"
+#include "WAVheader.h"
+#include "file_wrapper.h"
 
 #include <stdio.h>
 #include <stdlib.h>

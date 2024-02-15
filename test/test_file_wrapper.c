@@ -1,7 +1,7 @@
 #include "test_file_wrapper.h"
-#include "../src/file_wrapper.h"
+#include "file_wrapper.h"
 
-#include "../src/SpanU8.h"
+#include "SpanU8.h"
 
 #include <assert.h>
 

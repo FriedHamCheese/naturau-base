@@ -1,7 +1,7 @@
 #include "test_aud_std_fmt.h"
-#include "../src/aud_std_fmt.h"
+#include "aud_std_fmt.h"
 
-#include "../src/AudioDatapoints.h"
+#include "AudioDatapoints.h"
 
 #include <stdio.h>
 #include <stdlib.h>

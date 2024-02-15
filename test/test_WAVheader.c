@@ -1,5 +1,5 @@
 #include "test_WAVheader.h"
-#include "../src/WAVheader.h"
+#include "WAVheader.h"
 
 #include <stdio.h>
 #include <stdint.h>

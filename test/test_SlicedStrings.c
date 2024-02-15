@@ -1,5 +1,5 @@
 #include "test_SlicedStrings.h"
-#include "../src/SlicedStrings.h"
+#include "SlicedStrings.h"
 
 #include <stdio.h>
 #include <stdlib.h>
