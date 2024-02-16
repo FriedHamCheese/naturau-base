@@ -17,6 +17,9 @@
 
 void* user_input_loop(void* const runtime_core_data_void){
 	while(true){
+		printf(": ");
+		fflush(stdout);
+		
 		char* user_input_str;
 		const enum ntrb_GetCharStatus getstr_status = ntrb_getsn(128, stdin, &user_input_str);
 		if(getstr_status != ntrb_GetChar_OK){
@@ -65,7 +68,7 @@ void* user_input_loop(void* const runtime_core_data_void){
 						const enum ntrb_ReadFileResult readfile_result = queueaudio_status - ntrb_RCD_QueueAudio_ntrb_LoadStdFmtAudioResult - ntrb_LoadStdFmtAudioResult_ntrb_ReadFileResult;
 						fprintf(stderr, "[Error]: %s: %d: Unable to queue audio (ntrb_RCD_QueueAudioReturn %d).\n", __FILE__, __LINE__, queueaudio_status);		
 						if(readfile_result == ntrb_ReadFileResult_FileOpenError) 
-							fprintf(stderr, "\tMost common cause of this error is: the file does not exist in the working directory.\n");
+							fprintf(stderr, "\tMost common cause of this error is: the file does not exist in the specified directory.\n");
 						
 						fflush(stderr);
 					}else{

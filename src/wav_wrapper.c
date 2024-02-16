@@ -147,6 +147,7 @@ ntrb_AudioHeader ntrb_WAVheader_to_ntrb_AudioHeader(const ntrb_WAVheader* const 
 	audhd.ByteRate = wavheader->ByteRate;
 	audhd.NumChannels = wavheader->NumChannels;
 	audhd.BlockAlign = wavheader->BlockAlign;
+	audhd.BitsPerSample = wavheader->BitsPerSample;
 	
 	return audhd;
 }
