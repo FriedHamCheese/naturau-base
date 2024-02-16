@@ -30,16 +30,13 @@ path_debug:
 	@echo
 	@echo TEST_OBJFILES: 
 	@echo $(TEST_OBJFILES)
-	@echo
-	@echo TESTEXEC_OBJFILES:
-	@echo $(TESTEXEC_OBJFILES)
 	
 
 .PHONY: build
 build: $(OBJFILES)
 
 %.o: %.c
-$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR) Makefile
+$(OBJDIR)/%.o: $(SRCDIR)/%.c Makefile | $(OBJDIR) 
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR):
@@ -59,17 +56,16 @@ TEST_DIR := ./test
 TEST_OBJDIR := $(TEST_DIR)/bin
 TEST_SRCFILES := $(wildcard $(TEST_DIR)/*.c)
 TEST_OBJFILES := $(TEST_SRCFILES:$(TEST_DIR)/%.c=$(TEST_OBJDIR)/%.o)
-TESTEXEC_OBJFILES := $(OBJFILES) $(TEST_OBJFILES)
 
 TESTEXEC := $(TEST_DIR)/test.exe
 
 build_test: $(TESTEXEC)
 	$(TESTEXEC)
 
-$(TESTEXEC): $(TEST_OBJFILES) $(TESTEXEC_OBJFILES)
+$(TESTEXEC): $(TEST_OBJFILES) $(OBJFILES)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 	
-$(TEST_OBJDIR)/%.o: $(TEST_DIR)/%.c | $(TEST_OBJDIR) Makefile
+$(TEST_OBJDIR)/%.o: $(TEST_DIR)/%.c Makefile | $(TEST_OBJDIR) 
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TEST_OBJDIR):
