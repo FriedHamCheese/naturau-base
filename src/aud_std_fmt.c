@@ -63,36 +63,6 @@ ntrb_AudioDatapoints ntrb_split_as_mono(const ntrb_AudioDatapoints multichannel_
 	return mono;
 }
 
-
-//requires input audio to be in mono channel, float32.
-ntrb_AudioDatapoints ntrb_to_samplerate_mono_old(const ntrb_AudioDatapoints orig, const double dest_over_orig_samplerate){
-	const size_t orig_float_count = orig.byte_count / sizeof(float);
-	const double orig_over_dest_samplerate = 1.0f / dest_over_orig_samplerate;
-	
-	size_t dest_float_count = floor((float)orig_float_count * dest_over_orig_samplerate);	
-	//makes sure both channels has the same length.
-	const bool not_stereo_aligned_size = (dest_float_count % 2) != 0;
-	if(not_stereo_aligned_size) dest_float_count++;
-	
-	ntrb_AudioDatapoints dest = new_ntrb_AudioDatapoints(dest_float_count * sizeof(float));
-	if(dest.bytes == NULL) return failed_ntrb_AudioDatapoints;
-	
-	//predicts unaligned samplerate conversions linearly, instead of flooring the index, or other ways.
-	for(size_t i_dest = 0; i_dest < dest_float_count; i_dest++){
-		const double i_src = (double)i_dest * (double)orig_over_dest_samplerate;
-		const double i_src_floor = ntrb_clamp_float(floor(i_src), 0, orig_float_count - 1);
-		const double i_src_ceil = ntrb_clamp_float(ceil(i_src), 0, orig_float_count - 1);
-		
-		const float fp_floor = ((float*)(orig.bytes))[(size_t)i_src_floor];
-		const float fp_ceil  = ((float*)(orig.bytes))[(size_t)i_src_ceil];
-		
-		((float*)(dest.bytes))[i_dest] = fp_floor + ((i_src_ceil - i_src) * (fp_ceil - fp_floor));
-	}
-	
-	return dest;
-}
-
-/*
 ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, const double orig_samplerate, const double dest_samplerate){
 	const size_t orig_float_count = orig.byte_count / sizeof(float);
 	
@@ -112,11 +82,11 @@ ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, co
 		const float fp_floor = ((float*)(orig.bytes))[(size_t)i_orig_floor];
 		const float fp_ceil  = ((float*)(orig.bytes))[(size_t)i_orig_ceil];
 		
-		((float*)(dest.bytes))[i_dest] = fp_floor + ((i_orig_ceil - i_orig) * (fp_ceil - fp_floor));
+		((float*)(dest.bytes))[i_dest] = fp_floor + ((i_orig - i_orig_floor) * (fp_ceil - fp_floor));
 	}
 	
 	return dest;
-}*/
+}
 
 /*
 //round
@@ -130,16 +100,15 @@ ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, co
 	const double dest_over_orig_samplerate = (dest_samplerate - 1.0) / (orig_samplerate - 1.0);
 	const double orig_over_dest_samplerate = 1.0f / dest_over_orig_samplerate;	
 	
-	//predicts unaligned samplerate conversions linearly, instead of flooring the index, or other ways.
 	for(size_t i_dest = 0; i_dest < dest_float_count; i_dest++){
 		const size_t i_orig = ntrb_clamp_u64(llround((double)i_dest * (double)orig_over_dest_samplerate), 0, orig_float_count-1);
 		((float*)(dest.bytes))[i_dest] = ((float*)(orig.bytes))[i_orig];
 	}
 	
 	return dest;
-}
-*/
+}*/
 
+/*
 //floor
 ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, const double orig_samplerate, const double dest_samplerate){
 	const size_t orig_float_count = orig.byte_count / sizeof(float);
@@ -151,7 +120,6 @@ ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, co
 	const double dest_over_orig_samplerate = (dest_samplerate - 1.0) / (orig_samplerate - 1.0);
 	const double orig_over_dest_samplerate = 1.0f / dest_over_orig_samplerate;	
 	
-	//predicts unaligned samplerate conversions linearly, instead of flooring the index, or other ways.
 	for(size_t i_dest = 0; i_dest < dest_float_count; i_dest++){
 		const size_t i_orig = ntrb_clamp_u64(floor((double)i_dest * (double)orig_over_dest_samplerate), 0, orig_float_count-1);
 		((float*)(dest.bytes))[i_dest] = ((float*)(orig.bytes))[i_orig];
@@ -159,6 +127,7 @@ ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, co
 	
 	return dest;
 }
+*/
 
 //requires the input to be in float32 and stereo.
 //If orig and dest samplerate are equal, copies orig to a new allocated AudioDatapoints.
