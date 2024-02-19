@@ -92,6 +92,7 @@ ntrb_AudioDatapoints ntrb_to_samplerate_mono_old(const ntrb_AudioDatapoints orig
 	return dest;
 }
 
+/*
 ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, const double orig_samplerate, const double dest_samplerate){
 	const size_t orig_float_count = orig.byte_count / sizeof(float);
 	
@@ -115,8 +116,49 @@ ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, co
 	}
 	
 	return dest;
-}
+}*/
 
+/*
+//round
+ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, const double orig_samplerate, const double dest_samplerate){
+	const size_t orig_float_count = orig.byte_count / sizeof(float);
+	
+	size_t dest_float_count = floor((float)orig_float_count * (dest_samplerate / orig_samplerate));	
+	ntrb_AudioDatapoints dest = new_ntrb_AudioDatapoints(dest_float_count * sizeof(float));
+	if(dest.bytes == NULL) return failed_ntrb_AudioDatapoints;
+	
+	const double dest_over_orig_samplerate = (dest_samplerate - 1.0) / (orig_samplerate - 1.0);
+	const double orig_over_dest_samplerate = 1.0f / dest_over_orig_samplerate;	
+	
+	//predicts unaligned samplerate conversions linearly, instead of flooring the index, or other ways.
+	for(size_t i_dest = 0; i_dest < dest_float_count; i_dest++){
+		const size_t i_orig = ntrb_clamp_u64(llround((double)i_dest * (double)orig_over_dest_samplerate), 0, orig_float_count-1);
+		((float*)(dest.bytes))[i_dest] = ((float*)(orig.bytes))[i_orig];
+	}
+	
+	return dest;
+}
+*/
+
+//floor
+ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, const double orig_samplerate, const double dest_samplerate){
+	const size_t orig_float_count = orig.byte_count / sizeof(float);
+	
+	size_t dest_float_count = floor((float)orig_float_count * (dest_samplerate / orig_samplerate));	
+	ntrb_AudioDatapoints dest = new_ntrb_AudioDatapoints(dest_float_count * sizeof(float));
+	if(dest.bytes == NULL) return failed_ntrb_AudioDatapoints;
+	
+	const double dest_over_orig_samplerate = (dest_samplerate - 1.0) / (orig_samplerate - 1.0);
+	const double orig_over_dest_samplerate = 1.0f / dest_over_orig_samplerate;	
+	
+	//predicts unaligned samplerate conversions linearly, instead of flooring the index, or other ways.
+	for(size_t i_dest = 0; i_dest < dest_float_count; i_dest++){
+		const size_t i_orig = ntrb_clamp_u64(floor((double)i_dest * (double)orig_over_dest_samplerate), 0, orig_float_count-1);
+		((float*)(dest.bytes))[i_dest] = ((float*)(orig.bytes))[i_orig];
+	}
+	
+	return dest;
+}
 
 //requires the input to be in float32 and stereo.
 //If orig and dest samplerate are equal, copies orig to a new allocated AudioDatapoints.
