@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
+
 #include <assert.h>
 
 static void test_ntrb_clamp_i64(FILE*, FILE*){
@@ -45,7 +47,16 @@ static void test_ntrb_clamp_u64(FILE*, FILE*){
 	assert(ntrb_clamp_u64(val_3, min_3, max_3) == min_3);	
 }
 
+static void test_ntrb_float_equal(FILE*, FILE*){
+	const float allowable_error = 0.000001;
+	assert(ntrb_float_equal(2.0, 2.0, allowable_error) == true);
+	assert(ntrb_float_equal(2.0 - allowable_error, 2.0, allowable_error) == true);
+	assert(ntrb_float_equal(2.0 + allowable_error, 2.0, allowable_error) == true);
+	assert(ntrb_float_equal(2.0 + allowable_error*2, 2.0, allowable_error) == false);	
+}
+
 void test_suite_ntrb_utils(FILE* const outstream, FILE* const errstream){
 	test_ntrb_clamp_i64(outstream, errstream);
 	test_ntrb_clamp_u64(outstream, errstream);
+	test_ntrb_float_equal(outstream, errstream);
 }
