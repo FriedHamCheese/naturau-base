@@ -27,6 +27,8 @@ static const unsigned long wait_busy_stream_usecs = 10 * 1000;
 
 ntrb_RuntimeCoreData new_ntrb_RuntimeCoreData(const uint16_t track_count){
 	ntrb_RuntimeCoreData rcd;
+	
+	if(track_count == 0) return failed_ntrb_RuntimeCoreData;
 	rcd.audio_tracks = calloc(track_count, sizeof(ntrb_AudioDatapoints*));
 	if(rcd.audio_tracks == NULL) return failed_ntrb_RuntimeCoreData;
 	

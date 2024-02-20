@@ -11,12 +11,12 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-
 const unsigned long ntrb_msecs_per_callback = 100;
 
-static int stream_WAVf32_2ch_callback(const void *, void *output_void, unsigned long frameCount, 
-										const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, 
-										void *userData)
+
+static int stream_audio(const void *, void *output_void, unsigned long frameCount, 
+						const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, 
+						void *userData)
 {
 	const unsigned long float_count = frameCount * ntrb_std_audchannels;
 	float* const output = (float*)output_void;
@@ -84,7 +84,7 @@ void* ntrb_run_audio_engine(void* const runtime_data_void){
 	const unsigned long frames_per_buffer = ntrb_frames_for_msec(ntrb_std_samplerate) * ntrb_msecs_per_callback;
 	pa_error = Pa_OpenStream(&output_stream, NULL, &output_stream_params, 
 								ntrb_std_samplerate, frames_per_buffer, paClipOff,
-								stream_WAVf32_2ch_callback, runtime_data);
+								stream_audio, runtime_data);
 	if(pa_error) goto uninit_pa;
 	
 	pa_error = Pa_StartStream(output_stream);

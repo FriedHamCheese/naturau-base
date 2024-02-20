@@ -8,6 +8,7 @@ const ntrb_AudioDatapoints failed_ntrb_AudioDatapoints = {.bytes=NULL, .byte_cou
 
 ntrb_AudioDatapoints new_ntrb_AudioDatapoints(const size_t size_bytes){
 	ntrb_AudioDatapoints o;
+	if(size_bytes == 0) return failed_ntrb_AudioDatapoints;
 	o.bytes = calloc(size_bytes, sizeof(uint8_t));
 	o.byte_count = size_bytes;
 	o.byte_pos = 0;

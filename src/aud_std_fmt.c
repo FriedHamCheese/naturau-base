@@ -18,12 +18,6 @@
 #include <stdbool.h>
 
 
-/*
-TODO:
-	Standardised enum for error handling of conversion functions.
-\*/
-
-
 const uint32_t ntrb_std_samplerate = 48000;
 const uint8_t ntrb_std_audchannels = 2;
 const PaSampleFormat ntrb_std_sample_fmt = paFloat32;
@@ -62,6 +56,42 @@ ntrb_AudioDatapoints ntrb_split_as_mono(const ntrb_AudioDatapoints multichannel_
 	}
 	return mono;
 }
+
+//requires the audio to be in float32 and mono channeled.
+ntrb_AudioDatapoints ntrb_mono_to_xchannels(const ntrb_AudioDatapoints orig, const size_t dest_channels){
+	ntrb_AudioDatapoints multichannel_aud = new_ntrb_AudioDatapoints(orig.byte_count * dest_channels);
+	if(multichannel_aud.bytes == NULL) return failed_ntrb_AudioDatapoints;
+	
+	const size_t float_points = orig.byte_count / sizeof(float);
+	
+	//loop order can be swapped for cache friendliness.
+	for(size_t channel = 0; channel < dest_channels; channel++){		
+		for(size_t i_orig = 0; i_orig < float_points; i_orig++){
+			((float*)(multichannel_aud.bytes))[(i_orig*dest_channels) +channel] = ((float*)(orig.bytes))[i_orig];
+		}
+	}
+	
+	return multichannel_aud;
+}
+
+//requires 2 float32 AudioDatpoints with equal length to merge as an interleaved stereo AudioDatapoints.
+ntrb_AudioDatapoints ntrb_merge_to_stereo(const ntrb_AudioDatapoints l_ch, const ntrb_AudioDatapoints r_ch){
+	if(l_ch.byte_count != r_ch.byte_count) return failed_ntrb_AudioDatapoints;
+	
+	const size_t mono_float_count = r_ch.byte_count / sizeof(float);
+	const size_t stereo_float_count = mono_float_count * 2;
+	
+	ntrb_AudioDatapoints stereo_aud = new_ntrb_AudioDatapoints(stereo_float_count * sizeof(float));
+	if(stereo_aud.bytes == NULL) return failed_ntrb_AudioDatapoints;
+	
+	for(size_t i = 0; i < stereo_float_count; i+=2){
+		((float*)(stereo_aud.bytes))[i] = ((float*)(l_ch.bytes))[i/2];
+		((float*)(stereo_aud.bytes))[i+1] = ((float*)(r_ch.bytes))[i/2];
+	}
+	
+	return stereo_aud;
+}
+
 
 //requires input to be in mono channeled float32
 ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, const double orig_samplerate, const double dest_samplerate){
@@ -126,41 +156,6 @@ ntrb_AudioDatapoints ntrb_to_samplerate(const ntrb_AudioDatapoints orig, const u
 	free(dest_r.bytes);	
 	
 	return dest_aud;
-}
-
-//requires the audio to be in float32 and mono channeled.
-ntrb_AudioDatapoints ntrb_mono_to_xchannels(const ntrb_AudioDatapoints orig, const size_t dest_channels){
-	ntrb_AudioDatapoints multichannel_aud = new_ntrb_AudioDatapoints(orig.byte_count * dest_channels);
-	if(multichannel_aud.bytes == NULL) return failed_ntrb_AudioDatapoints;
-	
-	const size_t float_points = orig.byte_count / sizeof(float);
-	
-	//loop order can be swapped for cache friendliness.
-	for(size_t channel = 0; channel < dest_channels; channel++){		
-		for(size_t i_orig = 0; i_orig < float_points; i_orig++){
-			((float*)(multichannel_aud.bytes))[(i_orig*dest_channels) +channel] = ((float*)(orig.bytes))[i_orig];
-		}
-	}
-	
-	return multichannel_aud;
-}
-
-//requires 2 float32 AudioDatpoints with equal length to merge as an interleaved stereo AudioDatapoints.
-ntrb_AudioDatapoints ntrb_merge_to_stereo(const ntrb_AudioDatapoints l_ch, const ntrb_AudioDatapoints r_ch){
-	if(l_ch.byte_count != r_ch.byte_count) return failed_ntrb_AudioDatapoints;
-	
-	const size_t mono_float_count = r_ch.byte_count / sizeof(float);
-	const size_t stereo_float_count = mono_float_count * 2;
-	
-	ntrb_AudioDatapoints stereo_aud = new_ntrb_AudioDatapoints(stereo_float_count * sizeof(float));
-	if(stereo_aud.bytes == NULL) return failed_ntrb_AudioDatapoints;
-	
-	for(size_t i = 0; i < stereo_float_count; i+=2){
-		((float*)(stereo_aud.bytes))[i] = ((float*)(l_ch.bytes))[i/2];
-		((float*)(stereo_aud.bytes))[i+1] = ((float*)(r_ch.bytes))[i/2];
-	}
-	
-	return stereo_aud;
 }
 
 //input could be in any sample format, any channels, any samplerates.
