@@ -1,6 +1,7 @@
 #include "test_aud_std_fmt.h"
 #include "aud_std_fmt.h"
 
+#include "utils.h"
 #include "AudioDatapoints.h"
 
 #include <stdio.h>
@@ -57,6 +58,55 @@ static void test_ntrb_split_as_mono(FILE*, FILE*){
 	free(ch2_aud.bytes);
 	free(aud.bytes);
 }
+
+static void test_ntrb_to_samplerate_mono_upscale(FILE*, FILE*){
+	const size_t seconds = 1;
+	const size_t orig_samplerate = 3;
+	const float orig_datapoints[] = {1.5, -1.5, 1.2};
+	
+	const size_t dest_samplerate = 5;
+	const float expected_dest_datapoints[] = {1.5, 0, -1.5, -0.15, 1.2};
+	
+	const ntrb_AudioDatapoints orig_aud = {(uint8_t*)orig_datapoints, seconds * orig_samplerate * sizeof(float), 0};
+	ntrb_AudioDatapoints dest_aud = ntrb_to_samplerate_mono(orig_aud, orig_samplerate, dest_samplerate);
+	assert(dest_aud.bytes != NULL);
+	assert(dest_aud.byte_count == sizeof(float) * seconds * dest_samplerate);
+	
+	for(size_t i = 0; i < dest_samplerate * seconds; i++){
+		const float allowed_error = 0.0000001;
+		assert(ntrb_float_equal(expected_dest_datapoints[i], ((float*)(dest_aud.bytes))[i], allowed_error));
+	}
+	
+	free(dest_aud.bytes);
+}
+
+static void test_ntrb_to_samplerate_mono_downscale(FILE*, FILE*){
+	const size_t seconds = 1;
+	const size_t orig_samplerate = 6;
+	const float orig_datapoints[] = {-1.3, 0.15, -1.7, 1.6, 0.5, -1.2};
+	const ntrb_AudioDatapoints orig_aud = {(uint8_t*)orig_datapoints, seconds * orig_samplerate * sizeof(float), 0};
+	
+	const size_t dest_samplerate = 4;
+	const float expected_dest_datapoints[] = {-1.3, -1.08333333, 1.2333333, -1.2};
+	
+	ntrb_AudioDatapoints dest_aud = ntrb_to_samplerate_mono(orig_aud, orig_samplerate, dest_samplerate);
+	assert(dest_aud.bytes != NULL);
+	assert(dest_aud.byte_count == sizeof(float) * seconds * dest_samplerate);
+	
+	for(size_t i = 0; i < dest_samplerate * seconds; i++){
+		const float allowed_error = 0.000001;
+		assert(ntrb_float_equal(expected_dest_datapoints[i], ((float*)(dest_aud.bytes))[i], allowed_error));
+	}	
+	
+	
+	free(dest_aud.bytes);
+}
+
+static void test_ntrb_to_samplerate_mono(FILE* outstream, FILE* errstream){
+	test_ntrb_to_samplerate_mono_upscale(outstream, errstream);
+	test_ntrb_to_samplerate_mono_downscale(outstream, errstream);
+}
+
 
 static void test_ntrb_mono_to_xchannels(FILE*, FILE*){
 	const size_t mono_float_count = 5;
@@ -125,6 +175,7 @@ static void test_ntrb_merge_to_stereo(FILE*, FILE*){
 void test_suite_ntrb_aud_std_fmt(FILE* const outstream, FILE* const errstream){
 	test_ntrb_AudioDatapoints_i16_to_f32(outstream, errstream);
 	test_ntrb_split_as_mono(outstream, errstream);
+	test_ntrb_to_samplerate_mono(outstream, errstream);
 	test_ntrb_mono_to_xchannels(outstream, errstream);
 	test_ntrb_merge_to_stereo(outstream, errstream);
 }
