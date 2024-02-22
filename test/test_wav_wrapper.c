@@ -5,6 +5,8 @@
 #include "WAVheader.h"
 #include "file_wrapper.h"
 
+#include "portaudio.h"	//paInt16
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -80,7 +82,7 @@ static void test_get_ntrb_WAVheader(FILE*, FILE*){
 	//test ntrb_GetWAVheader_invalid_Subchunk2Size for Subchunk2Size
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/subchunk2_size_overflow.wav") == ntrb_ReadFileResult_OK);
 	assert(get_ntrb_WAVheader(&wavheader, &audiodata_offset, file_buffer) == ntrb_GetWAVheader_invalid_Subchunk2Size);
-	free(file_buffer.ptr);		
+	free(file_buffer.ptr);
 }
 
 static void test_ntrb_get_WAV_audiodata(FILE*, FILE*){
@@ -124,8 +126,40 @@ static void test_ntrb_WAVheader_audio_msec(FILE*, FILE*){
 	assert(calculated_msec <= aud_max_msec);
 }
 
+static void test_ntrb_WAVheader_to_ntrb_AudioHeader(FILE*, FILE*){
+	const ntrb_WAVheader regular_wav_header = {
+		.ChunkID = {'R', 'I', 'F', 'F'},
+		.ChunkSize = 4222146,
+		.Format = {'W', 'A', 'V', 'E'},
+		
+		.Subchunk1ID = {'f', 'm', 't', ' '},
+		.Subchunk1Size = 16,
+		.AudioFormat = 1,
+		.NumChannels = 2,
+		.SampleRate = 48000,
+		.ByteRate = 192000,
+		.BlockAlign = 4,
+		.BitsPerSample = 16,
+		
+		.Subchunk2ID = {'d', 'a', 't', 'a'},
+		.Subchunk2Size = 4221948
+	};
+
+	ntrb_AudioHeader aud_header = ntrb_WAVheader_to_ntrb_AudioHeader(&regular_wav_header);
+	assert(aud_header.AudioFormat == paInt16);
+	assert(aud_header.AudioDataSize == regular_wav_header.Subchunk2Size);
+	assert(aud_header.SampleRate == regular_wav_header.SampleRate);
+	assert(aud_header.ByteRate == regular_wav_header.ByteRate);
+	assert(aud_header.NumChannels == regular_wav_header. NumChannels);
+	assert(aud_header.BlockAlign == regular_wav_header.BlockAlign);
+	assert(aud_header.BitsPerSample == regular_wav_header.BitsPerSample);
+}
+
+
 void test_suite_ntrb_wav_wrapper(FILE* const outstream, FILE* const errstream){
 	test_get_ntrb_WAVheader(outstream, errstream);
 	test_ntrb_get_WAV_audiodata(outstream, errstream);
+	test_ntrb_WAVheader_to_ntrb_AudioHeader(outstream, errstream);
+	
 	test_ntrb_WAVheader_audio_msec(outstream, errstream);
 }
