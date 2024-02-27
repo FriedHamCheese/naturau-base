@@ -23,6 +23,8 @@ static void test_new_ntrb_AudioDatapoints(FILE* const, FILE* const){
 	
 	free(aud.bytes);
 	free(all_zero_array);
+	
+	assert(new_ntrb_AudioDatapoints(0).bytes == NULL);
 }
 
 static void test_copy_ntrb_AudioDatapoints(FILE* const, FILE* const){

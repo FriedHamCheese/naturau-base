@@ -2,6 +2,7 @@
 #include "utils.h"
 
 #include <stdio.h>
+#include <float.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -47,6 +48,13 @@ static void test_ntrb_clamp_u64(FILE*, FILE*){
 	assert(ntrb_clamp_u64(val_3, min_3, max_3) == min_3);	
 }
 
+static void test_ntrb_clamp_float(FILE*, FILE*){
+	const float allowable_error = FLT_MIN;
+	assert(ntrb_float_equal(ntrb_clamp_float(28.9, 28.8, 30), 28.9, allowable_error));
+	assert(ntrb_float_equal(ntrb_clamp_float(30.15, 30.16, 31), 30.16, allowable_error));
+	assert(ntrb_float_equal(ntrb_clamp_float(495.98, 495, 495.97), 495.97, allowable_error));
+}
+
 static void test_ntrb_float_equal(FILE*, FILE*){
 	const float allowable_error = 0.000001;
 	assert(ntrb_float_equal(2.0, 2.0, allowable_error) == true);
@@ -58,5 +66,6 @@ static void test_ntrb_float_equal(FILE*, FILE*){
 void test_suite_ntrb_utils(FILE* const outstream, FILE* const errstream){
 	test_ntrb_clamp_i64(outstream, errstream);
 	test_ntrb_clamp_u64(outstream, errstream);
+	test_ntrb_clamp_float(outstream, errstream);
 	test_ntrb_float_equal(outstream, errstream);
 }
