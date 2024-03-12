@@ -6,10 +6,10 @@ OBJDIR := ./bin
 SRCFILES := $(wildcard $(SRCDIR)/*.c)
 OBJFILES := $(SRCFILES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
-CC := gcc
-CFLAGS := -Wall -Wextra -g3 -I./include -I./include/ntrb
+CC := cc
+CFLAGS := -Wall -Wextra -g3 -I./include -I./include/ntrb -I../flac-1.4.3/include -DFLAC__NO_DLL
 LDFLAGS :=
-LDLIBS := -lportaudio
+LDLIBS :=  -lportaudio -L../flac-1.4.3/bin/src/libFLAC -lFLAC
 
 .PHONY: all
 all: build build_test
@@ -63,7 +63,7 @@ build_test: $(TESTEXEC)
 	$(TESTEXEC)
 
 $(TESTEXEC): $(TEST_OBJFILES) $(OBJFILES)
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 	
 $(TEST_OBJDIR)/%.o: $(TEST_DIR)/%.c Makefile | $(TEST_OBJDIR) 
 	$(CC) $(CFLAGS) -c $< -o $@
