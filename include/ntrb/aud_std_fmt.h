@@ -3,6 +3,7 @@
 
 #include "AudioDatapoints.h"
 #include "AudioHeader.h"
+#include "decode_flac.h"
 
 #include "portaudio.h"
 
@@ -37,10 +38,16 @@ enum ntrb_StdAudFmtConversionResult ntrb_to_standard_format(ntrb_AudioDatapoints
 enum ntrb_LoadStdFmtAudioResult{
 	ntrb_LoadStdFmtAudioResult_OK,
 	ntrb_LoadStdFmtAudioResult_AllocError,
+	ntrb_LoadStdFmtAudioResult_FiletypeError,
 	ntrb_LoadStdFmtAudioResult_ntrb_ReadFileResult = 15,
 	ntrb_LoadStdFmtAudioResult_ntrb_GetWAVheaderStatus = ntrb_LoadStdFmtAudioResult_ntrb_ReadFileResult + 15,
-	ntrb_LoadStdFmtAudioResult_ntrb_StdAudFmtConversionResult = ntrb_LoadStdFmtAudioResult_ntrb_GetWAVheaderStatus + 15,	
+	ntrb_LoadStdFmtAudioResult_ntrb_FLAC_decode_status = ntrb_LoadStdFmtAudioResult_ntrb_GetWAVheaderStatus + 15,
+	
+	ntrb_LoadStdFmtAudioResult_ntrb_StdAudFmtConversionResult = ntrb_LoadStdFmtAudioResult_ntrb_FLAC_decode_status + ntrb_FLAC_decode_FLAC__StreamDecoderErrorStatus + 15,
 };
+
+enum ntrb_LoadStdFmtAudioResult ntrb_load_wav(ntrb_AudioHeader* const header, ntrb_AudioDatapoints* const datapoints, const char* const filename);
+enum ntrb_LoadStdFmtAudioResult ntrb_load_flac(ntrb_AudioHeader* const header, ntrb_AudioDatapoints* const datapoints, const char* const filename);
 
 enum ntrb_LoadStdFmtAudioResult ntrb_load_std_fmt_audio(ntrb_AudioDatapoints* const ret, const char* const filename);
 

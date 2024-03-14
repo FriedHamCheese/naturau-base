@@ -74,8 +74,24 @@ static void test_ntrb_trim_duplicate_separators(FILE*, FILE*){
 	assert(strcmp(returned_str2, no_duplicate_str) == 0);
 }
 
+static void test_ntrb_get_filetype(FILE*, FILE*){
+	char* const filetype_1 = ntrb_get_filetype("I.love.cookies!");
+	assert(filetype_1 != NULL);
+	assert(strcmp(filetype_1, "cookies!") == 0);
+	free(filetype_1);
+	
+	char* const filetype_2 = ntrb_get_filetype("Nofiletype.");
+	assert(filetype_2 == NULL);
+	
+	char* const filetype_3 = ntrb_get_filetype(".makefile");
+	assert(filetype_3 != NULL);	
+	assert(strcmp(filetype_3, "makefile") == 0);
+	free(filetype_3);	
+}
+
 void test_suite_ntrb_str_utils(FILE* const outstream, FILE* const errstream){
 	test_ntrb_getc(outstream, errstream);
 	test_ntrb_getsn(outstream, errstream);
 	test_ntrb_trim_duplicate_separators(outstream, errstream);
+	test_ntrb_get_filetype(outstream, errstream);
 }
