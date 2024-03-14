@@ -14,5 +14,6 @@ enum ntrb_GetCharStatus ntrb_getc(FILE* const instream, char* const ret);
 enum ntrb_GetCharStatus ntrb_getsn(const size_t max_strlen, FILE* const instream, char** ret);
 
 char* ntrb_trim_duplicate_separators(const char* const untrimmed_str, const size_t str_len, const char separator);
+char* ntrb_get_filetype(const char* const filename);
 
 #endif

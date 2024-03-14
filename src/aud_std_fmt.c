@@ -6,13 +6,16 @@
 
 #include "wav_wrapper.h"
 #include "file_wrapper.h"
+#include "decode_flac.h"
 
 #include "utils.h"
+#include "str_utils.h"
 
 #include "portaudio.h"
 
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -221,39 +224,72 @@ enum ntrb_StdAudFmtConversionResult ntrb_to_standard_format(ntrb_AudioDatapoints
 	return ntrb_StdAudFmtConversion_OK;
 }
 
-
-enum ntrb_LoadStdFmtAudioResult ntrb_load_std_fmt_audio(ntrb_AudioDatapoints* const ret, const char* const filename){
+enum ntrb_LoadStdFmtAudioResult ntrb_load_wav(ntrb_AudioHeader* const header, ntrb_AudioDatapoints* const datapoints, const char* const filename){
 	ntrb_SpanU8 audiofile_data;
-	//audiofile_data.ptr Alloc
+	
 	const enum ntrb_ReadFileResult file_retreive_result = ntrb_read_entire_file_rb(&audiofile_data, filename);
-	//for anything error, we don't want to keep the read data. We are okay with EOF due to how the read function uses calloc,
-	//so anything after the EOF would be 0, which we chose to accept.
-	if(file_retreive_result != ntrb_ReadFileResult_OK && file_retreive_result != ntrb_ReadFileResult_ReachedEOF){			
+	if(file_retreive_result != ntrb_ReadFileResult_OK){	
 		return ntrb_LoadStdFmtAudioResult_ntrb_ReadFileResult + file_retreive_result;
 	}
 	
-	ntrb_AudioHeader audioheader;
 	size_t audiodata_offset = 0;
-	const enum ntrb_GetWAVheaderStatus audioheader_result = WAVfile_to_ntrb_AudioHeader(&audioheader, &audiodata_offset, audiofile_data);
+	const enum ntrb_GetWAVheaderStatus audioheader_result = WAVfile_to_ntrb_AudioHeader(header, &audiodata_offset, audiofile_data);
 
-	if(audioheader_result != ntrb_GetWAVheader_ok){	
-		//audiofile_data.ptr Free
+	if(audioheader_result != ntrb_GetWAVheader_ok){
 		free(audiofile_data.ptr);
-		print_ntrb_AudioHeader(audioheader, stdout);
+		print_ntrb_AudioHeader(*header, stdout);
 		return ntrb_LoadStdFmtAudioResult_ntrb_GetWAVheaderStatus + audioheader_result;
 	}
 
-	//audiodata.bytes Alloc
-	const ntrb_AudioDatapoints audiodata = ntrb_get_WAV_audiodata_ntrb_AudioHeader(audioheader, audiofile_data, audiodata_offset);
-	//audiofile_data.ptr Free
+	*datapoints = ntrb_get_WAV_audiodata_ntrb_AudioHeader(*header, audiofile_data, audiodata_offset);
 	free(audiofile_data.ptr);
 	
-	if(audiodata.bytes == NULL) return ntrb_LoadStdFmtAudioResult_AllocError;
+	if(datapoints->bytes == NULL) return ntrb_LoadStdFmtAudioResult_AllocError;	
+	return ntrb_LoadStdFmtAudioResult_OK;
+}
 
-	//ret.bytes Alloc
-	const enum ntrb_StdAudFmtConversionResult conversion_result = ntrb_to_standard_format(ret, audiodata, &audioheader);
-	//audiodata.bytes Free
-	free(audiodata.bytes);
+enum ntrb_LoadStdFmtAudioResult ntrb_load_flac(ntrb_AudioHeader* const header, ntrb_AudioDatapoints* const datapoints, const char* const filename){
+	ntrb_AudioDataFLAC flac_data;	
+	const uint8_t pre_alloc_seconds = 5;
+	flac_data.datapoints = new_ntrb_AudioDatapoints(sizeof(int16_t) * ntrb_std_samplerate * ntrb_std_audchannels * pre_alloc_seconds);
+	if(flac_data.datapoints.bytes == NULL) return ntrb_LoadStdFmtAudioResult_AllocError;
+	
+	const enum ntrb_FLAC_decode_status flac_decode_status = ntrb_decode_FLAC_file(filename, &flac_data);
+	if(flac_decode_status != ntrb_FLAC_decode_OK){
+		free(flac_data.datapoints.bytes);
+		return ntrb_LoadStdFmtAudioResult_ntrb_FLAC_decode_status + flac_decode_status;
+	}
+	
+	*header = flac_data.header;
+	*datapoints = flac_data.datapoints;
+	return ntrb_LoadStdFmtAudioResult_OK;	
+}
+
+
+enum ntrb_LoadStdFmtAudioResult ntrb_load_std_fmt_audio(ntrb_AudioDatapoints* const ret, const char* const filename){
+	char* const filetype = ntrb_get_filetype(filename);
+	if(!filetype) return ntrb_LoadStdFmtAudioResult_FiletypeError;
+	
+	ntrb_AudioHeader aud_header;
+	ntrb_AudioDatapoints aud_datapoints;
+	
+	if(strcmp(filetype, "wav") == 0){
+		free(filetype);
+		const enum ntrb_LoadStdFmtAudioResult wav_load_result = ntrb_load_wav(&aud_header, &aud_datapoints, filename);
+		if(wav_load_result != ntrb_LoadStdFmtAudioResult_OK) return wav_load_result;
+	}
+	else if(strcmp(filetype, "flac") == 0){
+		free(filetype);		
+		const enum ntrb_LoadStdFmtAudioResult flac_load_result = ntrb_load_flac(&aud_header, &aud_datapoints, filename);
+		if(flac_load_result != ntrb_LoadStdFmtAudioResult_OK) return flac_load_result;		
+	}
+	else{
+		free(filetype);	
+		return ntrb_LoadStdFmtAudioResult_FiletypeError;
+	}
+	
+	const enum ntrb_StdAudFmtConversionResult conversion_result = ntrb_to_standard_format(ret, aud_datapoints, &aud_header);
+	free(aud_datapoints.bytes);
 
 	if(conversion_result != ntrb_StdAudFmtConversion_OK)
 		return ntrb_LoadStdFmtAudioResult_ntrb_StdAudFmtConversionResult + conversion_result;

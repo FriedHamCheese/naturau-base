@@ -72,3 +72,17 @@ char* ntrb_trim_duplicate_separators(const char* const untrimmed_str, const size
 	
 	return trimmed_str;
 }
+
+char* ntrb_get_filetype(const char* const filename){	
+	const char* filetype_separator = strrchr(filename, '.');
+	if(!filetype_separator) return NULL;
+	
+	//if the period is the last character, this would point to a null terminator, the strlen of filetype_begin would be 0.
+	const char* filetype_begin = filetype_separator + 1;
+	const size_t filetype_len = strlen(filetype_begin);
+	if(!filetype_len) return NULL;
+	
+	char* filetype = calloc(filetype_len + 1, sizeof(char));
+	memcpy(filetype, filetype_begin, filetype_len);
+	return filetype;
+}

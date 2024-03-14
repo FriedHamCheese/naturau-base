@@ -27,6 +27,17 @@ static void test_new_ntrb_AudioDatapoints(FILE* const, FILE* const){
 	assert(new_ntrb_AudioDatapoints(0).bytes == NULL);
 }
 
+static void test_extend_ntrb_AudioDatapoints_capacity(FILE* const, FILE* const){
+	ntrb_AudioDatapoints aud = new_ntrb_AudioDatapoints(15);
+	assert(aud.bytes != NULL);
+	
+	assert(extend_ntrb_AudioDatapoints_capacity(&aud, 300));
+	assert(aud.bytes != NULL);
+	assert(aud.byte_count == 300 + 15);
+	
+	free(aud.bytes);
+}
+
 static void test_copy_ntrb_AudioDatapoints(FILE* const, FILE* const){
 	const size_t alloc_size_bytes = 32;
 	ntrb_AudioDatapoints aud_1 = new_ntrb_AudioDatapoints(alloc_size_bytes);
@@ -50,5 +61,6 @@ static void test_copy_ntrb_AudioDatapoints(FILE* const, FILE* const){
 
 void test_suite_ntrb_AudioDatapoints(FILE* const outstream, FILE* const errstream){
 	test_new_ntrb_AudioDatapoints(outstream, errstream);
+	test_extend_ntrb_AudioDatapoints_capacity(outstream, errstream);
 	test_copy_ntrb_AudioDatapoints(outstream, errstream);
 }
