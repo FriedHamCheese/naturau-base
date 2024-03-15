@@ -43,7 +43,7 @@ enum ntrb_LoadStdFmtAudioResult{
 	ntrb_LoadStdFmtAudioResult_ntrb_GetWAVheaderStatus = ntrb_LoadStdFmtAudioResult_ntrb_ReadFileResult + 15,
 	ntrb_LoadStdFmtAudioResult_ntrb_FLAC_decode_status = ntrb_LoadStdFmtAudioResult_ntrb_GetWAVheaderStatus + 15,
 	
-	ntrb_LoadStdFmtAudioResult_ntrb_StdAudFmtConversionResult = ntrb_LoadStdFmtAudioResult_ntrb_FLAC_decode_status + ntrb_FLAC_decode_FLAC__StreamDecoderErrorStatus + 15,
+	ntrb_LoadStdFmtAudioResult_ntrb_StdAudFmtConversionResult = ntrb_LoadStdFmtAudioResult_ntrb_FLAC_decode_status + ntrb_FLAC_decode_FLAC__StreamDecoderErrorStatus + 10,
 };
 
 enum ntrb_LoadStdFmtAudioResult ntrb_load_wav(ntrb_AudioHeader* const header, ntrb_AudioDatapoints* const datapoints, const char* const filename);
