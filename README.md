@@ -1,0 +1,1 @@
+naturau-base, or ntrb; is the base (or core) code of naturau, a full-scale dynamic audio mixer. ntrb mostly provides abstractions for reading audio files (currently wav and flac), but also includes a simplified version of the audio engine loop in naturau, as well as a few utility files for easier development of other projects using ntrb.
