@@ -6,7 +6,6 @@
 
 enum ntrb_FLAC_decode_status{
 	ntrb_FLAC_decode_OK,
-	ntrb_FLAC_decode_alloc_err,
 	ntrb_FLAC_decode_unsupported_bps,
 	ntrb_FLAC_decode_unsupported_channelcount,
 	ntrb_FLAC_decode_MD5_not_equal,

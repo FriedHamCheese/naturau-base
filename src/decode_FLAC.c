@@ -45,7 +45,7 @@ static FLAC__StreamDecoderWriteStatus decode_buffer(const FLAC__StreamDecoder*, 
 	
 	if(aud_data->datapoints.byte_pos + next_total_bytes >= aud_data->datapoints.byte_count){
 		if(!extend_ntrb_AudioDatapoints_capacity(&(aud_data->datapoints), aud_data->datapoints.byte_count)){
-			aud_data->_decoder_error = ntrb_FLAC_decode_alloc_err;
+			aud_data->_decoder_error =ntrb_FLAC_decode_FLAC__StreamDecoderState +  FLAC__STREAM_DECODER_MEMORY_ALLOCATION_ERROR;
 			return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
 		}
 	}
@@ -69,7 +69,8 @@ enum ntrb_FLAC_decode_status ntrb_decode_FLAC_file(const char* const filename, n
 	aud_data->_decoder_error = ntrb_FLAC_decode_OK;
 	//this pairs with FLAC__stream_decoder_delete();
 	FLAC__StreamDecoder* decoder = FLAC__stream_decoder_new();
-	if(decoder == NULL) return ntrb_FLAC_decode_alloc_err;
+	if(decoder == NULL) 
+		return ntrb_FLAC_decode_FLAC__StreamDecoderInitStatus + FLAC__STREAM_DECODER_INIT_STATUS_MEMORY_ALLOCATION_ERROR;
 	
 	FLAC__stream_decoder_set_md5_checking(decoder, true);
 	
@@ -77,14 +78,15 @@ enum ntrb_FLAC_decode_status ntrb_decode_FLAC_file(const char* const filename, n
 	FLAC__StreamDecoderInitStatus decoder_init_status = FLAC__stream_decoder_init_file(decoder, filename, decode_buffer, read_metadata, error_handler, aud_data);
 	
 	if(decoder_init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK){
-		FLAC__stream_decoder_delete(decoder);		
+		FLAC__stream_decoder_delete(decoder);
 		return ntrb_FLAC_decode_FLAC__StreamDecoderInitStatus + decoder_init_status;
 	}
 	
 	if(!FLAC__stream_decoder_process_until_end_of_metadata(decoder)){
 		const FLAC__StreamDecoderState decoder_state = FLAC__stream_decoder_get_state(decoder);
 		FLAC__stream_decoder_finish(decoder);
-		FLAC__stream_decoder_delete(decoder);		
+		FLAC__stream_decoder_delete(decoder);
+		
 		return ntrb_FLAC_decode_FLAC__StreamDecoderState + decoder_state;
 	}	
 	
@@ -102,7 +104,7 @@ enum ntrb_FLAC_decode_status ntrb_decode_FLAC_file(const char* const filename, n
 	if(!FLAC__stream_decoder_process_until_end_of_stream(decoder)){
 		const FLAC__StreamDecoderState decoder_state = FLAC__stream_decoder_get_state(decoder);	
 		FLAC__stream_decoder_finish(decoder);
-		FLAC__stream_decoder_delete(decoder);				
+		FLAC__stream_decoder_delete(decoder);			
 		
 		if(decoder_state == FLAC__STREAM_DECODER_ABORTED)
 			return aud_data->_decoder_error;

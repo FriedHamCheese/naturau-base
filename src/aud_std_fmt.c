@@ -262,7 +262,7 @@ enum ntrb_LoadStdFmtAudioResult ntrb_load_flac(ntrb_AudioHeader* const header, n
 	
 	*header = flac_data.header;
 	*datapoints = flac_data.datapoints;
-	return ntrb_LoadStdFmtAudioResult_OK;	
+	return ntrb_LoadStdFmtAudioResult_OK;
 }
 
 
