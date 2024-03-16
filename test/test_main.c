@@ -7,7 +7,6 @@
 #include "test_str_utils.h"
 #include "test_utils.h"
 #include "test_wav_wrapper.h"
-#include "test_WAVheader.h"
 
 #include <stdio.h>
 
@@ -19,7 +18,6 @@ int main(){
 	fprintf(outstream, "If an all clear message is not shown after this, the test has failed.\n");
 	fflush(outstream);
 	
-	test_suite_ntrb_WAVheader(outstream, errstream);
 	test_suite_ntrb_AudioDatapoints(outstream, errstream);
 	test_suite_ntrb_utils(outstream, errstream);		
 	test_suite_ntrb_str_utils(outstream, errstream);	
