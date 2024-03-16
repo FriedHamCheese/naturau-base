@@ -6,13 +6,9 @@
 #include <stdio.h>
 
 typedef struct{
-	//"unsigned long", probably uint32_t.
 	PaSampleFormat AudioFormat;
-	uint32_t AudioDataSize;
 	uint32_t SampleRate;
-	uint32_t ByteRate;
 	uint16_t NumChannels;
-	uint16_t BlockAlign;
 	uint16_t BitsPerSample;
 } ntrb_AudioHeader;
 

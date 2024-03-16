@@ -233,15 +233,16 @@ enum ntrb_LoadStdFmtAudioResult ntrb_load_wav(ntrb_AudioHeader* const header, nt
 	}
 	
 	size_t audiodata_offset = 0;
-	const enum ntrb_GetWAVheaderStatus audioheader_result = WAVfile_to_ntrb_AudioHeader(header, &audiodata_offset, audiofile_data);
+	size_t audiodata_size = 0;
+	const enum ntrb_AudioHeaderFromWAVFileStatus audioheader_result = WAVfile_to_ntrb_AudioHeader(header, &audiodata_offset, &audiodata_size, audiofile_data);
 
-	if(audioheader_result != ntrb_GetWAVheader_ok){
+	if(audioheader_result != ntrb_AudioHeaderFromWAVFile_ok){
 		free(audiofile_data.ptr);
 		print_ntrb_AudioHeader(*header, stdout);
-		return ntrb_LoadStdFmtAudioResult_ntrb_GetWAVheaderStatus + audioheader_result;
+		return ntrb_LoadStdFmtAudioResult_ntrb_AudioHeaderFromWAVFileStatus + audioheader_result;
 	}
 
-	*datapoints = ntrb_get_WAV_audiodata_ntrb_AudioHeader(*header, audiofile_data, audiodata_offset);
+	*datapoints = ntrb_get_WAV_audiodata(audiofile_data, audiodata_size, audiodata_offset);
 	free(audiofile_data.ptr);
 	
 	if(datapoints->bytes == NULL) return ntrb_LoadStdFmtAudioResult_AllocError;	
