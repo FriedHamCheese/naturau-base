@@ -11,7 +11,9 @@ enum ntrb_FLAC_decode_status{
 	ntrb_FLAC_decode_MD5_not_equal,
 	
 	ntrb_FLAC_decode_FLAC__StreamDecoderInitStatus = 10,
+	//20
 	ntrb_FLAC_decode_FLAC__StreamDecoderState = ntrb_FLAC_decode_FLAC__StreamDecoderInitStatus + 10,
+	//35
 	ntrb_FLAC_decode_FLAC__StreamDecoderErrorStatus = ntrb_FLAC_decode_FLAC__StreamDecoderState + 15,
 };
 

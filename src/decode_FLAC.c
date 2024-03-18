@@ -44,7 +44,7 @@ static FLAC__StreamDecoderWriteStatus decode_buffer(const FLAC__StreamDecoder*, 
 	const uint32_t next_total_bytes = aud_data->header.NumChannels * samples_per_channel * bytes_per_sample;
 	
 	if(aud_data->datapoints.byte_pos + next_total_bytes >= aud_data->datapoints.byte_count){
-		if(!extend_ntrb_AudioDatapoints_capacity(&(aud_data->datapoints), aud_data->datapoints.byte_count)){
+		if(!extend_ntrb_AudioDatapoints_capacity(&(aud_data->datapoints), next_total_bytes)){
 			aud_data->_decoder_error =ntrb_FLAC_decode_FLAC__StreamDecoderState +  FLAC__STREAM_DECODER_MEMORY_ALLOCATION_ERROR;
 			return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
 		}
@@ -100,6 +100,7 @@ enum ntrb_FLAC_decode_status ntrb_decode_FLAC_file(const char* const filename, n
 		FLAC__stream_decoder_delete(decoder);	
 		return ntrb_FLAC_decode_unsupported_channelcount;
 	}
+	
 	
 	if(!FLAC__stream_decoder_process_until_end_of_stream(decoder)){
 		const FLAC__StreamDecoderState decoder_state = FLAC__stream_decoder_get_state(decoder);	

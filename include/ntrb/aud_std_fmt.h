@@ -40,9 +40,11 @@ enum ntrb_LoadStdFmtAudioResult{
 	ntrb_LoadStdFmtAudioResult_AllocError,
 	ntrb_LoadStdFmtAudioResult_FiletypeError,
 	ntrb_LoadStdFmtAudioResult_ntrb_ReadFileResult = 15,
+	//30
 	ntrb_LoadStdFmtAudioResult_ntrb_AudioHeaderFromWAVFileStatus = ntrb_LoadStdFmtAudioResult_ntrb_ReadFileResult + 15,
+	//45
 	ntrb_LoadStdFmtAudioResult_ntrb_FLAC_decode_status = ntrb_LoadStdFmtAudioResult_ntrb_AudioHeaderFromWAVFileStatus + 15,
-	
+	//55
 	ntrb_LoadStdFmtAudioResult_ntrb_StdAudFmtConversionResult = ntrb_LoadStdFmtAudioResult_ntrb_FLAC_decode_status + ntrb_FLAC_decode_FLAC__StreamDecoderErrorStatus + 10,
 };
 
