@@ -1,7 +1,7 @@
 #include "decode_flac.h"
 
 #include "AudioHeader.h"
-#include "AudioDatapoints.h"
+#include "bytevec.h"
 
 #include "aud_std_fmt.h"
 
@@ -43,8 +43,8 @@ static FLAC__StreamDecoderWriteStatus decode_buffer(const FLAC__StreamDecoder*, 
 	const uint32_t samples_per_channel = frame->header.blocksize;
 	const uint32_t next_total_bytes = aud_data->header.NumChannels * samples_per_channel * bytes_per_sample;
 	
-	if(aud_data->datapoints.byte_pos + next_total_bytes >= aud_data->datapoints.byte_count){
-		if(!extend_ntrb_AudioDatapoints_capacity(&(aud_data->datapoints), next_total_bytes)){
+	if(aud_data->datapoints.elements + next_total_bytes >= aud_data->datapoints.capacity){
+		if(!ntrb_bytevec_reserve(&(aud_data->datapoints), aud_data->datapoints.capacity + next_total_bytes)){
 			aud_data->_decoder_error =ntrb_FLAC_decode_FLAC__StreamDecoderState +  FLAC__STREAM_DECODER_MEMORY_ALLOCATION_ERROR;
 			return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
 		}
@@ -53,8 +53,8 @@ static FLAC__StreamDecoderWriteStatus decode_buffer(const FLAC__StreamDecoder*, 
 	//this is not so cache friendly, but should be fine
 	for(uint32_t i = 0; i < samples_per_channel; i++){
 		for(uint8_t channel = 0; channel < aud_data->header.NumChannels; channel++){
-			*(int16_t*)(aud_data->datapoints.bytes + aud_data->datapoints.byte_pos) = buffer[channel][i];
-			aud_data->datapoints.byte_pos += bytes_per_sample;
+			*(int16_t*)(aud_data->datapoints.base_ptr + aud_data->datapoints.elements) = buffer[channel][i];
+			aud_data->datapoints.elements += bytes_per_sample;
 		}
 	}
 	

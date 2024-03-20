@@ -1,6 +1,7 @@
 #include "test_aud_std_fmt.h"
 #include "test_audeng_wrapper.h"
 #include "test_AudioDatapoints.h"
+#include "test_bytevec.h"
 #include "test_decode_flac.h"
 #include "test_file_wrapper.h"
 #include "test_RuntimeCoreData.h"
@@ -21,7 +22,8 @@ int main(){
 	
 	test_suite_ntrb_aud_std_fmt(outstream, errstream);
 	test_suite_ntrb_audeng_wrapper(outstream, errstream);
-	test_suite_ntrb_AudioDatapoints(outstream, errstream);	
+	test_suite_ntrb_AudioDatapoints(outstream, errstream);
+	test_suite_ntrb_bytevec();
 
 	test_suite_ntrb_decode_flac(outstream, errstream);
 	test_suite_ntrb_file_wrapper(outstream, errstream);

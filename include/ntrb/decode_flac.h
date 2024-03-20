@@ -2,7 +2,7 @@
 #define ntrb_decode_flac_h
 
 #include "AudioHeader.h"
-#include "AudioDatapoints.h"
+#include "bytevec.h"
 
 enum ntrb_FLAC_decode_status{
 	ntrb_FLAC_decode_OK,
@@ -19,7 +19,7 @@ enum ntrb_FLAC_decode_status{
 
 typedef struct{
 	ntrb_AudioHeader header;
-	ntrb_AudioDatapoints datapoints;
+	ntrb_bytevec datapoints;
 	//Needed a way to report an error from FLAC__StreamDecoderErrorCallback(), this is used internally.
 	enum ntrb_FLAC_decode_status _decoder_error;
 } ntrb_AudioDataFLAC;

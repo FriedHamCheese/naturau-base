@@ -252,17 +252,25 @@ enum ntrb_LoadStdFmtAudioResult ntrb_load_wav(ntrb_AudioHeader* const header, nt
 enum ntrb_LoadStdFmtAudioResult ntrb_load_flac(ntrb_AudioHeader* const header, ntrb_AudioDatapoints* const datapoints, const char* const filename){
 	ntrb_AudioDataFLAC flac_data;	
 	const uint8_t pre_alloc_seconds = 5;
-	flac_data.datapoints = new_ntrb_AudioDatapoints(sizeof(int16_t) * ntrb_std_samplerate * ntrb_std_audchannels * pre_alloc_seconds);
-	if(flac_data.datapoints.bytes == NULL) return ntrb_LoadStdFmtAudioResult_AllocError;
+	ntrb_bytevec_new(&flac_data.datapoints, sizeof(int16_t) * ntrb_std_samplerate * ntrb_std_audchannels * pre_alloc_seconds);
+	if(flac_data.datapoints.base_ptr == NULL) return ntrb_LoadStdFmtAudioResult_AllocError;
 	
 	const enum ntrb_FLAC_decode_status flac_decode_status = ntrb_decode_FLAC_file(filename, &flac_data);
 	if(flac_decode_status != ntrb_FLAC_decode_OK){
-		free(flac_data.datapoints.bytes);
+		ntrb_bytevec_free(&(flac_data.datapoints));
 		return ntrb_LoadStdFmtAudioResult_ntrb_FLAC_decode_status + flac_decode_status;
 	}
 	
+	*datapoints = new_ntrb_AudioDatapoints(flac_data.datapoints.elements);
+	if(datapoints->bytes == NULL){
+		ntrb_bytevec_free(&(flac_data.datapoints));		
+		return ntrb_LoadStdFmtAudioResult_AllocError;
+	}
+	
+	memcpy(datapoints->bytes, flac_data.datapoints.base_ptr, flac_data.datapoints.elements);
+	ntrb_bytevec_free(&(flac_data.datapoints));	
+	
 	*header = flac_data.header;
-	*datapoints = flac_data.datapoints;
 	return ntrb_LoadStdFmtAudioResult_OK;
 }
 
