@@ -80,7 +80,6 @@ void* user_input_loop(void* const runtime_core_data_void){
 		}	
 		else if(strcmp(command, "q") == strcmp_equal){
 			rcd->requested_exit = true;
-			ntrb_SlicedStrings_free(&sliced_strs);
 			break;
 		}
 		else{
