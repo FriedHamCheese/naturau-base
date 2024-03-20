@@ -70,3 +70,8 @@ $(TEST_OBJDIR)/%.o: $(TEST_DIR)/%.c Makefile | $(TEST_OBJDIR)
 
 $(TEST_OBJDIR):
 	mkdir $@
+	
+.PHONY: clean_test
+clean_test: 
+	rm -rf $(TESTEXEC)
+	rm -rf $(TEST_OBJDIR)
