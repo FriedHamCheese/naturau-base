@@ -12,6 +12,6 @@ typedef struct{
 	uint16_t BitsPerSample;
 } ntrb_AudioHeader;
 
-void print_ntrb_AudioHeader(const ntrb_AudioHeader header, FILE* const printstream);
+void ntrb_AudioHeader_print(const ntrb_AudioHeader header, FILE* const printstream);
 
 #endif

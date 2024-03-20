@@ -22,7 +22,7 @@ enum ntrb_AudioHeaderFromWAVFileStatus{
 };
 
 
-enum ntrb_AudioHeaderFromWAVFileStatus WAVfile_to_ntrb_AudioHeader(ntrb_AudioHeader* const return_arg, size_t* const audiodata_offset, size_t* const audiodata_bytes, const ntrb_SpanU8 file_buffer);
+enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile(ntrb_AudioHeader* const return_arg, size_t* const audiodata_offset, size_t* const audiodata_bytes, const ntrb_SpanU8 file_buffer);
 
 ntrb_AudioDatapoints ntrb_get_WAV_audiodata(const ntrb_SpanU8 wavfile, const size_t audiodata_size, const size_t audiodata_offset);
 #endif

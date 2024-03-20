@@ -25,7 +25,7 @@ const ntrb_RuntimeCoreData failed_ntrb_RuntimeCoreData = {
 static const unsigned long wait_busy_stream_usecs = 10 * 1000;
 
 
-ntrb_RuntimeCoreData new_ntrb_RuntimeCoreData(const uint16_t track_count){
+ntrb_RuntimeCoreData ntrb_RuntimeCoreData_new(const uint16_t track_count){
 	ntrb_RuntimeCoreData rcd;
 	
 	if(track_count == 0) return failed_ntrb_RuntimeCoreData;
@@ -41,11 +41,11 @@ ntrb_RuntimeCoreData new_ntrb_RuntimeCoreData(const uint16_t track_count){
 	return rcd;
 }
 
-void free_ntrb_RuntimeCoreData(ntrb_RuntimeCoreData* const rcd){
+void ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
 	if(rcd->audio_tracks != NULL){
 		for(size_t i = 0; i < rcd->audio_track_count; i++){			
 			if(rcd->audio_tracks[i] != NULL)
-				free_ntrb_RuntimeCoreData_track(rcd, i);
+				ntrb_RuntimeCoreData_free_track(rcd, i);
 		}
 		free(rcd->audio_tracks);
 		rcd->audio_tracks = NULL;
@@ -58,7 +58,7 @@ void free_ntrb_RuntimeCoreData(ntrb_RuntimeCoreData* const rcd){
 	rcd->writing_tracks = false;
 }
 
-void free_ntrb_RuntimeCoreData_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index){
+void ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index){
 	free(rcd->audio_tracks[track_index]->bytes);
 	free(rcd->audio_tracks[track_index]);
 	rcd->audio_tracks[track_index] = NULL;

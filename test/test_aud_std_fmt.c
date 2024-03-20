@@ -39,7 +39,7 @@ static void test_ntrb_split_as_mono(FILE*, FILE*){
 	const size_t mono_float_count = 3;
 	const size_t channels = 3;
 	const size_t float_count = mono_float_count * channels;
-	ntrb_AudioDatapoints aud = new_ntrb_AudioDatapoints(sizeof(float) * float_count);
+	ntrb_AudioDatapoints aud = ntrb_AudioDatapoints_new(sizeof(float) * float_count);
 	assert(aud.bytes != NULL);
 	
 	//0.0f through 8.0f
@@ -63,7 +63,7 @@ static void test_ntrb_mono_to_xchannels(FILE*, FILE*){
 	const size_t mono_float_count = 5;
 	const size_t dest_channels = 4;
 	
-	ntrb_AudioDatapoints mono_aud = new_ntrb_AudioDatapoints(sizeof(float) * mono_float_count);
+	ntrb_AudioDatapoints mono_aud = ntrb_AudioDatapoints_new(sizeof(float) * mono_float_count);
 	assert(mono_aud.bytes != NULL);
 	
 	//0.0f to 4.0f
@@ -91,14 +91,14 @@ static void test_ntrb_mono_to_xchannels(FILE*, FILE*){
 static void test_ntrb_merge_to_stereo(FILE*, FILE*){
 	const size_t mono_float_count = 4;
 	
-	ntrb_AudioDatapoints l_ch = new_ntrb_AudioDatapoints(sizeof(float) * mono_float_count);
+	ntrb_AudioDatapoints l_ch = ntrb_AudioDatapoints_new(sizeof(float) * mono_float_count);
 	assert(l_ch.bytes != NULL);
 	//1.0, 3.0, 5.0, 7.0
 	for(size_t i = 0; i < mono_float_count; i++){
 		((float*)(l_ch.bytes))[i] = (float)((2*i)+1);
 	}
 	
-	ntrb_AudioDatapoints r_ch = new_ntrb_AudioDatapoints(sizeof(float) * mono_float_count);	
+	ntrb_AudioDatapoints r_ch = ntrb_AudioDatapoints_new(sizeof(float) * mono_float_count);	
 	assert(r_ch.bytes != NULL);
 	//2.0, 4.0, 6.0, 8.0
 	for(size_t i = 0; i < mono_float_count; i++){

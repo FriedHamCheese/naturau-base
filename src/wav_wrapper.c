@@ -20,7 +20,7 @@ PaSampleFormat ntrb_WAV_PaSampleFormat(const uint16_t WAV_audioFormat, const uin
 	else return paCustomFormat;
 }
 
-enum ntrb_AudioHeaderFromWAVFileStatus WAVfile_to_ntrb_AudioHeader(ntrb_AudioHeader* const return_arg, size_t* const audiodata_offset, size_t* const audiodata_bytes, const ntrb_SpanU8 file_buffer){
+enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile(ntrb_AudioHeader* const return_arg, size_t* const audiodata_offset, size_t* const audiodata_bytes, const ntrb_SpanU8 file_buffer){
 	const size_t min_wav_header_size = 44;
 	if(file_buffer.elem < min_wav_header_size)
 		return ntrb_AudioHeaderFromWAVFile_buffer_too_small;
@@ -88,7 +88,7 @@ enum ntrb_AudioHeaderFromWAVFileStatus WAVfile_to_ntrb_AudioHeader(ntrb_AudioHea
 }
 
 ntrb_AudioDatapoints ntrb_get_WAV_audiodata(const ntrb_SpanU8 wavfile, const size_t audiodata_size, const size_t audiodata_offset){
-	ntrb_AudioDatapoints audiodata = new_ntrb_AudioDatapoints(audiodata_size * sizeof(uint8_t));
+	ntrb_AudioDatapoints audiodata = ntrb_AudioDatapoints_new(audiodata_size * sizeof(uint8_t));
 	if(audiodata.bytes == NULL) return audiodata;
 	
 	memcpy(audiodata.bytes, wavfile.ptr + audiodata_offset, audiodata_size);

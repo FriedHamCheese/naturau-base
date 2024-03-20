@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-void print_ntrb_AudioHeader(const ntrb_AudioHeader header, FILE* const printstream){
-	fprintf(printstream, "ntrb_AudioHeader contents from print_ntrb_AudioHeader():\n");
+void ntrb_AudioHeader_print(const ntrb_AudioHeader header, FILE* const printstream){
+	fprintf(printstream, "ntrb_AudioHeader contents from ntrb_AudioHeader_print():\n");
 		
 	fprintf(printstream, "AudioFormat: %lu\n", header.AudioFormat);
 	fprintf(printstream, "SampleRate: %u\n", header.SampleRate);

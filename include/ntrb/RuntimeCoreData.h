@@ -28,10 +28,10 @@ enum ntrb_RCD_QueueAudioReturn{
 //from RuntimeCoreData.c
 extern const ntrb_RuntimeCoreData failed_ntrb_RuntimeCoreData;
 
-ntrb_RuntimeCoreData new_ntrb_RuntimeCoreData(const uint16_t track_count);
-void free_ntrb_RuntimeCoreData(ntrb_RuntimeCoreData* const rcd);
+ntrb_RuntimeCoreData ntrb_RuntimeCoreData_new(const uint16_t track_count);
+void ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd);
 
-void free_ntrb_RuntimeCoreData_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index);
+void ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index);
 
 enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCoreData* const runtime_data, const char* filename);
 

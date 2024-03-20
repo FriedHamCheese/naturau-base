@@ -94,7 +94,7 @@ void* user_input_loop(void* const runtime_core_data_void){
 }
 
 int main(){
-	ntrb_RuntimeCoreData rcd = new_ntrb_RuntimeCoreData(256);
+	ntrb_RuntimeCoreData rcd = ntrb_RuntimeCoreData_new(256);
 	if(rcd.audio_tracks == NULL) return 0;
 	
 	pthread_t user_input_thread;
@@ -106,7 +106,7 @@ int main(){
 	pthread_join(user_input_thread, NULL);	
 	pthread_join(audio_engine_thread, NULL);
 	
-	free_ntrb_RuntimeCoreData(&rcd);
+	ntrb_RuntimeCoreData_free(&rcd);
 	
 	return 0;
 }
