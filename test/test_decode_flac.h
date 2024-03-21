@@ -7,10 +7,8 @@
 
 #include "FLAC/stream_decoder.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-
 
 static void test_ntrb_decode_FLAC_file(){
 	ntrb_AudioDataFLAC aud;
@@ -32,7 +30,7 @@ static void test_ntrb_decode_FLAC_file(){
 	assert(ntrb_decode_FLAC_file("./test/decode_flac/non-existent.flac", &aud) == ntrb_FLAC_decode_FLAC__StreamDecoderInitStatus + FLAC__STREAM_DECODER_INIT_STATUS_ERROR_OPENING_FILE);
 }
 
-void test_suite_ntrb_decode_flac(FILE*, FILE*){
+void test_suite_ntrb_decode_flac(){
 	test_ntrb_decode_FLAC_file();
 }
 

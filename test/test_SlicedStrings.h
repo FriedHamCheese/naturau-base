@@ -3,12 +3,11 @@
 
 #include "SlicedStrings.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 #include <assert.h>
 
-static void test_ntrb_SlicedStrings_new(FILE*, FILE*){
+static void test_ntrb_SlicedStrings_new(){
 	assert(ntrb_SlicedStrings_new(0).str_ptrs == NULL);
 	
 	const size_t str_count = 16;
@@ -27,7 +26,7 @@ static void test_ntrb_SlicedStrings_new(FILE*, FILE*){
 	free(expected_str_alloc);
 }
 
-static void test_ntrb_SlicedStrings_free(FILE*, FILE*){
+static void test_ntrb_SlicedStrings_free(){
 	ntrb_SlicedStrings_free(NULL);
 	
 	ntrb_SlicedStrings typical_alloc = ntrb_SlicedStrings_new(16);
@@ -42,7 +41,7 @@ static void test_ntrb_SlicedStrings_free(FILE*, FILE*){
 	ntrb_SlicedStrings_free(&null_sliced_str);
 }
 
-static void test_ntrb_SlicedStrings_slice_without_trimming(FILE*, FILE*){
+static void test_ntrb_SlicedStrings_slice_without_trimming(){
 	const char* const input_str = "Freshly,toasted,cheeseburger,buns";
 	const char* const expected_sliced_strs[] = {"Freshly", "toasted", "cheeseburger", "buns"};
 	
@@ -77,7 +76,7 @@ static void test_ntrb_SlicedStrings_slice_without_trimming(FILE*, FILE*){
 	ntrb_SlicedStrings_free(&zero_length);
 }
 
-static void test_ntrb_SlicedStrings_slice_sep(FILE*, FILE*){
+static void test_ntrb_SlicedStrings_slice_sep(){
 	const char* const input_str = ",,Freshly,,toasted,cheeseburger,,,buns,";
 	const char* const expected_sliced_strs[] = {"", "Freshly", "toasted", "cheeseburger", "buns", ""};
 	const size_t expected_slice_count = 6;
@@ -91,7 +90,7 @@ static void test_ntrb_SlicedStrings_slice_sep(FILE*, FILE*){
 	}	
 }
 
-static void test_ntrb_SlicedStrings_concat_strs(FILE*, FILE*){
+static void test_ntrb_SlicedStrings_concat_strs(){
 	const char* const unsliced_str = "Homemade american cheese";
 	ntrb_SlicedStrings sliced_strs = ntrb_SlicedStrings_slice_sep(unsliced_str, strlen(unsliced_str), ' ');
 	assert(sliced_strs.str_ptrs != NULL);
@@ -114,12 +113,12 @@ static void test_ntrb_SlicedStrings_concat_strs(FILE*, FILE*){
 }
 
 
-void test_suite_ntrb_SlicedStrings(FILE* const outstream, FILE* const errstream){
-	test_ntrb_SlicedStrings_new(outstream, errstream);
-	test_ntrb_SlicedStrings_free(outstream, errstream);
-	test_ntrb_SlicedStrings_slice_without_trimming(outstream, errstream);
-	test_ntrb_SlicedStrings_slice_sep(outstream, errstream);
-	test_ntrb_SlicedStrings_concat_strs(outstream, errstream);
+void test_suite_ntrb_SlicedStrings(){
+	test_ntrb_SlicedStrings_new();
+	test_ntrb_SlicedStrings_free();
+	test_ntrb_SlicedStrings_slice_without_trimming();
+	test_ntrb_SlicedStrings_slice_sep();
+	test_ntrb_SlicedStrings_concat_strs();
 }
 
 #endif

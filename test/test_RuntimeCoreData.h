@@ -3,13 +3,11 @@
 
 #include "RuntimeCoreData.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
-#include <stdbool.h>
 
-static void test_ntrb_RuntimeCoreData_new(FILE*, FILE*){	
+static void test_ntrb_RuntimeCoreData_new(){	
 	const uint16_t requested_audio_tracks = 256;
 	ntrb_RuntimeCoreData rcd = ntrb_RuntimeCoreData_new(requested_audio_tracks);
 	assert(rcd.audio_tracks != NULL);
@@ -26,7 +24,7 @@ static void test_ntrb_RuntimeCoreData_new(FILE*, FILE*){
 	assert(rcd2.audio_tracks == NULL);
 }
 
-static void test_free_ntrb_RuntimeCoreData(FILE*, FILE*){
+static void test_free_ntrb_RuntimeCoreData(){
 	ntrb_RuntimeCoreData rcd = ntrb_RuntimeCoreData_new(16);
 	assert(rcd.audio_tracks != NULL);
 	
@@ -56,7 +54,7 @@ static void test_free_ntrb_RuntimeCoreData(FILE*, FILE*){
 	ntrb_RuntimeCoreData_free(&rcd3);	
 }
 
-static void test_free_ntrb_RuntimeCoreData_track(FILE*, FILE*){
+static void test_free_ntrb_RuntimeCoreData_track(){
 	ntrb_RuntimeCoreData rcd = ntrb_RuntimeCoreData_new(16);
 	assert(rcd.audio_tracks != NULL);
 	
@@ -73,10 +71,10 @@ static void test_free_ntrb_RuntimeCoreData_track(FILE*, FILE*){
 }
 
 
-void test_suite_ntrb_RuntimeCoreData(FILE* const outstream, FILE* const errstream){
-	test_ntrb_RuntimeCoreData_new(outstream, errstream);
-	test_free_ntrb_RuntimeCoreData(outstream, errstream);
-	test_free_ntrb_RuntimeCoreData_track(outstream, errstream);
+void test_suite_ntrb_RuntimeCoreData(){
+	test_ntrb_RuntimeCoreData_new();
+	test_free_ntrb_RuntimeCoreData();
+	test_free_ntrb_RuntimeCoreData_track();
 }
 
 

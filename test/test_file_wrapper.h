@@ -6,16 +6,10 @@
 #include "SpanU8.h"
 
 #include <assert.h>
-
-#include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
-#include <stdbool.h>
 
-#include <time.h>
-
-static void test_ntrb_get_filesize_bytes(FILE* const, FILE* const){
+static void test_ntrb_get_filesize_bytes(){
 	FILE* test_file = fopen("test/15_bytes.txt", "rb");
 	assert(test_file != NULL);
 	
@@ -23,7 +17,7 @@ static void test_ntrb_get_filesize_bytes(FILE* const, FILE* const){
 	fclose(test_file);
 }
 
-static void test_ntrb_read_entire_file_rb(FILE* const, FILE* const){
+static void test_ntrb_read_entire_file_rb(){
 	const char* correct_data = "1234567890ABCDE";
 	
 	ntrb_SpanU8 file_buffer;
@@ -40,9 +34,9 @@ static void test_ntrb_read_entire_file_rb(FILE* const, FILE* const){
 }
 
 
-void test_suite_ntrb_file_wrapper(FILE* const outstream, FILE* const errstream){	
-	test_ntrb_get_filesize_bytes(outstream, errstream);
-	test_ntrb_read_entire_file_rb(outstream, errstream);
+void test_suite_ntrb_file_wrapper(){	
+	test_ntrb_get_filesize_bytes();
+	test_ntrb_read_entire_file_rb();
 }
 
 #endif

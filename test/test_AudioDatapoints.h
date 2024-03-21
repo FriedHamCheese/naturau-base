@@ -5,13 +5,10 @@
 
 #include <assert.h>
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
-#include <stdbool.h>
 
-static void test_ntrb_AudioDatapoints_new(FILE* const, FILE* const){
+static void test_ntrb_AudioDatapoints_new(){
 	const size_t alloc_size_bytes = 15;
 	void* all_zero_array = calloc(alloc_size_bytes, sizeof(uint8_t));
 	
@@ -29,7 +26,7 @@ static void test_ntrb_AudioDatapoints_new(FILE* const, FILE* const){
 	assert(ntrb_AudioDatapoints_new(0).bytes == NULL);
 }
 
-static void test_ntrb_AudioDatapoints_copy(FILE* const, FILE* const){
+static void test_ntrb_AudioDatapoints_copy(){
 	const size_t alloc_size_bytes = 32;
 	ntrb_AudioDatapoints aud_1 = ntrb_AudioDatapoints_new(alloc_size_bytes);
 	assert(aud_1.bytes != NULL);
@@ -50,9 +47,9 @@ static void test_ntrb_AudioDatapoints_copy(FILE* const, FILE* const){
 	free(aud_2.bytes);
 }
 
-void test_suite_ntrb_AudioDatapoints(FILE* const outstream, FILE* const errstream){
-	test_ntrb_AudioDatapoints_new(outstream, errstream);
-	test_ntrb_AudioDatapoints_copy(outstream, errstream);
+void test_suite_ntrb_AudioDatapoints(){
+	test_ntrb_AudioDatapoints_new();
+	test_ntrb_AudioDatapoints_copy();
 }
 
 #endif

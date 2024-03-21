@@ -5,12 +5,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
 
 #include <assert.h>
 
-static void test_ntrb_getc(FILE*, FILE*){
+static void test_ntrb_getc(){
 	//this covers the ntrb_GetChar_OK flag, and the ntrb_GetChar_EOF flag.
 	
 	FILE* const test_file = fopen("test/15_bytes.txt", "r");
@@ -31,7 +30,7 @@ static void test_ntrb_getc(FILE*, FILE*){
 	fclose(test_file);
 }
 
-static void test_ntrb_getsn(FILE*, FILE*){
+static void test_ntrb_getsn(){
 	FILE* const test_file = fopen("test/getsn_test.txt", "r");
 	assert(test_file != NULL);
 	
@@ -59,7 +58,7 @@ static void test_ntrb_getsn(FILE*, FILE*){
 	fclose(test_file);
 }
 
-static void test_ntrb_trim_duplicate_separators(FILE*, FILE*){
+static void test_ntrb_trim_duplicate_separators(){
 	const char* const input_str = "Freshly//baked/cookies///at/the/bakery.";
 	const char* const expected_str = "Freshly/baked/cookies/at/the/bakery.";
 	
@@ -76,7 +75,7 @@ static void test_ntrb_trim_duplicate_separators(FILE*, FILE*){
 	assert(strcmp(returned_str2, no_duplicate_str) == 0);
 }
 
-static void test_ntrb_get_filetype(FILE*, FILE*){
+static void test_ntrb_get_filetype(){
 	char* const filetype_1 = ntrb_get_filetype("I.love.cookies!");
 	assert(filetype_1 != NULL);
 	assert(strcmp(filetype_1, "cookies!") == 0);
@@ -91,11 +90,11 @@ static void test_ntrb_get_filetype(FILE*, FILE*){
 	free(filetype_3);	
 }
 
-static void test_suite_ntrb_str_utils(FILE* const outstream, FILE* const errstream){
-	test_ntrb_getc(outstream, errstream);
-	test_ntrb_getsn(outstream, errstream);
-	test_ntrb_trim_duplicate_separators(outstream, errstream);
-	test_ntrb_get_filetype(outstream, errstream);
+static void test_suite_ntrb_str_utils(){
+	test_ntrb_getc();
+	test_ntrb_getsn();
+	test_ntrb_trim_duplicate_separators();
+	test_ntrb_get_filetype();
 }
 
 #endif

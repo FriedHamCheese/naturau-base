@@ -9,13 +9,11 @@
 
 #include "portaudio.h"	//paInt16
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 #include <assert.h>
 
-static void test_ntrb_AudioHeader_from_WAVfile(FILE*, FILE*){
+static void test_ntrb_AudioHeader_from_WAVfile(){
 	ntrb_SpanU8 file_buffer;
 	ntrb_AudioHeader header;
 	size_t audiodata_size = 0;
@@ -77,7 +75,7 @@ static void test_ntrb_AudioHeader_from_WAVfile(FILE*, FILE*){
 }
 
 
-static void test_ntrb_get_WAV_audiodata(FILE*, FILE*){
+static void test_ntrb_get_WAV_audiodata(){
 	ntrb_SpanU8 file_buffer;
 	ntrb_AudioHeader header;
 	size_t audiodata_bytes = 0;
@@ -98,9 +96,9 @@ static void test_ntrb_get_WAV_audiodata(FILE*, FILE*){
 	free(file_buffer.ptr);
 }
 
-void test_suite_ntrb_wav_wrapper(FILE* const outstream, FILE* const errstream){
-	test_ntrb_AudioHeader_from_WAVfile(outstream, errstream);
-	test_ntrb_get_WAV_audiodata(outstream, errstream);
+void test_suite_ntrb_wav_wrapper(){
+	test_ntrb_AudioHeader_from_WAVfile();
+	test_ntrb_get_WAV_audiodata();
 }
 
 

@@ -6,13 +6,12 @@
 #include "utils.h"
 #include "AudioDatapoints.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
 
-static void test_ntrb_AudioDatapoints_i16_to_f32(FILE*, FILE*){
+static void test_ntrb_AudioDatapoints_i16_to_f32(){
 	const size_t datapoint_count = 9;
 	const int16_t i16_datapoints[] = {INT16_MAX, -INT16_MAX, 4095, -4095, -13, -15, 6, 9, 8};
 	
@@ -37,7 +36,7 @@ static void test_ntrb_AudioDatapoints_i16_to_f32(FILE*, FILE*){
 	free(f32_ref_datapoints);
 }
 
-static void test_ntrb_split_as_mono(FILE*, FILE*){
+static void test_ntrb_split_as_mono(){
 	const size_t mono_float_count = 3;
 	const size_t channels = 3;
 	const size_t float_count = mono_float_count * channels;
@@ -61,7 +60,7 @@ static void test_ntrb_split_as_mono(FILE*, FILE*){
 	free(aud.bytes);
 }
 
-static void test_ntrb_mono_to_xchannels(FILE*, FILE*){
+static void test_ntrb_mono_to_xchannels(){
 	const size_t mono_float_count = 5;
 	const size_t dest_channels = 4;
 	
@@ -90,7 +89,7 @@ static void test_ntrb_mono_to_xchannels(FILE*, FILE*){
 	free(dup4ch_aud.bytes);
 }
 
-static void test_ntrb_merge_to_stereo(FILE*, FILE*){
+static void test_ntrb_merge_to_stereo(){
 	const size_t mono_float_count = 4;
 	
 	ntrb_AudioDatapoints l_ch = ntrb_AudioDatapoints_new(sizeof(float) * mono_float_count);
@@ -126,7 +125,7 @@ static void test_ntrb_merge_to_stereo(FILE*, FILE*){
 }
 
 
-static void test_ntrb_to_samplerate_mono_upscale(FILE*, FILE*){
+static void test_ntrb_to_samplerate_mono_upscale(){
 	const size_t seconds = 1;
 	const size_t orig_samplerate = 3;
 	const float orig_datapoints[] = {1.5, -1.5, 1.2};
@@ -147,7 +146,7 @@ static void test_ntrb_to_samplerate_mono_upscale(FILE*, FILE*){
 	free(dest_aud.bytes);
 }
 
-static void test_ntrb_to_samplerate_mono_downscale(FILE*, FILE*){
+static void test_ntrb_to_samplerate_mono_downscale(){
 	const size_t seconds = 1;
 	const size_t orig_samplerate = 6;
 	const float orig_datapoints[] = {-1.3, 0.15, -1.7, 1.6, 0.5, -1.2};
@@ -169,18 +168,18 @@ static void test_ntrb_to_samplerate_mono_downscale(FILE*, FILE*){
 	free(dest_aud.bytes);
 }
 
-static void test_ntrb_to_samplerate_mono(FILE* outstream, FILE* errstream){
-	test_ntrb_to_samplerate_mono_upscale(outstream, errstream);
-	test_ntrb_to_samplerate_mono_downscale(outstream, errstream);
+static void test_ntrb_to_samplerate_mono(){
+	test_ntrb_to_samplerate_mono_upscale();
+	test_ntrb_to_samplerate_mono_downscale();
 }
 
 
-static void test_suite_ntrb_aud_std_fmt(FILE* const outstream, FILE* const errstream){
-	test_ntrb_AudioDatapoints_i16_to_f32(outstream, errstream);
-	test_ntrb_split_as_mono(outstream, errstream);
-	test_ntrb_to_samplerate_mono(outstream, errstream);
-	test_ntrb_mono_to_xchannels(outstream, errstream);
-	test_ntrb_merge_to_stereo(outstream, errstream);
+static void test_suite_ntrb_aud_std_fmt(){
+	test_ntrb_AudioDatapoints_i16_to_f32();
+	test_ntrb_split_as_mono();
+	test_ntrb_to_samplerate_mono();
+	test_ntrb_mono_to_xchannels();
+	test_ntrb_merge_to_stereo();
 }
 
 #endif
