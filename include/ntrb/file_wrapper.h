@@ -15,8 +15,6 @@ enum ntrb_ReadFileResult{
 	ntrb_ReadFileResult_FilesizeError,
 	ntrb_ReadFileResult_CallocError,
 	ntrb_ReadFileResult_FileReadError,
-	
-	ntrb_ReadFileResult_ReachedEOF,
 };
 
 long int ntrb_get_filesize_bytes(FILE* const file);

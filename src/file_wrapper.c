@@ -57,17 +57,12 @@ enum ntrb_ReadFileResult ntrb_read_entire_file_rb(ntrb_SpanU8* const buffer, con
 	buffer->elem = bytes_read;
 	
 	if(bytes_read != filesize_bytes){
-		const bool reached_EOF = feof(audio_file);
+		//eof would never happen, because read binary reads all the characters/bytes
 		
-		if(reached_EOF) 
-			//EOF is fine, but report it to the user.
-			result = ntrb_ReadFileResult_ReachedEOF;
-		else{	
-			//ferror happened, we choose to not return buffer which may contain errors.
-			free(buffer->ptr);
-			buffer->ptr = NULL;
-			result = ntrb_ReadFileResult_FileReadError;
-		}
+		//ferror happened, we choose to not return buffer which may contain errors.
+		free(buffer->ptr);
+		buffer->ptr = NULL;
+		result = ntrb_ReadFileResult_FileReadError;
 	}
 	
 	close_file:
