@@ -7,8 +7,7 @@
 #include <assert.h>
 
 static void test_ntrb_bytevec_new(){
-	ntrb_bytevec v;
-	assert(ntrb_bytevec_new(&v, 300));
+	ntrb_bytevec v =ntrb_bytevec_new(300);
 	assert(v.base_ptr != NULL);
 	assert(v.elements == 0);
 	assert(v.capacity == 300);
@@ -17,8 +16,8 @@ static void test_ntrb_bytevec_new(){
 }
 
 static void test_ntrb_bytevec_reserve(){
-	ntrb_bytevec v;
-	assert(ntrb_bytevec_new(&v, 300));
+	ntrb_bytevec v = ntrb_bytevec_new(300);
+	assert(v.base_ptr != NULL);
 	
 	v.elements = 299;
 	*(v.base_ptr + v.elements) = 97;
@@ -33,8 +32,8 @@ static void test_ntrb_bytevec_reserve(){
 }
 
 static void test_ntrb_bytevec_free(){
-	ntrb_bytevec v;
-	assert(ntrb_bytevec_new(&v, 300));
+	ntrb_bytevec v = ntrb_bytevec_new(300);
+	assert(v.base_ptr != NULL);
 	ntrb_bytevec_free(&v);
 	
 	assert(v.base_ptr == NULL);
