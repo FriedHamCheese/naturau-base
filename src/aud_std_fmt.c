@@ -250,11 +250,7 @@ enum ntrb_LoadStdFmtAudioResult ntrb_load_wav(ntrb_AudioHeader* const header, nt
 }
 
 enum ntrb_LoadStdFmtAudioResult ntrb_load_flac(ntrb_AudioHeader* const header, ntrb_AudioDatapoints* const datapoints, const char* const filename){
-	ntrb_AudioDataFLAC flac_data;	
-	const uint8_t pre_alloc_seconds = 5;
-	flac_data.datapoints  = ntrb_bytevec_new(sizeof(int16_t) * ntrb_std_samplerate * ntrb_std_audchannels * pre_alloc_seconds);
-	if(flac_data.datapoints.base_ptr == NULL) return ntrb_LoadStdFmtAudioResult_AllocError;
-	
+	ntrb_AudioDataFLAC flac_data;
 	const enum ntrb_FLAC_decode_status flac_decode_status = ntrb_decode_FLAC_file(filename, &flac_data);
 	if(flac_decode_status != ntrb_FLAC_decode_OK){
 		ntrb_bytevec_free(&(flac_data.datapoints));

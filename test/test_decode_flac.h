@@ -12,8 +12,6 @@
 
 static void test_ntrb_decode_FLAC_file(){
 	ntrb_AudioDataFLAC aud;
-	aud.datapoints = ntrb_bytevec_new(1);
-	assert(aud.datapoints.base_ptr != NULL);	
 	assert(ntrb_decode_FLAC_file("./test/decode_flac/portal_radio.flac", &aud) == ntrb_FLAC_decode_OK);
 	ntrb_bytevec_free(&(aud.datapoints));
 	
@@ -21,8 +19,6 @@ static void test_ntrb_decode_FLAC_file(){
 	
 	assert(ntrb_decode_FLAC_file("./test/decode_flac/invalid_bps.flac", &aud) == ntrb_FLAC_decode_unsupported_bps);	
 	
-	aud.datapoints= ntrb_bytevec_new(1);
-	assert(aud.datapoints.base_ptr != NULL);
 	assert(ntrb_decode_FLAC_file("./test/decode_flac/invalid_md5.flac", &aud) == ntrb_FLAC_decode_MD5_not_equal);
 	ntrb_bytevec_free(&(aud.datapoints));
 
