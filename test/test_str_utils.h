@@ -73,6 +73,7 @@ static void test_ntrb_trim_duplicate_separators(){
 	assert(returned_str2 != NULL);
 	assert(strlen(returned_str2) == nodup_strlen);
 	assert(strcmp(returned_str2, no_duplicate_str) == 0);
+	free(returned_str2);
 }
 
 static void test_ntrb_get_filetype(){

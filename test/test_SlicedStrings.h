@@ -88,6 +88,8 @@ static void test_ntrb_SlicedStrings_slice_sep(){
 	for(size_t i = 0; i < sliced_str.elem; i++){
 		assert(strcmp(sliced_str.str_ptrs[i], expected_sliced_strs[i]) == 0);
 	}	
+	
+	ntrb_SlicedStrings_free(&sliced_str);
 }
 
 static void test_ntrb_SlicedStrings_concat_strs(){
@@ -103,11 +105,13 @@ static void test_ntrb_SlicedStrings_concat_strs(){
 	char* const slash_sep_str = ntrb_SlicedStrings_concat_strs(sliced_strs, 0, sliced_strs.elem, '/');
 	assert(slash_sep_str != NULL);
 	assert(strcmp(slash_sep_str, expected_slash_sep_str) == 0);
+	free(slash_sep_str);
 	
 	const char* const expected_nosep_str = "americancheese";
 	char* const nosep_str = ntrb_SlicedStrings_concat_strs(sliced_strs, 1, sliced_strs.elem, '\0');
 	assert(nosep_str != NULL);
 	assert(strcmp(nosep_str, expected_nosep_str) == 0);	
+	free(nosep_str);
 	
 	ntrb_SlicedStrings_free(&sliced_strs);
 }
