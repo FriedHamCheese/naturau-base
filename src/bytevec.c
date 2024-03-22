@@ -3,13 +3,16 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-bool ntrb_bytevec_new(ntrb_bytevec* const obj, const size_t alloc_bytes){
-	obj->base_ptr = malloc(alloc_bytes);
-	if(obj->base_ptr == NULL) return false;
+const ntrb_bytevec failed_ntrb_bytevec = {.base_ptr = NULL, .elements = 0, .capacity = 0};
+
+ntrb_bytevec ntrb_bytevec_new(const size_t alloc_bytes){
+	ntrb_bytevec obj;
+	obj.base_ptr = malloc(alloc_bytes);
+	if(obj.base_ptr == NULL) return failed_ntrb_bytevec;
 	
-	obj->elements = 0;
-	obj->capacity = alloc_bytes;
-	return true;
+	obj.elements = 0;
+	obj.capacity = alloc_bytes;
+	return obj;
 }
 bool ntrb_bytevec_reserve(ntrb_bytevec* const obj, const size_t additional_bytes){
 	const size_t new_capacity = obj->capacity + additional_bytes;

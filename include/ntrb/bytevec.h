@@ -11,7 +11,10 @@ typedef struct{
 	size_t capacity;
 } ntrb_bytevec;
 
-bool ntrb_bytevec_new(ntrb_bytevec* const obj, const size_t alloc_bytes);
+//from bytevec.c
+extern const ntrb_bytevec failed_ntrb_bytevec;
+
+ntrb_bytevec ntrb_bytevec_new(const size_t alloc_bytes);
 bool ntrb_bytevec_reserve(ntrb_bytevec* const obj, const size_t additional_bytes);
 void ntrb_bytevec_free(ntrb_bytevec* const obj);
 

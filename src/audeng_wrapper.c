@@ -41,7 +41,7 @@ static int stream_audio(const void *, void *output_void, unsigned long frameCoun
 					output[i] += *((float*)(current_audiotrack->bytes + current_audiotrack->byte_pos));
 					current_audiotrack->byte_pos += sizeof(float);
 				}else{
-					free_ntrb_RuntimeCoreData_track(runtime_data, track_id);
+					ntrb_RuntimeCoreData_free_track(runtime_data, track_id);
 					break;
 				}
 			}

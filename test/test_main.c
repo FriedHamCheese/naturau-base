@@ -13,28 +13,25 @@
 #include <stdio.h>
 
 int main(){
-	FILE* const outstream = stdout;
-	FILE* const errstream = stderr;
+	printf("Initiating test routine...\n");	
+	printf("If an all clear message is not shown after this, the test has failed.\n");
+	fflush(stdout);
 	
-	fprintf(outstream, "Initiating test routine...\n");	
-	fprintf(outstream, "If an all clear message is not shown after this, the test has failed.\n");
-	fflush(outstream);
-	
-	test_suite_ntrb_aud_std_fmt(outstream, errstream);
-	test_suite_ntrb_audeng_wrapper(outstream, errstream);
-	test_suite_ntrb_AudioDatapoints(outstream, errstream);
+	test_suite_ntrb_aud_std_fmt();
+	test_suite_ntrb_audeng_wrapper();
+	test_suite_ntrb_AudioDatapoints();
 	test_suite_ntrb_bytevec();
 
-	test_suite_ntrb_decode_flac(outstream, errstream);
-	test_suite_ntrb_file_wrapper(outstream, errstream);
-	test_suite_ntrb_RuntimeCoreData(outstream, errstream);
-	test_suite_ntrb_SlicedStrings(outstream, errstream);	
-	test_suite_ntrb_str_utils(outstream, errstream);	
-	test_suite_ntrb_wav_wrapper(outstream, errstream);
-	test_suite_ntrb_utils(outstream, errstream);		
+	test_suite_ntrb_decode_flac();
+	test_suite_ntrb_file_wrapper();
+	test_suite_ntrb_RuntimeCoreData();
+	test_suite_ntrb_SlicedStrings();	
+	test_suite_ntrb_str_utils();	
+	test_suite_ntrb_wav_wrapper();
+	test_suite_ntrb_utils();		
 	
-	fprintf(outstream, "\n[ALL CLEAR]: No errors from test routine.\n");
-	fflush(outstream);
+	printf("\n[ALL CLEAR]: No errors from test routine.\n");
+	fflush(stdout);
 	
 	return 0;
 }

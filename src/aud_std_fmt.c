@@ -28,7 +28,7 @@ const PaSampleFormat ntrb_std_sample_fmt = paFloat32;
 //Can accept any sample rate and any channels, just required the input to be an int16 AudioDatapoints.
 ntrb_AudioDatapoints ntrb_AudioDatapoints_i16_to_f32(const ntrb_AudioDatapoints int16){
 	const size_t int16_count = int16.byte_count / sizeof(int16_t);
-	ntrb_AudioDatapoints float32 = new_ntrb_AudioDatapoints(int16_count * sizeof(float));
+	ntrb_AudioDatapoints float32 = ntrb_AudioDatapoints_new(int16_count * sizeof(float));
 	if(float32.bytes == NULL) return failed_ntrb_AudioDatapoints;
 
 	for(size_t i = 0; i < int16_count; i++){
@@ -51,7 +51,7 @@ ntrb_AudioDatapoints ntrb_split_as_mono(const ntrb_AudioDatapoints multichannel_
 	const size_t multichannel_aud_float_count = (multichannel_aud.byte_count / sizeof(float));
 	
 	const size_t mono_float_count = multichannel_aud_float_count / channels;
-	ntrb_AudioDatapoints mono = new_ntrb_AudioDatapoints(mono_float_count * sizeof(float));
+	ntrb_AudioDatapoints mono = ntrb_AudioDatapoints_new(mono_float_count * sizeof(float));
 	if(mono.bytes == NULL) return failed_ntrb_AudioDatapoints;
 	
 	for(size_t i = 0; i < mono_float_count; i++){
@@ -62,7 +62,7 @@ ntrb_AudioDatapoints ntrb_split_as_mono(const ntrb_AudioDatapoints multichannel_
 
 //requires the audio to be in float32 and mono channeled.
 ntrb_AudioDatapoints ntrb_mono_to_xchannels(const ntrb_AudioDatapoints orig, const size_t dest_channels){
-	ntrb_AudioDatapoints multichannel_aud = new_ntrb_AudioDatapoints(orig.byte_count * dest_channels);
+	ntrb_AudioDatapoints multichannel_aud = ntrb_AudioDatapoints_new(orig.byte_count * dest_channels);
 	if(multichannel_aud.bytes == NULL) return failed_ntrb_AudioDatapoints;
 	
 	const size_t float_points = orig.byte_count / sizeof(float);
@@ -84,7 +84,7 @@ ntrb_AudioDatapoints ntrb_merge_to_stereo(const ntrb_AudioDatapoints l_ch, const
 	const size_t mono_float_count = r_ch.byte_count / sizeof(float);
 	const size_t stereo_float_count = mono_float_count * 2;
 	
-	ntrb_AudioDatapoints stereo_aud = new_ntrb_AudioDatapoints(stereo_float_count * sizeof(float));
+	ntrb_AudioDatapoints stereo_aud = ntrb_AudioDatapoints_new(stereo_float_count * sizeof(float));
 	if(stereo_aud.bytes == NULL) return failed_ntrb_AudioDatapoints;
 	
 	for(size_t i = 0; i < stereo_float_count; i+=2){
@@ -101,7 +101,7 @@ ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, co
 	const size_t orig_float_count = orig.byte_count / sizeof(float);
 	
 	size_t dest_float_count = floor((float)orig_float_count * (dest_samplerate / orig_samplerate));	
-	ntrb_AudioDatapoints dest = new_ntrb_AudioDatapoints(dest_float_count * sizeof(float));
+	ntrb_AudioDatapoints dest = ntrb_AudioDatapoints_new(dest_float_count * sizeof(float));
 	if(dest.bytes == NULL) return failed_ntrb_AudioDatapoints;
 	
 	const double dest_over_orig_samplerate = (dest_samplerate - 1.0) / (orig_samplerate - 1.0);
@@ -126,7 +126,7 @@ ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, co
 //If orig and dest samplerate are equal, copies orig to a new allocated AudioDatapoints.
 //If not, interpolates the dest datapoints from orig.
 ntrb_AudioDatapoints ntrb_to_samplerate(const ntrb_AudioDatapoints orig, const uint32_t orig_samplerate, const uint32_t dest_samplerate){
-	if(orig_samplerate == dest_samplerate) return copy_ntrb_AudioDatapoints(orig);
+	if(orig_samplerate == dest_samplerate) return ntrb_AudioDatapoints_copy(orig);
 	
 	const double dest_over_orig_samplerate = (double)dest_samplerate / (double)orig_samplerate;
 	
@@ -167,7 +167,7 @@ enum ntrb_StdAudFmtConversionResult ntrb_to_std_sample_fmt(ntrb_AudioDatapoints*
 		*ret_aud = ntrb_AudioDatapoints_i16_to_f32(orig);
 	}
 	else if(originalFormat == ntrb_std_sample_fmt){
-		*ret_aud = copy_ntrb_AudioDatapoints(orig);
+		*ret_aud = ntrb_AudioDatapoints_copy(orig);
 	}
 	else return ntrb_StdAudFmtConversion_UnknownSampleFormat;
 
@@ -179,7 +179,7 @@ enum ntrb_StdAudFmtConversionResult ntrb_to_std_sample_fmt(ntrb_AudioDatapoints*
 //input must be in float32 sample format.
 enum ntrb_StdAudFmtConversionResult ntrb_to_std_aud_channels(ntrb_AudioDatapoints* const ret_aud, const ntrb_AudioDatapoints orig, const uint8_t audchannels){
 	if(audchannels == ntrb_std_audchannels){
-		*ret_aud = copy_ntrb_AudioDatapoints(orig);
+		*ret_aud = ntrb_AudioDatapoints_copy(orig);
 	}
 	else if(audchannels == 1){
 		*ret_aud = ntrb_mono_to_xchannels(orig, 2);
@@ -234,11 +234,11 @@ enum ntrb_LoadStdFmtAudioResult ntrb_load_wav(ntrb_AudioHeader* const header, nt
 	
 	size_t audiodata_offset = 0;
 	size_t audiodata_size = 0;
-	const enum ntrb_AudioHeaderFromWAVFileStatus audioheader_result = WAVfile_to_ntrb_AudioHeader(header, &audiodata_offset, &audiodata_size, audiofile_data);
+	const enum ntrb_AudioHeaderFromWAVFileStatus audioheader_result = ntrb_AudioHeader_from_WAVfile(header, &audiodata_offset, &audiodata_size, audiofile_data);
 
 	if(audioheader_result != ntrb_AudioHeaderFromWAVFile_ok){
 		free(audiofile_data.ptr);
-		print_ntrb_AudioHeader(*header, stdout);
+		ntrb_AudioHeader_print(*header, stdout);
 		return ntrb_LoadStdFmtAudioResult_ntrb_AudioHeaderFromWAVFileStatus + audioheader_result;
 	}
 
@@ -250,18 +250,14 @@ enum ntrb_LoadStdFmtAudioResult ntrb_load_wav(ntrb_AudioHeader* const header, nt
 }
 
 enum ntrb_LoadStdFmtAudioResult ntrb_load_flac(ntrb_AudioHeader* const header, ntrb_AudioDatapoints* const datapoints, const char* const filename){
-	ntrb_AudioDataFLAC flac_data;	
-	const uint8_t pre_alloc_seconds = 5;
-	ntrb_bytevec_new(&flac_data.datapoints, sizeof(int16_t) * ntrb_std_samplerate * ntrb_std_audchannels * pre_alloc_seconds);
-	if(flac_data.datapoints.base_ptr == NULL) return ntrb_LoadStdFmtAudioResult_AllocError;
-	
+	ntrb_AudioDataFLAC flac_data;
 	const enum ntrb_FLAC_decode_status flac_decode_status = ntrb_decode_FLAC_file(filename, &flac_data);
 	if(flac_decode_status != ntrb_FLAC_decode_OK){
 		ntrb_bytevec_free(&(flac_data.datapoints));
 		return ntrb_LoadStdFmtAudioResult_ntrb_FLAC_decode_status + flac_decode_status;
 	}
 	
-	*datapoints = new_ntrb_AudioDatapoints(flac_data.datapoints.elements);
+	*datapoints = ntrb_AudioDatapoints_new(flac_data.datapoints.elements);
 	if(datapoints->bytes == NULL){
 		ntrb_bytevec_free(&(flac_data.datapoints));		
 		return ntrb_LoadStdFmtAudioResult_AllocError;
