@@ -47,9 +47,19 @@ static void test_ntrb_AudioDatapoints_copy(){
 	free(aud_2.bytes);
 }
 
-void test_suite_ntrb_AudioDatapoints(){
+static void test_ntrb_AudioDatapoints_free(){
+	ntrb_AudioDatapoints aud = ntrb_AudioDatapoints_new(35);
+	assert(aud.bytes != NULL);
+	
+	ntrb_AudioDatapoints_free(&aud);
+	assert(aud.bytes == NULL);
+	assert(aud.byte_count == 0);
+}
+
+static void test_suite_ntrb_AudioDatapoints(){
 	test_ntrb_AudioDatapoints_new();
 	test_ntrb_AudioDatapoints_copy();
+	test_ntrb_AudioDatapoints_free();
 }
 
 #endif

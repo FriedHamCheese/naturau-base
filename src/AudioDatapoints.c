@@ -24,3 +24,10 @@ ntrb_AudioDatapoints ntrb_AudioDatapoints_copy(const ntrb_AudioDatapoints orig){
 	clone.byte_pos = orig.byte_pos;
 	return clone;
 }
+
+void ntrb_AudioDatapoints_free(ntrb_AudioDatapoints* const obj){
+	free(obj->bytes);
+	obj->bytes = NULL;
+	obj->byte_count = 0;
+	obj->byte_pos = 0;
+}

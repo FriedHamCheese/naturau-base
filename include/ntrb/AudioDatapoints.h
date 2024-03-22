@@ -14,4 +14,6 @@ extern const ntrb_AudioDatapoints failed_ntrb_AudioDatapoints;
 
 ntrb_AudioDatapoints ntrb_AudioDatapoints_new(const size_t size_bytes);
 ntrb_AudioDatapoints ntrb_AudioDatapoints_copy(const ntrb_AudioDatapoints orig);
+void ntrb_AudioDatapoints_free(ntrb_AudioDatapoints* const obj);
+
 #endif
