@@ -26,7 +26,7 @@ static int stream_audio(const void *, void *output_void, unsigned long frameCoun
 	
 	ntrb_RuntimeCoreData* const runtime_data = (ntrb_RuntimeCoreData*)userData;
 	if(!runtime_data->in_pause_state){
-		runtime_data->streaming_audio = true;
+		pthread_rwlock_wrlock(&(runtime_data->audio_track_rwlock));
 
 		for(uint16_t track_id = 0; track_id < runtime_data->audio_track_count; track_id++)
 		{
@@ -46,7 +46,7 @@ static int stream_audio(const void *, void *output_void, unsigned long frameCoun
 				}
 			}
 		}
-		runtime_data->streaming_audio = false;
+		pthread_rwlock_unlock(&(runtime_data->audio_track_rwlock));
 	}
 	
 	if(runtime_data->requested_exit) return paComplete;

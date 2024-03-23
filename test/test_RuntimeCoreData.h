@@ -15,8 +15,6 @@ static void test_ntrb_RuntimeCoreData_new(){
 	assert(rcd.audio_track_count == requested_audio_tracks);
 	assert(rcd.requested_exit == false);
 	assert(rcd.in_pause_state == true);	
-	assert(rcd.streaming_audio == false);	
-	assert(rcd.writing_tracks == false);
 	
 	ntrb_RuntimeCoreData_free(&rcd);
 	
