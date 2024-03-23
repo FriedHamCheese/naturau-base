@@ -9,22 +9,23 @@
 
 static void test_ntrb_RuntimeCoreData_new(){	
 	const uint16_t requested_audio_tracks = 256;
-	ntrb_RuntimeCoreData rcd = ntrb_RuntimeCoreData_new(requested_audio_tracks);
-	assert(rcd.audio_tracks != NULL);
+	ntrb_RuntimeCoreData rcd;
+	assert(ntrb_RuntimeCoreData_new(&rcd, requested_audio_tracks) == 0);
 	
+	assert(rcd.audio_tracks != NULL);
 	assert(rcd.audio_track_count == requested_audio_tracks);
 	assert(rcd.requested_exit == false);
 	assert(rcd.in_pause_state == true);	
 	
 	ntrb_RuntimeCoreData_free(&rcd);
 	
-	ntrb_RuntimeCoreData rcd2 = ntrb_RuntimeCoreData_new(0);
-	assert(rcd2.audio_tracks == NULL);
+	ntrb_RuntimeCoreData rcd2;
+	assert(ntrb_RuntimeCoreData_new(&rcd2, 0) == ENOMEM);
 }
 
 static void test_free_ntrb_RuntimeCoreData(){
-	ntrb_RuntimeCoreData rcd = ntrb_RuntimeCoreData_new(16);
-	assert(rcd.audio_tracks != NULL);
+	ntrb_RuntimeCoreData rcd;
+	assert(ntrb_RuntimeCoreData_new(&rcd, 16) == 0);
 	
 	ntrb_AudioDatapoints* aud_1 = malloc(sizeof(ntrb_AudioDatapoints));
 	assert(aud_1 != NULL);
@@ -39,22 +40,18 @@ static void test_free_ntrb_RuntimeCoreData(){
 	rcd.audio_tracks[3] = aud_1;
 	rcd.audio_tracks[7] = aud_2;
 	
-	ntrb_RuntimeCoreData_free(&rcd);
+	assert(ntrb_RuntimeCoreData_free(&rcd) == 0);
 	
 	assert(rcd.audio_tracks == NULL);
 	assert(rcd.audio_track_count == 0);
 	
 	ntrb_RuntimeCoreData rcd2 = failed_ntrb_RuntimeCoreData;
-	ntrb_RuntimeCoreData_free(&rcd2);
-	
-	ntrb_RuntimeCoreData rcd3 = ntrb_RuntimeCoreData_new(16);
-	assert(rcd3.audio_tracks != NULL);
-	ntrb_RuntimeCoreData_free(&rcd3);	
+	assert(ntrb_RuntimeCoreData_free(&rcd2) != 0);
 }
 
 static void test_free_ntrb_RuntimeCoreData_track(){
-	ntrb_RuntimeCoreData rcd = ntrb_RuntimeCoreData_new(16);
-	assert(rcd.audio_tracks != NULL);
+	ntrb_RuntimeCoreData rcd;
+	assert(ntrb_RuntimeCoreData_new(&rcd, 16) == 0);
 	
 	ntrb_AudioDatapoints* aud_1 = malloc(sizeof(ntrb_AudioDatapoints));
 	assert(aud_1 != NULL);
@@ -65,7 +62,7 @@ static void test_free_ntrb_RuntimeCoreData_track(){
 	ntrb_RuntimeCoreData_free_track(&rcd, 10);
 	assert(rcd.audio_tracks[10] == NULL);
 
-	ntrb_RuntimeCoreData_free(&rcd);	
+	assert(ntrb_RuntimeCoreData_free(&rcd) == 0);	
 }
 
 

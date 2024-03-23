@@ -21,23 +21,19 @@ const ntrb_RuntimeCoreData failed_ntrb_RuntimeCoreData = {
 	.in_pause_state = true
 };
 
-ntrb_RuntimeCoreData ntrb_RuntimeCoreData_new(const uint16_t track_count){
-	ntrb_RuntimeCoreData rcd;
+int ntrb_RuntimeCoreData_new(ntrb_RuntimeCoreData* const rcd, const uint16_t track_count){	
+	if(track_count == 0) return ENOMEM;
+	rcd->audio_tracks = calloc(track_count, sizeof(ntrb_AudioDatapoints*));
+	if(rcd->audio_tracks == NULL) return ENOMEM;
 	
-	if(track_count == 0) return failed_ntrb_RuntimeCoreData;
-	rcd.audio_tracks = calloc(track_count, sizeof(ntrb_AudioDatapoints*));
-	if(rcd.audio_tracks == NULL) return failed_ntrb_RuntimeCoreData;
+	rcd->audio_track_count = track_count;
+	rcd->requested_exit = false;
+	rcd->in_pause_state = true;
 	
-	rcd.audio_track_count = track_count;
-	rcd.requested_exit = false;
-	rcd.in_pause_state = true;
-	
-	pthread_rwlock_init(&(rcd.audio_track_rwlock), NULL);
-	
-	return rcd;
+	return pthread_rwlock_init(&(rcd->audio_track_rwlock), NULL);
 }
 
-void ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
+int ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
 	pthread_rwlock_wrlock(&(rcd->audio_track_rwlock));
 	
 	if(rcd->audio_tracks != NULL){
@@ -51,10 +47,11 @@ void ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
 	rcd->audio_track_count = 0;
 	
 	pthread_rwlock_unlock(&(rcd->audio_track_rwlock));
-	pthread_rwlock_destroy(&(rcd->audio_track_rwlock));	
 	
 	rcd->requested_exit = true;
 	rcd->in_pause_state = true;
+	
+	return pthread_rwlock_destroy(&(rcd->audio_track_rwlock));
 }
 
 void ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index){
