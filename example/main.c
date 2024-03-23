@@ -94,8 +94,12 @@ void* user_input_loop(void* const runtime_core_data_void){
 }
 
 int main(){
-	ntrb_RuntimeCoreData rcd = ntrb_RuntimeCoreData_new(256);
-	if(rcd.audio_tracks == NULL) return 0;
+	ntrb_RuntimeCoreData rcd;
+	const int rcd_new_status = ntrb_RuntimeCoreData_new(&rcd, 256);
+	if(rcd_new_status != 0){
+		fprintf(stderr, "[Error]: %s: %d: Error initialising ntrb_RuntimeCoreData (%d).\n", __FILE__, __LINE__, rcd_new_status);		
+		return 0;
+	}
 	
 	pthread_t user_input_thread;
 	pthread_create(&user_input_thread, NULL, user_input_loop, &rcd);

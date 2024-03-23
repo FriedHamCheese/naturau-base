@@ -12,36 +12,30 @@
 #include <stdbool.h>
 #include <stdatomic.h>
 
+#include <pthread.h>
 
 const ntrb_RuntimeCoreData failed_ntrb_RuntimeCoreData = {
 	.audio_tracks=NULL,
 	.audio_track_count = 0,
 	.requested_exit = true,
-	.in_pause_state = true,
-	.streaming_audio = true,
-	.writing_tracks = true
+	.in_pause_state = true
 };
 
-static const unsigned long wait_busy_stream_usecs = 10 * 1000;
-
-
-ntrb_RuntimeCoreData ntrb_RuntimeCoreData_new(const uint16_t track_count){
-	ntrb_RuntimeCoreData rcd;
+int ntrb_RuntimeCoreData_new(ntrb_RuntimeCoreData* const rcd, const uint16_t track_count){	
+	if(track_count == 0) return ENOMEM;
+	rcd->audio_tracks = calloc(track_count, sizeof(ntrb_AudioDatapoints*));
+	if(rcd->audio_tracks == NULL) return ENOMEM;
 	
-	if(track_count == 0) return failed_ntrb_RuntimeCoreData;
-	rcd.audio_tracks = calloc(track_count, sizeof(ntrb_AudioDatapoints*));
-	if(rcd.audio_tracks == NULL) return failed_ntrb_RuntimeCoreData;
+	rcd->audio_track_count = track_count;
+	rcd->requested_exit = false;
+	rcd->in_pause_state = true;
 	
-	rcd.audio_track_count = track_count;
-	rcd.requested_exit = false;
-	rcd.in_pause_state = true;
-	rcd.streaming_audio = false;
-	rcd.writing_tracks = false;
-	
-	return rcd;
+	return pthread_rwlock_init(&(rcd->audio_track_rwlock), NULL);
 }
 
-void ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
+int ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
+	pthread_rwlock_wrlock(&(rcd->audio_track_rwlock));
+	
 	if(rcd->audio_tracks != NULL){
 		for(size_t i = 0; i < rcd->audio_track_count; i++){			
 			if(rcd->audio_tracks[i] != NULL)
@@ -49,13 +43,15 @@ void ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
 		}
 		free(rcd->audio_tracks);
 		rcd->audio_tracks = NULL;
-	}
-	
+	}	
 	rcd->audio_track_count = 0;
+	
+	pthread_rwlock_unlock(&(rcd->audio_track_rwlock));
+	
 	rcd->requested_exit = true;
 	rcd->in_pause_state = true;
-	rcd->streaming_audio = false;
-	rcd->writing_tracks = false;
+	
+	return pthread_rwlock_destroy(&(rcd->audio_track_rwlock));
 }
 
 void ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index){
@@ -74,16 +70,9 @@ enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCore
 		return ntrb_RCD_QueueAudio_ntrb_LoadStdFmtAudioResult + audio_load_result;
 	}
 	
-	while(runtime_data->streaming_audio || runtime_data->writing_tracks){
-		if(usleep(wait_busy_stream_usecs) == EINTR){
-			free(aud->bytes);
-			free(aud);
-			return ntrb_RCD_QueueAudio_SleepInterrupt;
-		}
-	}
-	
 	bool wrote_track = false;
-	runtime_data->writing_tracks = true;
+	
+	pthread_rwlock_wrlock(&(runtime_data->audio_track_rwlock));
 	
 	for(uint16_t i = 0; i < runtime_data->audio_track_count; i++){
 		const bool track_empty = runtime_data->audio_tracks[i] == NULL;
@@ -94,7 +83,7 @@ enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCore
 		}
 	}
 	
-	runtime_data->writing_tracks = false;
+	pthread_rwlock_unlock(&(runtime_data->audio_track_rwlock));
 	if(!wrote_track) return ntrb_RCD_QueueAudio_TracksAllFull;
 	else return ntrb_RCD_QueueAudio_OK;
 }
