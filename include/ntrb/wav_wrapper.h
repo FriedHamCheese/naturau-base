@@ -21,8 +21,10 @@ enum ntrb_AudioHeaderFromWAVFileStatus{
 	ntrb_AudioHeaderFromWAVFile_invalid_Subchunk2Size,	
 };
 
+size_t ntrb_getSubchunk1Start(const ntrb_SpanU8 file_buffer, const size_t RIFFchunkEnd);
+size_t ntrb_getSubchunk2Start(const ntrb_SpanU8 file_buffer, const size_t Subchunk1End);
 
-enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile(ntrb_AudioHeader* const return_arg, size_t* const audiodata_offset, size_t* const audiodata_bytes, const ntrb_SpanU8 file_buffer);
+enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile(ntrb_AudioHeader* const returnArg, size_t* const audiodataOffset, size_t* const audiodataSize, const ntrb_SpanU8 fileBuffer);
 
 ntrb_AudioDatapoints ntrb_get_WAV_audiodata(const ntrb_SpanU8 wavfile, const size_t audiodata_size, const size_t audiodata_offset);
 #endif

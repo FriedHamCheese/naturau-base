@@ -13,6 +13,39 @@
 #include <string.h>
 #include <assert.h>
 
+static void test_ntrb_getSubchunk1Start(){
+	const size_t typical_RIFF_chunk_end = 12;
+	
+	ntrb_SpanU8 file_buffer;
+	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/regular_wav.wav") == ntrb_ReadFileResult_OK);
+
+	assert(ntrb_getSubchunk1Start(file_buffer, typical_RIFF_chunk_end) == 12);
+	free(file_buffer.ptr);
+	
+	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/subchunk1_seek.wav") == ntrb_ReadFileResult_OK);
+	assert(ntrb_getSubchunk1Start(file_buffer, typical_RIFF_chunk_end) == 48);
+	free(file_buffer.ptr);	
+}
+
+static void test_ntrb_getSubchunk2Start(){
+	const size_t typical_RIFF_chunk_end = 12;
+	const size_t minimum_subchunk1_size = 24;	
+	
+	ntrb_SpanU8 file_buffer;
+	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/regular_wav.wav") == ntrb_ReadFileResult_OK);
+
+	const size_t file_1_subchunk1_start = ntrb_getSubchunk1Start(file_buffer, typical_RIFF_chunk_end);
+	assert(file_1_subchunk1_start != 0);
+	assert(ntrb_getSubchunk2Start(file_buffer, file_1_subchunk1_start + minimum_subchunk1_size) == 198);	
+	free(file_buffer.ptr);
+	
+	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/subchunk1_seek.wav") == ntrb_ReadFileResult_OK);
+	const size_t file_2_subchunk1_start = ntrb_getSubchunk1Start(file_buffer, typical_RIFF_chunk_end);
+	assert(file_2_subchunk1_start != 0);
+	assert(ntrb_getSubchunk2Start(file_buffer, file_2_subchunk1_start + minimum_subchunk1_size) == 72);	
+	free(file_buffer.ptr);
+}
+
 static void test_ntrb_AudioHeader_from_WAVfile(){
 	ntrb_SpanU8 file_buffer;
 	ntrb_AudioHeader header;
@@ -97,6 +130,8 @@ static void test_ntrb_get_WAV_audiodata(){
 }
 
 void test_suite_ntrb_wav_wrapper(){
+	test_ntrb_getSubchunk1Start();
+	test_ntrb_getSubchunk2Start();
 	test_ntrb_AudioHeader_from_WAVfile();
 	test_ntrb_get_WAV_audiodata();
 }
