@@ -1,6 +1,7 @@
 #include "bytevec.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 
 const ntrb_bytevec failed_ntrb_bytevec = {.base_ptr = NULL, .elements = 0, .capacity = 0};
@@ -23,6 +24,17 @@ bool ntrb_bytevec_reserve(ntrb_bytevec* const obj, const size_t additional_bytes
 	obj->capacity = new_capacity;
 	return true;
 }
+
+bool ntrb_bytevec_append(ntrb_bytevec* const obj, const size_t typesize, const void* const value){
+	while(obj->elements + typesize >= obj->capacity){
+		bool reserve_success = ntrb_bytevec_reserve(obj, obj->capacity);
+		if(!reserve_success) return false;
+	}
+	
+	memcpy(obj->base_ptr + obj->elements, value, typesize);
+	obj->elements += typesize;
+	return true;
+}	
 
 void ntrb_bytevec_free(ntrb_bytevec* const obj){
 	free(obj->base_ptr);

@@ -16,6 +16,7 @@ extern const ntrb_bytevec failed_ntrb_bytevec;
 
 ntrb_bytevec ntrb_bytevec_new(const size_t alloc_bytes);
 bool ntrb_bytevec_reserve(ntrb_bytevec* const obj, const size_t additional_bytes);
+bool ntrb_bytevec_append(ntrb_bytevec* const obj, const size_t typesize, const void* const value);
 void ntrb_bytevec_free(ntrb_bytevec* const obj);
 
 #endif
