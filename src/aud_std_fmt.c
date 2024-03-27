@@ -127,9 +127,7 @@ ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, co
 //If not, interpolates the dest datapoints from orig.
 ntrb_AudioDatapoints ntrb_to_samplerate(const ntrb_AudioDatapoints orig, const uint32_t orig_samplerate, const uint32_t dest_samplerate){
 	if(orig_samplerate == dest_samplerate) return ntrb_AudioDatapoints_copy(orig);
-	
-	const double dest_over_orig_samplerate = (double)dest_samplerate / (double)orig_samplerate;
-	
+		
 	ntrb_AudioDatapoints dest_aud = failed_ntrb_AudioDatapoints;
 	const size_t stereo_channels = 2;
 	const size_t left_channel_offset = 0;
