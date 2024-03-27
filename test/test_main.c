@@ -1,3 +1,4 @@
+#include "test_alloc.h"
 #include "test_aud_std_fmt.h"
 #include "test_audeng_wrapper.h"
 #include "test_AudioDatapoints.h"
@@ -17,6 +18,7 @@ int main(){
 	printf("If an all clear message is not shown after this, the test has failed.\n");
 	fflush(stdout);
 	
+	test_suite_ntrb_alloc();
 	test_suite_ntrb_aud_std_fmt();
 	test_suite_ntrb_audeng_wrapper();
 	test_suite_ntrb_AudioDatapoints();
