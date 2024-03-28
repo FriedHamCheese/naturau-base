@@ -1,4 +1,5 @@
 #include "SlicedStrings.h"
+#include "alloc.h"
 
 #include "str_utils.h"
 
@@ -18,11 +19,11 @@ ntrb_SlicedStrings ntrb_SlicedStrings_new(const size_t str_count){
 	slices.elem = str_count;	
 	if(str_count == 0) return failed_ntrb_SlicedStrings;
 	
-	slices.str_ptrs = calloc(str_count, sizeof(char*));	//implicit NULL initialised char*.
+	slices.str_ptrs = ntrb_calloc(str_count, sizeof(char*));	//implicit NULL initialised char*.
 	if(slices.str_ptrs == NULL) return failed_ntrb_SlicedStrings;	
 	
 	for(size_t i = 0; i < slices.elem; i++){
-		char* const ptr = calloc(ntrb_slice_string_max_len + 1, sizeof(char));	//implicit all \0 initialised char[]
+		char* const ptr = ntrb_calloc(ntrb_slice_string_max_len + 1, sizeof(char));	//implicit all \0 initialised char[]
 		if(ptr == NULL){
 			ntrb_SlicedStrings_free(&slices);
 			return failed_ntrb_SlicedStrings;
@@ -37,9 +38,9 @@ void ntrb_SlicedStrings_free(ntrb_SlicedStrings* const obj){
 	if(obj->str_ptrs == NULL) return;
 	
 	for(size_t i = 0; i < obj->elem; i++){
-		free(obj->str_ptrs[i]);
+		ntrb_free(obj->str_ptrs[i]);
 	}
-	free(obj->str_ptrs);
+	ntrb_free(obj->str_ptrs);
 	obj->str_ptrs = NULL;
 	obj->elem = 0;
 }
@@ -78,13 +79,13 @@ ntrb_SlicedStrings ntrb_SlicedStrings_slice_sep(const char* const str, const siz
 	if(no_duplicate_sep_str == NULL) return failed_ntrb_SlicedStrings;
 	
 	ntrb_SlicedStrings slices = ntrb_SlicedStrings_slice_without_trimming(no_duplicate_sep_str, strlen(no_duplicate_sep_str), separator);
-	free(no_duplicate_sep_str);
+	ntrb_free(no_duplicate_sep_str);
 	if(slices.str_ptrs == NULL) return failed_ntrb_SlicedStrings;
 	
 	for(size_t i = 0; i < slices.elem; i++){
 		const size_t slice_str_len = strlen(slices.str_ptrs[i]);
 		if(slice_str_len < ntrb_slice_string_max_len){
-			slices.str_ptrs[i] = realloc(slices.str_ptrs[i], slice_str_len + 1);
+			slices.str_ptrs[i] = ntrb_realloc(slices.str_ptrs[i], slice_str_len + 1);
 			slices.str_ptrs[i][slice_str_len] = '\0';
 		}
 	}
@@ -112,7 +113,7 @@ char* ntrb_SlicedStrings_concat_strs(const ntrb_SlicedStrings slices, const size
 	if(!no_separator) total_strlen--;
 	
 	const size_t null_term_size = sizeof(char);
-	char* str = calloc(total_strlen + null_term_size, sizeof(char));
+	char* str = ntrb_calloc(total_strlen + null_term_size, sizeof(char));
 	if(str == NULL) return NULL;
 		
 	if(no_separator){

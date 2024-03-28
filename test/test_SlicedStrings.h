@@ -16,14 +16,14 @@ static void test_ntrb_SlicedStrings_new(){
 	assert(sliced_strs.str_ptrs != NULL);
 
 	const size_t str_alloc_size = ntrb_slice_string_max_len+1;
-	char* expected_str_alloc = calloc(str_alloc_size, sizeof(char));
+	char* expected_str_alloc = ntrb_calloc(str_alloc_size, sizeof(char));
 	
 	for(size_t i = 0; i < sliced_strs.elem; i++){
 		assert(memcmp(expected_str_alloc, sliced_strs.str_ptrs[i], str_alloc_size) == 0);
 	}
 	
 	ntrb_SlicedStrings_free(&sliced_strs);
-	free(expected_str_alloc);
+	ntrb_free(expected_str_alloc);
 }
 
 static void test_ntrb_SlicedStrings_free(){
@@ -105,13 +105,13 @@ static void test_ntrb_SlicedStrings_concat_strs(){
 	char* const slash_sep_str = ntrb_SlicedStrings_concat_strs(sliced_strs, 0, sliced_strs.elem, '/');
 	assert(slash_sep_str != NULL);
 	assert(strcmp(slash_sep_str, expected_slash_sep_str) == 0);
-	free(slash_sep_str);
+	ntrb_free(slash_sep_str);
 	
 	const char* const expected_nosep_str = "americancheese";
 	char* const nosep_str = ntrb_SlicedStrings_concat_strs(sliced_strs, 1, sliced_strs.elem, '\0');
 	assert(nosep_str != NULL);
 	assert(strcmp(nosep_str, expected_nosep_str) == 0);	
-	free(nosep_str);
+	ntrb_free(nosep_str);
 	
 	ntrb_SlicedStrings_free(&sliced_strs);
 }

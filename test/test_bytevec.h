@@ -2,6 +2,7 @@
 #define test_ntrb_bytevec_h
 
 #include "bytevec.h"
+#include "alloc.h"
 
 #include <stdio.h>
 #include <stddef.h>

@@ -1,4 +1,5 @@
 #include "str_utils.h"
+#include "alloc.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,14 +29,14 @@ enum ntrb_GetCharStatus ntrb_getsn(const size_t max_strlen, FILE* const instream
 	if an feof is caught, we return the read *(char*) param, remember an EOF has occurred, clear the error, and return EOF enum.
 	if fgets reads without any errors, return the read *(char)* param and return an OK enum.
 	*/
-	*ret = calloc(max_strlen+1, sizeof(char));
+	*ret = ntrb_calloc(max_strlen+1, sizeof(char));
 	if(*ret == NULL) return ntrb_GetChar_AllocErr;
 	
 	//this reads max_strlen characters.
 	char* const fgets_ptr = fgets(*ret, max_strlen+1, instream);
 
 	if(fgets_ptr == NULL){
-		free(*ret);
+		ntrb_free(*ret);
 		*ret = NULL;
 		
 		const int feof_status = feof(instream);
@@ -46,7 +47,7 @@ enum ntrb_GetCharStatus ntrb_getsn(const size_t max_strlen, FILE* const instream
 		else return (ntrb_GetChar_Ferror + ferror_status);
 	}
 	
-	*ret = realloc(*ret, strlen(*ret)+1);
+	*ret = ntrb_realloc(*ret, strlen(*ret)+1);
 	const size_t last_char_it = strlen(*ret)-1;
 	if((*ret)[last_char_it] == '\n') (*ret)[last_char_it] = '\0';
 	
@@ -54,7 +55,7 @@ enum ntrb_GetCharStatus ntrb_getsn(const size_t max_strlen, FILE* const instream
 }
 
 char* ntrb_trim_duplicate_separators(const char* const untrimmed_str, const size_t str_len, const char separator){	
-	char* const trimmed_str = calloc(str_len+1, sizeof(char));
+	char* const trimmed_str = ntrb_calloc(str_len+1, sizeof(char));
 	if(trimmed_str == NULL) return NULL;
 	
 	size_t i_trimmed = 0;
@@ -82,7 +83,7 @@ char* ntrb_get_filetype(const char* const filename){
 	const size_t filetype_len = strlen(filetype_begin);
 	if(!filetype_len) return NULL;
 	
-	char* filetype = calloc(filetype_len + 1, sizeof(char));
+	char* filetype = ntrb_calloc(filetype_len + 1, sizeof(char));
 	memcpy(filetype, filetype_begin, filetype_len);
 	return filetype;
 }
