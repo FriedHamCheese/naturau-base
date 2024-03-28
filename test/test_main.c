@@ -30,18 +30,19 @@ int main(){
 	assert(ntrb_memdebug_init());
 	#endif
 	
-	test_suite_ntrb_aud_std_fmt();
-	test_suite_ntrb_audeng_wrapper();
-	test_suite_ntrb_AudioDatapoints();
+	test_suite_ntrb_utils();	
 	test_suite_ntrb_bytevec();
-
-	test_suite_ntrb_decode_flac();
-	test_suite_ntrb_file_wrapper();
-	test_suite_ntrb_RuntimeCoreData();
+	test_suite_ntrb_AudioDatapoints();
 	test_suite_ntrb_SlicedStrings();	
 	test_suite_ntrb_str_utils();	
+
+	test_suite_ntrb_file_wrapper();
 	test_suite_ntrb_wav_wrapper();
-	test_suite_ntrb_utils();
+	test_suite_ntrb_decode_flac();
+	
+	test_suite_ntrb_aud_std_fmt();
+	test_suite_ntrb_audeng_wrapper();
+	test_suite_ntrb_RuntimeCoreData();
 	
 	#ifdef NTRB_MEMDEBUG
 	ntrb_memdebug_uninit(true);

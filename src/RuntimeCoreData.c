@@ -1,5 +1,6 @@
 #include "RuntimeCoreData.h"
 
+#include "alloc.h"
 #include "aud_std_fmt.h"
 #include "audeng_wrapper.h"
 #include "AudioDatapoints.h"
@@ -55,7 +56,7 @@ int ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
 }
 
 void ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index){
-	free(rcd->audio_tracks[track_index]->bytes);
+	ntrb_free(rcd->audio_tracks[track_index]->bytes);
 	free(rcd->audio_tracks[track_index]);
 	rcd->audio_tracks[track_index] = NULL;
 }
