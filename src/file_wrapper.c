@@ -1,6 +1,8 @@
 #include "file_wrapper.h"
 #include "SpanU8.h"
 
+#include "alloc.h"
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -44,7 +46,7 @@ enum ntrb_ReadFileResult ntrb_read_entire_file_rb(ntrb_SpanU8* const buffer, con
 	}
 	
 	//buffer Alloc, this ptr is the return value
-	buffer->ptr = (uint8_t*)calloc(filesize_bytes, sizeof(uint8_t));
+	buffer->ptr = (uint8_t*)ntrb_calloc(filesize_bytes, sizeof(uint8_t));
 	if(buffer->ptr == NULL){
 		result = ntrb_ReadFileResult_CallocError;
 		goto close_file;
@@ -60,7 +62,7 @@ enum ntrb_ReadFileResult ntrb_read_entire_file_rb(ntrb_SpanU8* const buffer, con
 		//eof would never happen, because read binary reads all the characters/bytes
 		
 		//ferror happened, we choose to not return buffer which may contain errors.
-		free(buffer->ptr);
+		ntrb_free(buffer->ptr);
 		buffer->ptr = NULL;
 		result = ntrb_ReadFileResult_FileReadError;
 	}

@@ -27,12 +27,12 @@ static void test_free_ntrb_RuntimeCoreData(){
 	ntrb_RuntimeCoreData rcd;
 	assert(ntrb_RuntimeCoreData_new(&rcd, 16) == 0);
 	
-	ntrb_AudioDatapoints* aud_1 = malloc(sizeof(ntrb_AudioDatapoints));
+	ntrb_AudioDatapoints* aud_1 = ntrb_malloc(sizeof(ntrb_AudioDatapoints));
 	assert(aud_1 != NULL);
 	*aud_1 = ntrb_AudioDatapoints_new(sizeof(float));
 	assert(aud_1->bytes != NULL);
 	
-	ntrb_AudioDatapoints* aud_2 = malloc(sizeof(ntrb_AudioDatapoints));
+	ntrb_AudioDatapoints* aud_2 = ntrb_malloc(sizeof(ntrb_AudioDatapoints));
 	assert(aud_2 != NULL);
 	*aud_2 = ntrb_AudioDatapoints_new(sizeof(float));
 	assert(aud_2->bytes != NULL);
@@ -53,7 +53,7 @@ static void test_free_ntrb_RuntimeCoreData_track(){
 	ntrb_RuntimeCoreData rcd;
 	assert(ntrb_RuntimeCoreData_new(&rcd, 16) == 0);
 	
-	ntrb_AudioDatapoints* aud_1 = malloc(sizeof(ntrb_AudioDatapoints));
+	ntrb_AudioDatapoints* aud_1 = ntrb_malloc(sizeof(ntrb_AudioDatapoints));
 	assert(aud_1 != NULL);
 	*aud_1 = ntrb_AudioDatapoints_new(sizeof(float));
 	assert(aud_1->bytes != NULL);

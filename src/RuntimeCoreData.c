@@ -24,7 +24,7 @@ const ntrb_RuntimeCoreData failed_ntrb_RuntimeCoreData = {
 
 int ntrb_RuntimeCoreData_new(ntrb_RuntimeCoreData* const rcd, const uint16_t track_count){	
 	if(track_count == 0) return ENOMEM;
-	rcd->audio_tracks = calloc(track_count, sizeof(ntrb_AudioDatapoints*));
+	rcd->audio_tracks = ntrb_calloc(track_count, sizeof(ntrb_AudioDatapoints*));
 	if(rcd->audio_tracks == NULL) return ENOMEM;
 	
 	rcd->audio_track_count = track_count;
@@ -42,7 +42,7 @@ int ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
 			if(rcd->audio_tracks[i] != NULL)
 				ntrb_RuntimeCoreData_free_track(rcd, i);
 		}
-		free(rcd->audio_tracks);
+		ntrb_free(rcd->audio_tracks);
 		rcd->audio_tracks = NULL;
 	}	
 	rcd->audio_track_count = 0;
@@ -57,17 +57,17 @@ int ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
 
 void ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index){
 	ntrb_free(rcd->audio_tracks[track_index]->bytes);
-	free(rcd->audio_tracks[track_index]);
+	ntrb_free(rcd->audio_tracks[track_index]);
 	rcd->audio_tracks[track_index] = NULL;
 }
 
 enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCoreData* const runtime_data, const char* filename){
-	ntrb_AudioDatapoints* aud = malloc(sizeof(ntrb_AudioDatapoints));
+	ntrb_AudioDatapoints* aud = ntrb_malloc(sizeof(ntrb_AudioDatapoints));
 	if(aud == NULL) return ntrb_RCD_QueueAudio_MallocError;
 	
 	enum ntrb_LoadStdFmtAudioResult audio_load_result = ntrb_load_std_fmt_audio(aud, filename);
 	if(audio_load_result != ntrb_LoadStdFmtAudioResult_OK){
-		free(aud);
+		ntrb_free(aud);
 		return ntrb_RCD_QueueAudio_ntrb_LoadStdFmtAudioResult + audio_load_result;
 	}
 	
