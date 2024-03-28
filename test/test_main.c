@@ -25,7 +25,11 @@ int main(){
 	test_suite__ntrb_alloc_bytevec();
 	test_suite_ntrb_alloc();
 	
-	#ifndef NTRB_TEST_MEMDEBUG_LEAK_ONLY	
+	#ifndef NTRB_TEST_MEMDEBUG_LEAK_ONLY
+	#ifdef NTRB_MEMDEBUG
+	assert(ntrb_memdebug_init());
+	#endif
+	
 	test_suite_ntrb_aud_std_fmt();
 	test_suite_ntrb_audeng_wrapper();
 	test_suite_ntrb_AudioDatapoints();
@@ -38,6 +42,10 @@ int main(){
 	test_suite_ntrb_str_utils();	
 	test_suite_ntrb_wav_wrapper();
 	test_suite_ntrb_utils();
+	
+	#ifdef NTRB_MEMDEBUG
+	ntrb_memdebug_uninit(true);
+	#endif
 	#endif
 	
 	printf("\n[ALL CLEAR]: No errors from test routine.\n");

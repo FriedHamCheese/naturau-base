@@ -1,4 +1,3 @@
-#define NTRB_MEMDEBUG
 #include "alloc.h"
 
 #include <stdio.h>
@@ -7,6 +6,7 @@
 #include <string.h>
 #include <stdbool.h>
 
+#ifdef NTRB_MEMDEBUG
 static bool _test__ntrb_memdebug_ptr_equal(const size_t i, const void* const ptr){
 	return ((void**)(_ntrb_memdebug_ptr.base_ptr))[i] == ptr;
 }
@@ -247,7 +247,10 @@ static void test__ntrb_memdebug_realloc(){
 	ntrb_memdebug_uninit(false);	
 }
 
+#endif
+
 static void test_suite_ntrb_alloc(){
+	#ifdef NTRB_MEMDEBUG
 	test__ntrb_memdebug_add_element_to_unused_space();
 	test__ntrb_memdebug_add_element();
 	test__ntrb_memdebug_remove_element();
@@ -256,6 +259,5 @@ static void test_suite_ntrb_alloc(){
 	test__ntrb_memdebug_malloc();
 	test__ntrb_memdebug_calloc();
 	test__ntrb_memdebug_realloc();
+	#endif
 }
-
-#undef NTRB_MEMDEBUG

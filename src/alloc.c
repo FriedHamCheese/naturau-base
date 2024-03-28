@@ -1,4 +1,3 @@
-#define NTRB_MEMDEBUG
 #include "alloc.h"
 #include "_alloc_bytevec.h"
 
@@ -12,6 +11,7 @@ _ntrb_alloc_bytevec _ntrb_memdebug_size;
 _ntrb_alloc_bytevec _ntrb_memdebug_filename;
 _ntrb_alloc_bytevec _ntrb_memdebug_line;
 
+#ifdef NTRB_MEMDEBUG
 bool ntrb_memdebug_init(){
 	_ntrb_memdebug_ptr = _ntrb_alloc_bytevec_new(sizeof(void*));
 	if(_ntrb_memdebug_ptr.base_ptr == NULL) return false;
@@ -177,4 +177,4 @@ void _ntrb_memdebug_remove_element(const size_t i_element, const size_t element_
 	}
 }
 
-#undef NTRB_MEMDEBUG
+#endif
