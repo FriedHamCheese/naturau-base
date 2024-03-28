@@ -1,28 +1,28 @@
 #define NTRB_MEMDEBUG
 #include "alloc.h"
-#include "bytevec.h"
+#include "_alloc_bytevec.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
 	
-ntrb_bytevec _ntrb_memdebug_ptr;
-ntrb_bytevec _ntrb_memdebug_size;
-ntrb_bytevec _ntrb_memdebug_filename;
-ntrb_bytevec _ntrb_memdebug_line;
+_ntrb_alloc_bytevec _ntrb_memdebug_ptr;
+_ntrb_alloc_bytevec _ntrb_memdebug_size;
+_ntrb_alloc_bytevec _ntrb_memdebug_filename;
+_ntrb_alloc_bytevec _ntrb_memdebug_line;
 
 bool ntrb_memdebug_init(){
-	_ntrb_memdebug_ptr = ntrb_bytevec_new(sizeof(void*));
+	_ntrb_memdebug_ptr = _ntrb_alloc_bytevec_new(sizeof(void*));
 	if(_ntrb_memdebug_ptr.base_ptr == NULL) return false;
 	
-	_ntrb_memdebug_size = ntrb_bytevec_new(sizeof(size_t));
+	_ntrb_memdebug_size = _ntrb_alloc_bytevec_new(sizeof(size_t));
 	if(_ntrb_memdebug_size.base_ptr == NULL) return false;
 	
-	_ntrb_memdebug_filename = ntrb_bytevec_new(sizeof(const char*));
+	_ntrb_memdebug_filename = _ntrb_alloc_bytevec_new(sizeof(const char*));
 	if(_ntrb_memdebug_filename.base_ptr == NULL) return false;
 	
-	_ntrb_memdebug_line = ntrb_bytevec_new(sizeof(int));
+	_ntrb_memdebug_line = _ntrb_alloc_bytevec_new(sizeof(int));
 	if(_ntrb_memdebug_line.base_ptr == NULL) return false;
 	
 	return true;
@@ -34,10 +34,10 @@ void ntrb_memdebug_uninit(const bool print_summary){
 		ntrb_memdebug_view();
 	}
 	
-	ntrb_bytevec_free(&_ntrb_memdebug_ptr);
-	ntrb_bytevec_free(&_ntrb_memdebug_size);
-	ntrb_bytevec_free(&_ntrb_memdebug_filename);
-	ntrb_bytevec_free(&_ntrb_memdebug_line);	
+	_ntrb_alloc_bytevec_free(&_ntrb_memdebug_ptr);
+	_ntrb_alloc_bytevec_free(&_ntrb_memdebug_size);
+	_ntrb_alloc_bytevec_free(&_ntrb_memdebug_filename);
+	_ntrb_alloc_bytevec_free(&_ntrb_memdebug_line);	
 }
 
 
@@ -119,10 +119,10 @@ void _ntrb_memdebug_free(void* const ptr, const char* const filename, const int 
 
 void _ntrb_memdebug_add_element(void* const ptr, const size_t size_bytes, const char* const filename, const int line){
 	if(!_ntrb_memdebug_add_element_to_unused_space(ptr, size_bytes, filename, line)){
-		assert(ntrb_bytevec_append(&_ntrb_memdebug_ptr, sizeof(void*), &ptr));
-		assert(ntrb_bytevec_append(&_ntrb_memdebug_size, sizeof(size_t), &size_bytes));
-		assert(ntrb_bytevec_append(&_ntrb_memdebug_filename, sizeof(const char*), &filename));
-		assert(ntrb_bytevec_append(&_ntrb_memdebug_line, sizeof(int), &line));		
+		assert(_ntrb_alloc_bytevec_append(&_ntrb_memdebug_ptr, sizeof(void*), &ptr));
+		assert(_ntrb_alloc_bytevec_append(&_ntrb_memdebug_size, sizeof(size_t), &size_bytes));
+		assert(_ntrb_alloc_bytevec_append(&_ntrb_memdebug_filename, sizeof(const char*), &filename));
+		assert(_ntrb_alloc_bytevec_append(&_ntrb_memdebug_line, sizeof(int), &line));		
 	}
 }
 

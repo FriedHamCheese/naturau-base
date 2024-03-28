@@ -1,7 +1,7 @@
 #ifndef ntrb_alloc_h
 #define ntrb_alloc_h
 
-#include "bytevec.h"
+#include "_alloc_bytevec.h"
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -24,10 +24,10 @@
 #endif
 
 //all from alloc.c
-extern ntrb_bytevec _ntrb_memdebug_ptr;
-extern ntrb_bytevec _ntrb_memdebug_size;
-extern ntrb_bytevec _ntrb_memdebug_filename;
-extern ntrb_bytevec _ntrb_memdebug_line;
+extern _ntrb_alloc_bytevec _ntrb_memdebug_ptr;
+extern _ntrb_alloc_bytevec _ntrb_memdebug_size;
+extern _ntrb_alloc_bytevec _ntrb_memdebug_filename;
+extern _ntrb_alloc_bytevec _ntrb_memdebug_line;
 
 void* _ntrb_memdebug_malloc(const size_t size_bytes, const char* const filename, const int line);
 void* _ntrb_memdebug_calloc(const size_t elements, const size_t typesize, const char* const filename, const int line);
