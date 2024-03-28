@@ -2,9 +2,14 @@
 #include "_alloc_bytevec.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+	
+int_least64_t _ntrb_memdebug_initialized_value;
+//i just mashed my keypad kekew
+const int_least64_t _ntrb_memdebug_correct_initialized_value = 84984981896;
 	
 _ntrb_alloc_bytevec _ntrb_memdebug_ptr;
 _ntrb_alloc_bytevec _ntrb_memdebug_size;
@@ -13,6 +18,7 @@ _ntrb_alloc_bytevec _ntrb_memdebug_line;
 
 #ifdef NTRB_MEMDEBUG
 bool ntrb_memdebug_init(){
+	assert(_ntrb_memdebug_initialized_value != _ntrb_memdebug_correct_initialized_value);
 	_ntrb_memdebug_ptr = _ntrb_alloc_bytevec_new(sizeof(void*));
 	if(_ntrb_memdebug_ptr.base_ptr == NULL) return false;
 	
@@ -25,10 +31,13 @@ bool ntrb_memdebug_init(){
 	_ntrb_memdebug_line = _ntrb_alloc_bytevec_new(sizeof(int));
 	if(_ntrb_memdebug_line.base_ptr == NULL) return false;
 	
+	_ntrb_memdebug_initialized_value = _ntrb_memdebug_correct_initialized_value;
 	return true;
 }
 
 void ntrb_memdebug_uninit(const bool print_summary){
+	assert(_ntrb_memdebug_initialized_value == _ntrb_memdebug_correct_initialized_value);
+	
 	if(print_summary){
 		printf("[Info]: ntrb_memdebug_uninit() called, the resources listed below are not freed properly.\n");
 		ntrb_memdebug_view();
@@ -38,10 +47,14 @@ void ntrb_memdebug_uninit(const bool print_summary){
 	_ntrb_alloc_bytevec_free(&_ntrb_memdebug_size);
 	_ntrb_alloc_bytevec_free(&_ntrb_memdebug_filename);
 	_ntrb_alloc_bytevec_free(&_ntrb_memdebug_line);	
+	
+	_ntrb_memdebug_initialized_value = 125;
 }
 
 
 void ntrb_memdebug_view(){
+	assert(_ntrb_memdebug_initialized_value == _ntrb_memdebug_correct_initialized_value);
+	
 	bool printed_an_element = false;
 	for(size_t i = 0; i < _ntrb_memdebug_ptr.elements/sizeof(void*); i++){
 		const void* ptr = *(void**)(_ntrb_memdebug_ptr.base_ptr + i*sizeof(void*));
@@ -62,7 +75,7 @@ void ntrb_memdebug_view(){
 }
 
 
-void* _ntrb_memdebug_malloc(const size_t size_bytes, const char* const filename, const int line){
+void* _ntrb_memdebug_malloc(const size_t size_bytes, const char* const filename, const int line){	
 	void* const ptr = malloc(size_bytes);
 	if(ptr) _ntrb_memdebug_add_element(ptr, size_bytes, filename, line);
 	
@@ -118,6 +131,8 @@ void _ntrb_memdebug_free(void* const ptr, const char* const filename, const int 
 
 
 void _ntrb_memdebug_add_element(void* const ptr, const size_t size_bytes, const char* const filename, const int line){
+	assert(_ntrb_memdebug_initialized_value == _ntrb_memdebug_correct_initialized_value);
+
 	if(!_ntrb_memdebug_add_element_to_unused_space(ptr, size_bytes, filename, line)){
 		assert(_ntrb_alloc_bytevec_append(&_ntrb_memdebug_ptr, sizeof(void*), &ptr));
 		assert(_ntrb_alloc_bytevec_append(&_ntrb_memdebug_size, sizeof(size_t), &size_bytes));
@@ -144,7 +159,9 @@ bool _ntrb_memdebug_add_element_to_unused_space(void* const ptr, const size_t si
 	return false;
 }
 
-int_least64_t _ntrb_memdebug_ptr_index(const void* const ptr){
+int_least64_t _ntrb_memdebug_ptr_index(const void* const ptr){	
+	assert(_ntrb_memdebug_initialized_value == _ntrb_memdebug_correct_initialized_value);
+
 	const size_t ptr_count = _ntrb_memdebug_ptr.elements / sizeof(void*);
 	
 	for(size_t i = 0; i < ptr_count; i++){
@@ -156,6 +173,8 @@ int_least64_t _ntrb_memdebug_ptr_index(const void* const ptr){
 }
 
 void _ntrb_memdebug_replace_element(const size_t i_element, void* const ptr, const size_t size_bytes, const char* const filename, const int line){
+	assert(_ntrb_memdebug_initialized_value == _ntrb_memdebug_correct_initialized_value);
+
 	((void**)(_ntrb_memdebug_ptr.base_ptr))[i_element] = ptr;
 	((size_t*)(_ntrb_memdebug_size.base_ptr))[i_element] = size_bytes;
 	((const char**)(_ntrb_memdebug_filename.base_ptr))[i_element] = filename;
@@ -163,6 +182,8 @@ void _ntrb_memdebug_replace_element(const size_t i_element, void* const ptr, con
 }
 
 void _ntrb_memdebug_remove_element(const size_t i_element, const size_t element_count){
+	assert(_ntrb_memdebug_initialized_value == _ntrb_memdebug_correct_initialized_value);
+	
 	((void**)(_ntrb_memdebug_ptr.base_ptr))[i_element] = NULL;
 	((size_t*)(_ntrb_memdebug_size.base_ptr))[i_element] = 0;
 	((const char**)(_ntrb_memdebug_filename.base_ptr))[i_element] = NULL;
