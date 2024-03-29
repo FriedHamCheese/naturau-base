@@ -278,17 +278,17 @@ enum ntrb_LoadStdFmtAudioResult ntrb_load_std_fmt_audio(ntrb_AudioDatapoints* co
 	ntrb_AudioDatapoints aud_datapoints;
 	
 	if(strcmp(filetype, "wav") == 0){
-		free(filetype);
+		ntrb_free(filetype);
 		const enum ntrb_LoadStdFmtAudioResult wav_load_result = ntrb_load_wav(&aud_header, &aud_datapoints, filename);
 		if(wav_load_result != ntrb_LoadStdFmtAudioResult_OK) return wav_load_result;
 	}
 	else if(strcmp(filetype, "flac") == 0){
-		free(filetype);		
+		ntrb_free(filetype);		
 		const enum ntrb_LoadStdFmtAudioResult flac_load_result = ntrb_load_flac(&aud_header, &aud_datapoints, filename);
 		if(flac_load_result != ntrb_LoadStdFmtAudioResult_OK) return flac_load_result;		
 	}
 	else{
-		free(filetype);	
+		ntrb_free(filetype);	
 		return ntrb_LoadStdFmtAudioResult_FiletypeError;
 	}
 	
