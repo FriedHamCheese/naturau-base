@@ -10,7 +10,7 @@
 
 static void test_ntrb_AudioDatapoints_new(){
 	const size_t alloc_size_bytes = 15;
-	void* all_zero_array = calloc(alloc_size_bytes, sizeof(uint8_t));
+	void* all_zero_array = ntrb_calloc(alloc_size_bytes, sizeof(uint8_t));
 	
 	const ntrb_AudioDatapoints aud = ntrb_AudioDatapoints_new(alloc_size_bytes);
 	
@@ -20,8 +20,8 @@ static void test_ntrb_AudioDatapoints_new(){
 	
 	assert(memcmp(aud.bytes, all_zero_array, alloc_size_bytes) == 0);
 	
-	free(aud.bytes);
-	free(all_zero_array);
+	ntrb_free(aud.bytes);
+	ntrb_free(all_zero_array);
 	
 	assert(ntrb_AudioDatapoints_new(0).bytes == NULL);
 }
@@ -43,8 +43,8 @@ static void test_ntrb_AudioDatapoints_copy(){
 	assert(aud_1.byte_pos == aud_2.byte_pos);
 	assert(aud_2.byte_count == aud_1.byte_count);
 	
-	free(aud_1.bytes);
-	free(aud_2.bytes);
+	ntrb_free(aud_1.bytes);
+	ntrb_free(aud_2.bytes);
 }
 
 static void test_ntrb_AudioDatapoints_free(){

@@ -7,6 +7,7 @@
 #include "aud_std_fmt.h"
 #include "audeng_wrapper.h"
 #include "file_wrapper.h"
+#include "alloc.h"
 
 #include <pthread.h>
 
@@ -29,7 +30,7 @@ void* user_input_loop(void* const runtime_core_data_void){
 		}
 		
 		ntrb_SlicedStrings sliced_strs = ntrb_SlicedStrings_slice(user_input_str, strlen(user_input_str));
-		free(user_input_str);
+		ntrb_free(user_input_str);
 		if(sliced_strs.str_ptrs == NULL){
 			fprintf(stderr, "[Error]: %s: %d: Error parsing user input.\n", __FILE__, __LINE__);
 			fflush(stderr);	
@@ -76,9 +77,11 @@ void* user_input_loop(void* const runtime_core_data_void){
 						fflush(stdout);
 					}
 				}
+				ntrb_free(concat_strs);
 			}
 		}	
 		else if(strcmp(command, "q") == strcmp_equal){
+			ntrb_SlicedStrings_free(&sliced_strs);			
 			rcd->requested_exit = true;
 			break;
 		}
@@ -94,6 +97,13 @@ void* user_input_loop(void* const runtime_core_data_void){
 }
 
 int main(){
+	#ifdef NTRB_MEMDEBUG
+	if(!ntrb_memdebug_init()){
+		fprintf(stderr, "[Error]: %s: %d: Error initialising ntrb_memdebug.\n", __FILE__, __LINE__);		
+		return -1;
+	}
+	#endif
+	
 	ntrb_RuntimeCoreData rcd;
 	const int rcd_new_status = ntrb_RuntimeCoreData_new(&rcd, 256);
 	if(rcd_new_status != 0){
@@ -111,6 +121,10 @@ int main(){
 	pthread_join(audio_engine_thread, NULL);
 	
 	ntrb_RuntimeCoreData_free(&rcd);
+	
+	#ifdef NTRB_MEMDEBUG
+	ntrb_memdebug_uninit(true);
+	#endif
 	
 	return 0;
 }

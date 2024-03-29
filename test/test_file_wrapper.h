@@ -25,7 +25,7 @@ static void test_ntrb_read_entire_file_rb(){
 	assert(read_result == ntrb_ReadFileResult_OK);
 	assert(memcmp(correct_data, file_buffer.ptr, file_buffer.elem) == 0);
 	
-	free(file_buffer.ptr);
+	ntrb_free(file_buffer.ptr);
 	
 	ntrb_SpanU8 file_buffer_2;
 	const char* invalid_file = "opekfop4ekfoprk4fop4kf.jpg";

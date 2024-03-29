@@ -32,7 +32,7 @@ static void test_ntrb_AudioDatapoints_i16_to_f32(){
 	assert(f32_aud.byte_count == datapoint_count * sizeof(float));
 	
 	assert(memcmp(f32_aud.bytes, f32_ref_datapoints, f32_aud.byte_count) == 0);
-	free(f32_aud.bytes);
+	ntrb_free(f32_aud.bytes);
 	free(f32_ref_datapoints);
 }
 
@@ -56,8 +56,8 @@ static void test_ntrb_split_as_mono(){
 	assert(((float*)(ch2_aud.bytes))[1] == 4.0f);
 	assert(((float*)(ch2_aud.bytes))[2] == 7.0f);
 	
-	free(ch2_aud.bytes);
-	free(aud.bytes);
+	ntrb_free(ch2_aud.bytes);
+	ntrb_free(aud.bytes);
 }
 
 static void test_ntrb_mono_to_xchannels(){
@@ -85,8 +85,8 @@ static void test_ntrb_mono_to_xchannels(){
 		}
 	}
 	
-	free(mono_aud.bytes);
-	free(dup4ch_aud.bytes);
+	ntrb_free(mono_aud.bytes);
+	ntrb_free(dup4ch_aud.bytes);
 }
 
 static void test_ntrb_merge_to_stereo(){
@@ -119,9 +119,9 @@ static void test_ntrb_merge_to_stereo(){
 	l_ch.byte_count--;	
 	assert(ntrb_merge_to_stereo(l_ch, r_ch).bytes == NULL);
 	
-	free(l_ch.bytes);
-	free(r_ch.bytes);
-	free(stereo_aud.bytes);
+	ntrb_free(l_ch.bytes);
+	ntrb_free(r_ch.bytes);
+	ntrb_free(stereo_aud.bytes);
 }
 
 
@@ -143,7 +143,7 @@ static void test_ntrb_to_samplerate_mono_upscale(){
 		assert(ntrb_float_equal(expected_dest_datapoints[i], ((float*)(dest_aud.bytes))[i], allowed_error));
 	}
 	
-	free(dest_aud.bytes);
+	ntrb_free(dest_aud.bytes);
 }
 
 static void test_ntrb_to_samplerate_mono_downscale(){
@@ -165,7 +165,7 @@ static void test_ntrb_to_samplerate_mono_downscale(){
 	}	
 	
 	
-	free(dest_aud.bytes);
+	ntrb_free(dest_aud.bytes);
 }
 
 static void test_ntrb_to_samplerate_mono(){

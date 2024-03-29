@@ -41,15 +41,15 @@ static void test_ntrb_getsn(){
 	char* read_str = 0;
 	assert(ntrb_getsn(128, test_file, &read_str) == ntrb_GetChar_OK);
 	assert(strcmp(read_str, line_1) == 0);
-	free(read_str);
+	ntrb_free(read_str);
 	
 	assert(ntrb_getsn(128, test_file, &read_str) == ntrb_GetChar_OK);
 	assert(strcmp(read_str, line_2) == 0);
-	free(read_str);
+	ntrb_free(read_str);
 
 	assert(ntrb_getsn(128, test_file, &read_str) == ntrb_GetChar_OK);
 	assert(strcmp(read_str, line_3) == 0);
-	free(read_str);
+	ntrb_free(read_str);
 
 	//EOF
 	assert(ntrb_getsn(128, test_file, &read_str) == ntrb_GetChar_EOF);
@@ -65,7 +65,7 @@ static void test_ntrb_trim_duplicate_separators(){
 	char* const returned_str = ntrb_trim_duplicate_separators(input_str, strlen(input_str), '/');
 	assert(returned_str != NULL);
 	assert(strcmp(returned_str, expected_str) == 0);
-	free(returned_str);
+	ntrb_free(returned_str);
 	
 	const char* const no_duplicate_str = "Coconut water";
 	const size_t nodup_strlen = strlen(no_duplicate_str);
@@ -73,14 +73,14 @@ static void test_ntrb_trim_duplicate_separators(){
 	assert(returned_str2 != NULL);
 	assert(strlen(returned_str2) == nodup_strlen);
 	assert(strcmp(returned_str2, no_duplicate_str) == 0);
-	free(returned_str2);
+	ntrb_free(returned_str2);
 }
 
 static void test_ntrb_get_filetype(){
 	char* const filetype_1 = ntrb_get_filetype("I.love.cookies!");
 	assert(filetype_1 != NULL);
 	assert(strcmp(filetype_1, "cookies!") == 0);
-	free(filetype_1);
+	ntrb_free(filetype_1);
 	
 	char* const filetype_2 = ntrb_get_filetype("Nofiletype.");
 	assert(filetype_2 == NULL);
@@ -88,7 +88,7 @@ static void test_ntrb_get_filetype(){
 	char* const filetype_3 = ntrb_get_filetype(".makefile");
 	assert(filetype_3 != NULL);	
 	assert(strcmp(filetype_3, "makefile") == 0);
-	free(filetype_3);	
+	ntrb_free(filetype_3);	
 }
 
 static void test_suite_ntrb_str_utils(){

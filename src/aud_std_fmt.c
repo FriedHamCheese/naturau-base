@@ -9,6 +9,7 @@
 #include "decode_flac.h"
 
 #include "utils.h"
+#include "alloc.h"
 #include "str_utils.h"
 
 #include "portaudio.h"
@@ -136,25 +137,25 @@ ntrb_AudioDatapoints ntrb_to_samplerate(const ntrb_AudioDatapoints orig, const u
 	ntrb_AudioDatapoints orig_l = ntrb_split_as_mono(orig, stereo_channels, left_channel_offset);
 	ntrb_AudioDatapoints dest_l = ntrb_to_samplerate_mono(orig_l, (double)orig_samplerate, (double)dest_samplerate);
 	if(orig_l.bytes == NULL || dest_l.bytes == NULL){
-		free(orig_l.bytes);
-		free(dest_l.bytes);
+		ntrb_AudioDatapoints_free(&orig_l);
+		ntrb_AudioDatapoints_free(&dest_l);
 	}
-	free(orig_l.bytes);	
+	ntrb_AudioDatapoints_free(&orig_l);	
 		
 	ntrb_AudioDatapoints orig_r = ntrb_split_as_mono(orig, stereo_channels, right_channel_offset);
 	ntrb_AudioDatapoints dest_r = ntrb_to_samplerate_mono(orig_r, (double)orig_samplerate, (double)dest_samplerate);
 	if(orig_r.bytes == NULL || dest_r.bytes == NULL){
-		free(dest_l.bytes);	
-		free(orig_r.bytes);
-		free(dest_r.bytes);
+		ntrb_AudioDatapoints_free(&dest_l);	
+		ntrb_AudioDatapoints_free(&orig_r);
+		ntrb_AudioDatapoints_free(&dest_r);
 	}
-	free(orig_r.bytes);
+	ntrb_AudioDatapoints_free(&orig_r);
 	
 	dest_aud = ntrb_merge_to_stereo(dest_l, dest_r);
 	if(dest_aud.bytes == NULL) dest_aud = failed_ntrb_AudioDatapoints;
 	
-	free(dest_l.bytes);
-	free(dest_r.bytes);	
+	ntrb_AudioDatapoints_free(&dest_l);
+	ntrb_AudioDatapoints_free(&dest_r);	
 	
 	return dest_aud;
 }
@@ -209,13 +210,13 @@ enum ntrb_StdAudFmtConversionResult ntrb_to_standard_format(ntrb_AudioDatapoints
 	ntrb_AudioDatapoints audF32_2ch;
 	const enum ntrb_StdAudFmtConversionResult to_2ch_result = ntrb_to_std_aud_channels(&audF32_2ch, audF32, orig_header->NumChannels);
 	//ret_aud.bytes Alloc
-	free(audF32.bytes);
+	ntrb_AudioDatapoints_free(&audF32);
 	if(to_2ch_result != ntrb_StdAudFmtConversion_OK)
 		return to_2ch_result;
 	
 	//audF32_96k.bytes Alloc
 	const enum ntrb_StdAudFmtConversionResult to_96k_result = ntrb_to_std_samplerate(ret_aud, audF32_2ch, orig_header->SampleRate);
-	free(audF32_2ch.bytes);
+	ntrb_AudioDatapoints_free(&audF32_2ch);
 	if(to_96k_result != ntrb_StdAudFmtConversion_OK)
 		return to_96k_result;
 	
@@ -235,13 +236,13 @@ enum ntrb_LoadStdFmtAudioResult ntrb_load_wav(ntrb_AudioHeader* const header, nt
 	const enum ntrb_AudioHeaderFromWAVFileStatus audioheader_result = ntrb_AudioHeader_from_WAVfile(header, &audiodata_offset, &audiodata_size, audiofile_data);
 
 	if(audioheader_result != ntrb_AudioHeaderFromWAVFile_ok){
-		free(audiofile_data.ptr);
+		ntrb_free(audiofile_data.ptr);
 		ntrb_AudioHeader_print(*header, stdout);
 		return ntrb_LoadStdFmtAudioResult_ntrb_AudioHeaderFromWAVFileStatus + audioheader_result;
 	}
 
 	*datapoints = ntrb_get_WAV_audiodata(audiofile_data, audiodata_size, audiodata_offset);
-	free(audiofile_data.ptr);
+	ntrb_free(audiofile_data.ptr);
 	
 	if(datapoints->bytes == NULL) return ntrb_LoadStdFmtAudioResult_AllocError;	
 	return ntrb_LoadStdFmtAudioResult_OK;
@@ -277,22 +278,22 @@ enum ntrb_LoadStdFmtAudioResult ntrb_load_std_fmt_audio(ntrb_AudioDatapoints* co
 	ntrb_AudioDatapoints aud_datapoints;
 	
 	if(strcmp(filetype, "wav") == 0){
-		free(filetype);
+		ntrb_free(filetype);
 		const enum ntrb_LoadStdFmtAudioResult wav_load_result = ntrb_load_wav(&aud_header, &aud_datapoints, filename);
 		if(wav_load_result != ntrb_LoadStdFmtAudioResult_OK) return wav_load_result;
 	}
 	else if(strcmp(filetype, "flac") == 0){
-		free(filetype);		
+		ntrb_free(filetype);		
 		const enum ntrb_LoadStdFmtAudioResult flac_load_result = ntrb_load_flac(&aud_header, &aud_datapoints, filename);
 		if(flac_load_result != ntrb_LoadStdFmtAudioResult_OK) return flac_load_result;		
 	}
 	else{
-		free(filetype);	
+		ntrb_free(filetype);	
 		return ntrb_LoadStdFmtAudioResult_FiletypeError;
 	}
 	
 	const enum ntrb_StdAudFmtConversionResult conversion_result = ntrb_to_standard_format(ret, aud_datapoints, &aud_header);
-	free(aud_datapoints.bytes);
+	ntrb_free(aud_datapoints.bytes);
 
 	if(conversion_result != ntrb_StdAudFmtConversion_OK)
 		return ntrb_LoadStdFmtAudioResult_ntrb_StdAudFmtConversionResult + conversion_result;

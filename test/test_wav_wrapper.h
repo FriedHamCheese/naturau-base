@@ -20,11 +20,11 @@ static void test_ntrb_getSubchunk1Start(){
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/regular_wav.wav") == ntrb_ReadFileResult_OK);
 
 	assert(ntrb_getSubchunk1Start(file_buffer, typical_RIFF_chunk_end) == 12);
-	free(file_buffer.ptr);
+	ntrb_free(file_buffer.ptr);
 	
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/subchunk1_seek.wav") == ntrb_ReadFileResult_OK);
 	assert(ntrb_getSubchunk1Start(file_buffer, typical_RIFF_chunk_end) == 48);
-	free(file_buffer.ptr);	
+	ntrb_free(file_buffer.ptr);	
 }
 
 static void test_ntrb_getSubchunk2Start(){
@@ -37,13 +37,13 @@ static void test_ntrb_getSubchunk2Start(){
 	const size_t file_1_subchunk1_start = ntrb_getSubchunk1Start(file_buffer, typical_RIFF_chunk_end);
 	assert(file_1_subchunk1_start != 0);
 	assert(ntrb_getSubchunk2Start(file_buffer, file_1_subchunk1_start + minimum_subchunk1_size) == 198);	
-	free(file_buffer.ptr);
+	ntrb_free(file_buffer.ptr);
 	
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/subchunk1_seek.wav") == ntrb_ReadFileResult_OK);
 	const size_t file_2_subchunk1_start = ntrb_getSubchunk1Start(file_buffer, typical_RIFF_chunk_end);
 	assert(file_2_subchunk1_start != 0);
 	assert(ntrb_getSubchunk2Start(file_buffer, file_2_subchunk1_start + minimum_subchunk1_size) == 72);	
-	free(file_buffer.ptr);
+	ntrb_free(file_buffer.ptr);
 }
 
 static void test_ntrb_AudioHeader_from_WAVfile(){
@@ -56,7 +56,7 @@ static void test_ntrb_AudioHeader_from_WAVfile(){
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/regular_wav.wav") == ntrb_ReadFileResult_OK);
 	assert(ntrb_AudioHeader_from_WAVfile(&header, &audiodata_offset, &audiodata_size, file_buffer) == ntrb_AudioHeaderFromWAVFile_ok);
 
-	free(file_buffer.ptr);
+	ntrb_free(file_buffer.ptr);
 	assert(header.AudioFormat == paInt16);
 	assert(header.NumChannels == 2);
 	assert(header.SampleRate == 48000);
@@ -74,37 +74,37 @@ static void test_ntrb_AudioHeader_from_WAVfile(){
 	//test ntrb_AudioHeaderFromWAVFile_invalid_RIFF_ID
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/invalid_riff.wav") == ntrb_ReadFileResult_OK);
 	assert(ntrb_AudioHeader_from_WAVfile(&header, &audiodata_offset, &audiodata_size, file_buffer) == ntrb_AudioHeaderFromWAVFile_invalid_RIFF_ID);
-	free(file_buffer.ptr);
+	ntrb_free(file_buffer.ptr);
 	
 	//test ntrb_AudioHeaderFromWAVFile_invalid_WAVE_ID
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/invalid_wave.wav") == ntrb_ReadFileResult_OK);
 	assert(ntrb_AudioHeader_from_WAVfile(&header, &audiodata_offset, &audiodata_size, file_buffer) == ntrb_AudioHeaderFromWAVFile_invalid_WAVE_ID);
-	free(file_buffer.ptr);
+	ntrb_free(file_buffer.ptr);
 
 	//test ntrb_AudioHeaderFromWAVFile_invalid_fmt_ID
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/invalid_fmt.wav") == ntrb_ReadFileResult_OK);
 	assert(ntrb_AudioHeader_from_WAVfile(&header, &audiodata_offset, &audiodata_size, file_buffer) == ntrb_AudioHeaderFromWAVFile_invalid_fmt_ID);
-	free(file_buffer.ptr);
+	ntrb_free(file_buffer.ptr);
 
 	//test ntrb_AudioHeaderFromWAVFile_invalid_data_ID
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/invalid_data_id.wav") == ntrb_ReadFileResult_OK);
 	assert(ntrb_AudioHeader_from_WAVfile(&header, &audiodata_offset, &audiodata_size, file_buffer) == ntrb_AudioHeaderFromWAVFile_invalid_data_ID);
-	free(file_buffer.ptr);
+	ntrb_free(file_buffer.ptr);
 
 	//test ntrb_AudioHeaderFromWAVFile_invalid_chunk_size for ChunkSize
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/chunksize_overflow.wav") == ntrb_ReadFileResult_OK);
 	assert(ntrb_AudioHeader_from_WAVfile(&header, &audiodata_offset, &audiodata_size, file_buffer) == ntrb_AudioHeaderFromWAVFile_invalid_chunk_size);
-	free(file_buffer.ptr);	
+	ntrb_free(file_buffer.ptr);	
 	
 	//test ntrb_AudioHeaderFromWAVFile_invalid_Subchunk1Size for Subchunk1Size
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/subchunk1_size_overflow.wav") == ntrb_ReadFileResult_OK);
 	assert(ntrb_AudioHeader_from_WAVfile(&header, &audiodata_offset, &audiodata_size, file_buffer) == ntrb_AudioHeaderFromWAVFile_invalid_Subchunk1Size);
-	free(file_buffer.ptr);	
+	ntrb_free(file_buffer.ptr);	
 	
 	//test ntrb_AudioHeaderFromWAVFile_invalid_Subchunk2Size for Subchunk2Size
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/subchunk2_size_overflow.wav") == ntrb_ReadFileResult_OK);
 	assert(ntrb_AudioHeader_from_WAVfile(&header, &audiodata_offset, &audiodata_size, file_buffer) == ntrb_AudioHeaderFromWAVFile_invalid_Subchunk2Size);
-	free(file_buffer.ptr);
+	ntrb_free(file_buffer.ptr);
 }
 
 
@@ -117,7 +117,7 @@ static void test_ntrb_get_WAV_audiodata(){
 	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/regular_wav.wav") == ntrb_ReadFileResult_OK);
 	assert(ntrb_AudioHeader_from_WAVfile(&header, &audiodata_offset, &audiodata_bytes, file_buffer) == ntrb_AudioHeaderFromWAVFile_ok);
 
-	const ntrb_AudioDatapoints aud = ntrb_get_WAV_audiodata(file_buffer, audiodata_bytes, audiodata_offset);
+	ntrb_AudioDatapoints aud = ntrb_get_WAV_audiodata(file_buffer, audiodata_bytes, audiodata_offset);
 	assert(aud.bytes != NULL);
 	assert(aud.byte_pos == 0);
 	assert(aud.byte_count == audiodata_bytes);
@@ -125,8 +125,8 @@ static void test_ntrb_get_WAV_audiodata(){
 	const int memcmp_equal = 0;
 	assert(memcmp(aud.bytes, file_buffer.ptr + audiodata_offset, audiodata_bytes) == memcmp_equal);
 	
-	free(aud.bytes);
-	free(file_buffer.ptr);
+	ntrb_AudioDatapoints_free(&aud);
+	ntrb_free(file_buffer.ptr);
 }
 
 void test_suite_ntrb_wav_wrapper(){
