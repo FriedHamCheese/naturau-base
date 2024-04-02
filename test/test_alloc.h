@@ -1,5 +1,7 @@
 #include "alloc.h"
 
+#include <pthread.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -247,6 +249,71 @@ static void test__ntrb_memdebug_realloc(){
 	ntrb_memdebug_uninit(false);	
 }
 
+static void* _test__ntrb_memdebug_malloc_thread(void* const int_ptr){
+	void* ptr = _ntrb_memdebug_malloc(*((int*)int_ptr), __FILE__, *((int*)int_ptr));
+	assert(ptr);
+	return ptr;
+}
+
+#define _test__ntrb_memdebug_thread_count 1000
+const int size_increment = 3;
+void* ptrs[_test__ntrb_memdebug_thread_count];
+
+static void* _test__ntrb_memdebug_realloc_thread(void* const int_ptr){
+	const int i = *((int*)int_ptr);
+	void* ptr = _ntrb_memdebug_realloc(ptrs[i], i + size_increment, __FILE__, i + size_increment);
+	assert(ptr);
+	return ptr;
+}
+
+static void* _test__ntrb_memdebug_free_thread(void* int_ptr){
+	const int i = *((int*)int_ptr);
+	_ntrb_memdebug_free(ptrs[i], __FILE__, __LINE__);
+	return NULL;	
+}
+
+static void test__ntrb_memdebug_test_lock(){
+	assert(ntrb_memdebug_init());
+	
+	pthread_t threads[_test__ntrb_memdebug_thread_count];
+	
+	//testing and checking _ntrb_memdebug_malloc
+	printf("[Info]: Testing data race for _ntrb_memdebug_malloc() in %s:%d with %d threads.\n", __FILE__, __LINE__, _test__ntrb_memdebug_thread_count);
+	for(int i = 0; i < _test__ntrb_memdebug_thread_count; i++){
+		assert(pthread_create(threads + i, NULL, _test__ntrb_memdebug_malloc_thread, &i) == 0);
+		assert(pthread_join(threads[i], ptrs + i) == 0);
+	}
+	
+	for(int i = 0; i < _test__ntrb_memdebug_thread_count; i++){
+		assert(_test__ntrb_memdebug_element_equal(i, ptrs[i], i, __FILE__, i));
+	}
+	
+	//testing and checking _ntrb_memdebug_realloc
+	printf("[Info]: Testing data race for _ntrb_memdebug_realloc() in %s:%d with %d threads.\n", __FILE__, __LINE__, _test__ntrb_memdebug_thread_count);	
+	for(int i = 0; i < _test__ntrb_memdebug_thread_count; i++){
+		assert(pthread_create(threads + i, NULL, _test__ntrb_memdebug_realloc_thread, &i) == 0);
+		assert(pthread_join(threads[i], ptrs + i) == 0);
+	}	
+	
+	for(int i = 0; i < _test__ntrb_memdebug_thread_count; i++){
+		assert(_test__ntrb_memdebug_element_equal(i, ptrs[i], i + size_increment, __FILE__, i + size_increment));
+	}
+	
+	//testing and checking _ntrb_memdebug_free
+	printf("[Info]: Testing data race for _ntrb_memdebug_free() in %s:%d with %d threads.\n", __FILE__, __LINE__, _test__ntrb_memdebug_thread_count);	
+	
+	for(int i = 0; i < _test__ntrb_memdebug_thread_count; i++){
+		assert(pthread_create(threads + i, NULL, _test__ntrb_memdebug_free_thread, &i) == 0);
+		assert(pthread_join(threads[i], NULL) == 0);
+	}	
+	
+	for(int i = 0; i < _test__ntrb_memdebug_thread_count; i++){
+		assert(_test__ntrb_memdebug_element_equal(i, NULL,0, NULL, 0));
+	}
+	
+	assert(ntrb_memdebug_uninit(false) == 0);
+}
+
 #endif
 
 static void test_suite_ntrb_alloc(){
@@ -259,5 +326,7 @@ static void test_suite_ntrb_alloc(){
 	test__ntrb_memdebug_malloc();
 	test__ntrb_memdebug_calloc();
 	test__ntrb_memdebug_realloc();
+	
+	test__ntrb_memdebug_test_lock();
 	#endif
 }

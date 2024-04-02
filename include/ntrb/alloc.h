@@ -14,10 +14,11 @@
 	
 	//preventing unintended initialisation of memdebug
 	bool ntrb_memdebug_init();
-	void ntrb_memdebug_uninit(const bool print_summary);
-	void ntrb_memdebug_view();
-	
-	//all from alloc.c
+	int ntrb_memdebug_init_with_return_value();
+	int ntrb_memdebug_uninit(const bool print_summary);
+	int ntrb_memdebug_view();
+
+	//from alloc.c
 	extern _ntrb_alloc_bytevec _ntrb_memdebug_ptr;
 	extern _ntrb_alloc_bytevec _ntrb_memdebug_size;
 	extern _ntrb_alloc_bytevec _ntrb_memdebug_filename;
@@ -27,6 +28,8 @@
 	void* _ntrb_memdebug_calloc(const size_t elements, const size_t typesize, const char* const filename, const int line);
 	void* _ntrb_memdebug_realloc(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
 	void _ntrb_memdebug_free(void* const ptr, const char* const filename, const int line);
+
+	void _ntrb_memdebug_view_no_lock();
 
 	bool _ntrb_memdebug_add_element_to_unused_space(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
 	void _ntrb_memdebug_add_element(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
