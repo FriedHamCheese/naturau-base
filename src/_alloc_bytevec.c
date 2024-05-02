@@ -27,6 +27,7 @@ bool _ntrb_alloc_bytevec_reserve(_ntrb_alloc_bytevec* const obj, const size_t ad
 
 bool _ntrb_alloc_bytevec_append(_ntrb_alloc_bytevec* const obj, const size_t typesize, const void* const value){
 	while(obj->elements + typesize >= obj->capacity){
+		//Doubling obj's capacity.
 		bool reserve_success = _ntrb_alloc_bytevec_reserve(obj, obj->capacity);
 		if(!reserve_success) return false;
 	}
