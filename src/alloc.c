@@ -8,7 +8,8 @@
 #include <stdlib.h>
 
 #include <pthread.h>
-	
+
+#ifdef NTRB_MEMDEBUG
 pthread_rwlock_t _ntrb_memdebug_rwlock;
 	
 static _Atomic int_least64_t _ntrb_memdebug_initialized_value;
@@ -20,7 +21,6 @@ _ntrb_alloc_bytevec _ntrb_memdebug_size;
 _ntrb_alloc_bytevec _ntrb_memdebug_filename;
 _ntrb_alloc_bytevec _ntrb_memdebug_line;
 
-#ifdef NTRB_MEMDEBUG
 bool ntrb_memdebug_init(){
 	return ntrb_memdebug_init_with_return_value() == 0;
 }
