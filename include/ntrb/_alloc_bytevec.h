@@ -34,7 +34,7 @@ Functions can return this to indicate that either the function has failed or the
 
 If the base_ptr is NULL, this indicates a failure from a function and the container should not be further accessed.
 
-Defined in bytevec.c
+Defined in _alloc_bytevec.c
 */
 extern const _ntrb_alloc_bytevec failed__ntrb_alloc_bytevec;
 
@@ -46,7 +46,7 @@ elements is set to 0 bytes and capacity is set to alloc_bytes.
 If the function fails to allocate the memory, it returns failed__ntrb_alloc_bytevec.
 
 If alloc_bytes is 0, the behaviour depends on the implementation of malloc.
-If malloc returns NULL, the function returns failed__ntrb_alloc_bytevec. Else, it returns a valid object and should be usable.
+If malloc returns NULL when allocating 0 bytes, the function returns failed__ntrb_alloc_bytevec. Else, it returns a valid object and should be usable.
 */
 _ntrb_alloc_bytevec _ntrb_alloc_bytevec_new(const size_t alloc_bytes);
 

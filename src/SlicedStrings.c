@@ -58,7 +58,8 @@ ntrb_SlicedStrings ntrb_SlicedStrings_slice_without_trimming(const char* const s
 	
 	size_t str_ptr_pos = 0;
 	size_t str_pos = 0;
-	for(size_t i = 0; i < str_len; i++){		
+	for(size_t i = 0; i < str_len; i++){
+		//Keep on adding the characters to the string until it reaches the separator or exceeds the max length of a substring.
 		if(str[i] != separator && str_pos < ntrb_slice_string_max_len){
 			slices.str_ptrs[str_ptr_pos][str_pos] = str[i];
 			str_pos++;

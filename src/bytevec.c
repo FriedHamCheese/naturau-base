@@ -16,6 +16,7 @@ ntrb_bytevec ntrb_bytevec_new(const size_t alloc_bytes){
 	obj.capacity = alloc_bytes;
 	return obj;
 }
+
 bool ntrb_bytevec_reserve(ntrb_bytevec* const obj, const size_t additional_bytes){
 	const size_t new_capacity = obj->capacity + additional_bytes;
 	void* new_ptr = ntrb_realloc(obj->base_ptr, new_capacity);
