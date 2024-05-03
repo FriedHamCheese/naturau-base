@@ -32,19 +32,32 @@ int ntrb_memdebug_init_with_return_value(){
 	if(rwlock_init_error) return rwlock_init_error;
 	
 	_ntrb_memdebug_ptr = _ntrb_alloc_bytevec_new(sizeof(void*));
-	if(_ntrb_memdebug_ptr.base_ptr == NULL) return ENOMEM;
+	if(_ntrb_memdebug_ptr.base_ptr == NULL) goto uninit_rwlock;	
 	
 	_ntrb_memdebug_size = _ntrb_alloc_bytevec_new(sizeof(size_t));
-	if(_ntrb_memdebug_size.base_ptr == NULL) return ENOMEM;
+	if(_ntrb_memdebug_size.base_ptr == NULL) goto free__ntrb_memdebug_ptr;
 	
 	_ntrb_memdebug_filename = _ntrb_alloc_bytevec_new(sizeof(const char*));
-	if(_ntrb_memdebug_filename.base_ptr == NULL) return ENOMEM;
+	if(_ntrb_memdebug_filename.base_ptr == NULL) goto free__ntrb_memdebug_size;
 	
 	_ntrb_memdebug_line = _ntrb_alloc_bytevec_new(sizeof(int));
-	if(_ntrb_memdebug_line.base_ptr == NULL) return ENOMEM;
+	if(_ntrb_memdebug_line.base_ptr == NULL) goto free__ntrb_memdebug_filename;
 	
 	_ntrb_memdebug_initialized_value = _ntrb_memdebug_correct_initialized_value;	
 	return 0;
+	
+	free__ntrb_memdebug_filename:
+	_ntrb_alloc_bytevec_free(&_ntrb_memdebug_filename);
+	
+	free__ntrb_memdebug_size:
+	_ntrb_alloc_bytevec_free(&_ntrb_memdebug_size);
+	
+	free__ntrb_memdebug_ptr:
+	_ntrb_alloc_bytevec_free(&_ntrb_memdebug_ptr);
+	
+	uninit_rwlock:
+	pthread_rwlock_destroy(&_ntrb_memdebug_rwlock);
+	return ENOMEM;
 }
 
 int ntrb_memdebug_uninit(const bool print_summary){
@@ -173,6 +186,8 @@ void* _ntrb_memdebug_realloc(void* const ptr, const size_t size_bytes, const cha
 
 void _ntrb_memdebug_free(void* const ptr, const char* const filename, const int line){
 	assert(_ntrb_memdebug_initialized_value == _ntrb_memdebug_correct_initialized_value);
+	
+	if(ptr == NULL) return;
 	
 	const int wrlock_error = pthread_rwlock_wrlock(&_ntrb_memdebug_rwlock);
 	if(wrlock_error){
