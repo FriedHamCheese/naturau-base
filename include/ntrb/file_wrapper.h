@@ -25,6 +25,8 @@ long int ntrb_get_filesize_bytes(FILE* const file);
 
 /**
 Reads the file contents from a file from the provided filename which the filename may be a relative path from the program callsite or an absolute filepath. Then allocates memory to the provided uninitialised ntrb_SpanU8 and writes the file contents to it. buffer->elem is set to the filesize of the file.
+
+All errors guarantee the provided buffer is deallocated if the function allocates it.
 */
 enum ntrb_ReadFileResult ntrb_read_entire_file_rb(ntrb_SpanU8* const buffer, const char* filename);
 

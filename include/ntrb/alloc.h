@@ -13,7 +13,7 @@ To debug memory management, add -DNTRB_MEMDEBUG to CFLAGS of ntrb and other code
 
 The ntrb_(func)(...) are macros which transform to the underlying debugging implementations from ntrb if NTRB_MEMDEBUG is defined. If it is not defined, it turns into (func)(...). So ntrb_realloc would transform into _ntrb_memdebug_realloc if debugging is enabled, else just realloc.
 
-\todo For 2.0, merge the 4 bytevecs into 1 and have a struct for the information instead.
+\todo For 0.2, merge the 4 bytevecs into 1 and have a struct for the information instead.
 */
 
 /**
