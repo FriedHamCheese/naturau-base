@@ -16,12 +16,14 @@ If str_ptrs is NULL, this indicates failure from a function or failure to alloca
 See SlicedStrings.h for methods for manipulating the container.
 */
 typedef struct{
-	char** str_ptrs;	///< An array of char*, each separately allocated.
+	char** str_ptrs;	///< An array of char* which the char** is allocated and each of the char* is also separately allocated.
 	size_t elem;		///< The amount of char* which the container has access to.
 } ntrb_SlicedStrings;
 
 /**
 A quick value for failure returns of a function or memory allocation.
+
+If the object you recieve indicates failure from a function or memory allocation, its str_ptrs will be NULL.
 
 Defined in SlicedStrings.c
 */
@@ -52,7 +54,7 @@ If obj is NULL, the function does nothing. If obj->str_ptrs is NULL, it does not
 void ntrb_SlicedStrings_free(ntrb_SlicedStrings* const obj);
 
 /**
-Returns the substrings in the provided string which are separated by the separator argument.
+Returns the substrings which are separated by the separator argument in the provided string.
 
 This function does not truncate (trim) each of the substrings to its length, leaving 0 filled space after the substrings.
 It also doesn't remove duplicate separators, which can lead to empty substrings. 
@@ -69,7 +71,7 @@ Returns an object which the str_ptrs isn't NULL if successful. Else returns one 
 ntrb_SlicedStrings ntrb_SlicedStrings_slice_without_trimming(const char* const str, const size_t str_len, const char separator);
 
 /**
-Returns the substrings in the provided string which are separated by the separator argument.
+Returns the substrings which are separated by the separator argument in the provided string.
 
 \param str the main string to reference from.
 \param str_len the length of the main string.
@@ -82,7 +84,7 @@ Returns an object which the str_ptrs isn't NULL if successful. Else returns one 
 ntrb_SlicedStrings ntrb_SlicedStrings_slice_sep(const char* const str, const size_t str_len, const char separator);
 
 /**
-Returns the substrings in the provided string which are separated by a space character.
+Returns the substrings which are separated by a space character in the provided string.
 
 \param str the main string to reference from.
 \param str_len the length of the main string.
@@ -96,10 +98,10 @@ Concatenates the strings in the object to a single, separately allocated string.
 
 \param slices A valid object with valid substrings to concatenate the strings from.
 \param beg An index (starts at 0) of the string in slices.sub_strs to start concatenation from.
-\param end An index of the last string in slices.sub_strs.
-\param separator A character to put inbetween the substrings while concatenating.
+\param end An index after the index of the last string to concatenate from, pass in slices.elem to concatenate to the last string.
+\param separator A character to put in between the substrings while concatenating.
 
-- If separator is a null character, the function joins the string without a separator inbetween.
+- If separator is a null character, the function joins the string without a separator in between.
 - if beg > end, the function returns NULL.
 - if (beg or end) > slices.elem, the function returns NULL.
 

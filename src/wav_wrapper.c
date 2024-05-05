@@ -14,7 +14,6 @@ PaSampleFormat ntrb_WAV_PaSampleFormat(const uint16_t WAV_audioFormat, const uin
 	const uint16_t PCM_format = 1;
 	const uint16_t IEEE_float_format = 3;
 	if(WAV_audioFormat == PCM_format && BitsPerSample == 16) return paInt16;
-	if(WAV_audioFormat == PCM_format && BitsPerSample == 32) return paInt32;
 	if(WAV_audioFormat == IEEE_float_format && BitsPerSample == 32) return paFloat32;
 	
 	else return paCustomFormat;
