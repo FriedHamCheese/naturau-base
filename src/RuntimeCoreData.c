@@ -85,6 +85,10 @@ enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCore
 	}
 	
 	pthread_rwlock_unlock(&(runtime_data->audio_track_rwlock));
-	if(!wrote_track) return ntrb_RCD_QueueAudio_TracksAllFull;
+	if(!wrote_track){
+		ntrb_AudioDatapoints_free(aud);
+		ntrb_free(aud);
+		return ntrb_RCD_QueueAudio_TracksAllFull;
+	}
 	else return ntrb_RCD_QueueAudio_OK;
 }
