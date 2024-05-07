@@ -104,7 +104,7 @@ enum ntrb_FLAC_decode_status ntrb_decode_FLAC_file(const char* const filename, n
 	const size_t stdaud_for_5_secs = 5 * ntrb_std_samplerate * ntrb_std_audchannels * sizeof(int16_t);
 	aud_data->datapoints = ntrb_bytevec_new(stdaud_for_5_secs);
 	if(aud_data->datapoints.base_ptr == NULL)
-		return ntrb_FLAC_decode_FLAC__StreamDecoderInitStatus + FLAC__STREAM_DECODER_INIT_STATUS_MEMORY_ALLOCATION_ERROR; 	
+		return ntrb_FLAC_decode_FLAC__StreamDecoderInitStatus + FLAC__STREAM_DECODER_INIT_STATUS_MEMORY_ALLOCATION_ERROR;
 	
 	if(!FLAC__stream_decoder_process_until_end_of_stream(decoder)){
 		const FLAC__StreamDecoderState decoder_state = FLAC__stream_decoder_get_state(decoder);	

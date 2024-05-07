@@ -21,9 +21,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-
+///Standard sample rate used in audio loop: 48000 hz.
 const uint32_t ntrb_std_samplerate = 48000;
+///Standard audio channel count used in audio loop: 2.
 const uint8_t ntrb_std_audchannels = 2;
+///Standard sample format used in audio loop: paFloat32.
 const PaSampleFormat ntrb_std_sample_fmt = paFloat32;
 
 //Can accept any sample rate and any channels, just required the input to be an int16 AudioDatapoints.

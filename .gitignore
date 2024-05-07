@@ -2,3 +2,5 @@
 *.o
 *.exe
 *.dll
+/doc/html
+/doc/latex

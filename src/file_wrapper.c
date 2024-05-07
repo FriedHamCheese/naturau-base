@@ -8,10 +8,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-const int ntrb_get_filesize_bytes_seekend_error = -1;
-const int ntrb_get_filesize_bytes_ftell_error = -2;
-const int ntrb_get_filesize_bytes_seekset_error = -3;
-
 long int ntrb_get_filesize_bytes(FILE* const file){
 	const int fseek_ok = 0;
 	
@@ -20,10 +16,10 @@ long int ntrb_get_filesize_bytes(FILE* const file){
 	
 	const long int ftell_err  =-1;
 	const long int filesize = ftell(file);
-	if(filesize == ftell_err) return -2;	
+	if(filesize == ftell_err) return -1;	
 	
 	int seekset_result = fseek(file, 0, SEEK_SET);
-	if (seekset_result != fseek_ok) return -3;
+	if (seekset_result != fseek_ok) return -1;
 	
 	return filesize;
 }
@@ -35,11 +31,9 @@ enum ntrb_ReadFileResult ntrb_read_entire_file_rb(ntrb_SpanU8* const buffer, con
 	FILE* audio_file = fopen(filename, "rb");
 	if(audio_file == NULL) return ntrb_ReadFileResult_FileOpenError;
 	
-	//using int64_t instead of long int because a long int may be 32 bits,
-	//which may cause an error when comparing with max of size_t which may also be unsigned long int, 32 bits wide.
-	//and since a filesize of 2^63-1 is highly unlikely, this is probably more ideal to prevent signed/unsigned comparsion.
-	const int64_t minimum_normal_filesize_return = 0;
-	const int64_t filesize_bytes = ntrb_get_filesize_bytes(audio_file);
+	//Filesize should not be a negative number, otherwise the filesize function failed to get the filesize.
+	const long int minimum_normal_filesize_return = 0;
+	const long int filesize_bytes = ntrb_get_filesize_bytes(audio_file);
 	if(filesize_bytes < minimum_normal_filesize_return){
 		result = ntrb_ReadFileResult_FilesizeError;
 		goto close_file;
@@ -52,13 +46,12 @@ enum ntrb_ReadFileResult ntrb_read_entire_file_rb(ntrb_SpanU8* const buffer, con
 		goto close_file;
 	}
 	
-	//casting from size_t to int64_t because of signed/unsigned compare with filesize_bytes,
-	//and the probability of a file having the size of 2^63-1 is highly unlikely,
-	//meaning that the cast should be safe for most scenarios.
-	const int64_t bytes_read = fread(buffer->ptr, sizeof(uint8_t), filesize_bytes, audio_file);
+	const size_t bytes_read = fread(buffer->ptr, sizeof(uint8_t), filesize_bytes, audio_file);
 	buffer->elem = bytes_read;
 	
-	if(bytes_read != filesize_bytes){
+	//This cast is fine. 
+	//It only causes issues when filesize_bytes has a signed bit, which is checked before reaching here.
+	if(bytes_read != (size_t)filesize_bytes){
 		//eof would never happen, because read binary reads all the characters/bytes
 		
 		//ferror happened, we choose to not return buffer which may contain errors.
