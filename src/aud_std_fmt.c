@@ -224,7 +224,7 @@ enum ntrb_StdAudFmtConversionResult ntrb_to_standard_format(ntrb_AudioDatapoints
 	
 	return ntrb_StdAudFmtConversion_OK;
 }
-
+/*
 enum ntrb_LoadStdFmtAudioResult ntrb_load_wav(ntrb_AudioHeader* const header, ntrb_AudioDatapoints* const datapoints, const char* const filename){
 	ntrb_SpanU8 audiofile_data;
 	
@@ -300,4 +300,4 @@ enum ntrb_LoadStdFmtAudioResult ntrb_load_std_fmt_audio(ntrb_AudioDatapoints* co
 	if(conversion_result != ntrb_StdAudFmtConversion_OK)
 		return ntrb_LoadStdFmtAudioResult_ntrb_StdAudFmtConversionResult + conversion_result;
 	else return ntrb_LoadStdFmtAudioResult_OK;
-}
+}*/

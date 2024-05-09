@@ -96,10 +96,56 @@ enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile(ntrb_AudioH
 	return ntrb_AudioHeaderFromWAVFile_ok;
 }
 
+
+enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile_2(ntrb_AudioHeader* const returnArg, size_t* const audiodataOffset, size_t* const audiodataSize, const ntrb_SpanU8 fileBuffer){
+	const size_t minWAVheaderSize = 44;
+	if(fileBuffer.elem < minWAVheaderSize)
+		return ntrb_AudioHeaderFromWAVFile_buffer_too_small;
+		
+	const int strcmpEqual = 0;	
+	
+	//RIFF filetype descriptor
+	char ChunkID[4];
+	*(uint32_t*)ChunkID = *(uint32_t*)(fileBuffer.ptr + 0);	
+	if(strncmp(ChunkID, "RIFF", 4) != strcmpEqual)
+		return ntrb_AudioHeaderFromWAVFile_invalid_RIFF_ID;
+	
+	char FormatID[4];
+	*(uint32_t*)FormatID = *(uint32_t*)(fileBuffer.ptr + 8);
+
+	if(strncmp(FormatID, "WAVE", 4) != strcmpEqual)
+		return ntrb_AudioHeaderFromWAVFile_invalid_WAVE_ID;
+		
+	const size_t Subchunk1Start = ntrb_getSubchunk1Start(fileBuffer, 12);
+	if(Subchunk1Start == 0) return ntrb_AudioHeaderFromWAVFile_invalid_fmt_ID;
+		
+		
+	//Subchunk1 - Audiodata information	
+	const uint16_t WAV_AudioFormat = *(uint16_t*)(fileBuffer.ptr + Subchunk1Start + 8);
+	returnArg->NumChannels = *(uint16_t*)(fileBuffer.ptr + Subchunk1Start + 10);
+	returnArg->SampleRate = *(uint32_t*)(fileBuffer.ptr + Subchunk1Start + 12);
+	returnArg->BitsPerSample = *(uint16_t*)(fileBuffer.ptr + Subchunk1Start + 22);
+	returnArg->AudioFormat = ntrb_WAV_PaSampleFormat(WAV_AudioFormat, returnArg->BitsPerSample);
+
+	//Subchunk2 - Audiodata
+	const size_t Subchunk2Start = ntrb_getSubchunk2Start(fileBuffer, Subchunk1Start + 24);
+	if(Subchunk2Start == 0) return ntrb_AudioHeaderFromWAVFile_invalid_data_ID;
+
+	*audiodataSize = *(uint32_t*)(fileBuffer.ptr + Subchunk2Start + 4);
+
+	*audiodataOffset = Subchunk2Start + 8;
+	return ntrb_AudioHeaderFromWAVFile_ok;
+}
+
+bool verify_WAV_out_of_bounds(const size_t audiodataOffset, const size_t audiodataSize, const size_t filesize){
+	return filesize <= (audiodataOffset + audiodataSize);
+}
+
+/*
 ntrb_AudioDatapoints ntrb_get_WAV_audiodata(const ntrb_SpanU8 wavfile, const size_t audiodata_size, const size_t audiodata_offset){
 	ntrb_AudioDatapoints audiodata = ntrb_AudioDatapoints_new(audiodata_size * sizeof(uint8_t));
 	if(audiodata.bytes == NULL) return audiodata;
 	
 	memcpy(audiodata.bytes, wavfile.ptr + audiodata_offset, audiodata_size);
 	return audiodata;	
-}
+}*/

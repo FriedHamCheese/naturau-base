@@ -18,6 +18,9 @@ typedef struct{
 	uint32_t SampleRate;
 	uint16_t NumChannels;
 	uint16_t BitsPerSample;			///< How many bits are in a sample, 16 32, etc... 
+	
+	size_t audiodataOffset;
+	size_t audiodataSize;
 } ntrb_AudioHeader;
 
 ///A function which prints the contents of the provided header to the stream.

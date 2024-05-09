@@ -11,6 +11,7 @@ A module for reading WAV files.
 #include "AudioDatapoints.h"
 
 #include <stdio.h>
+#include <stdbool.h>
 
 /**
 Returns the PaSampleFormat equivalent from the two provided arguments.
@@ -72,6 +73,10 @@ Attempts to fetch and convert the WAV header data to ntrb_AudioHeader, get the o
 \param[out] audiodataSize the size of the audio data.
 */
 enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile(ntrb_AudioHeader* const returnArg, size_t* const audiodataOffset, size_t* const audiodataSize, const ntrb_SpanU8 fileBuffer);
+
+enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile_2(ntrb_AudioHeader* const returnArg, size_t* const audiodataOffset, size_t* const audiodataSize, const ntrb_SpanU8 fileBuffer);
+
+bool verify_WAV_out_of_bounds(const size_t audiodataOffset, const size_t audiodataSize, const size_t filesize);
 
 /**
 Returns a separately allocated buffer containing the audio data from wavfile.

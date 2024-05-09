@@ -29,5 +29,7 @@ Reads the file contents from a file from the provided filename which the filenam
 All errors guarantee the provided buffer is deallocated if the function allocates it.
 */
 enum ntrb_ReadFileResult ntrb_read_entire_file_rb(ntrb_SpanU8* const buffer, const char* filename);
+enum ntrb_ReadFileResult ntrb_read_entire_file_rb_ptr(ntrb_SpanU8* const buffer, FILE* const file);
+enum ntrb_ReadFileResult ntrb_readsome_from_file_rb(ntrb_SpanU8* const buffer, FILE* const file, const size_t bytes_to_read);
 
 #endif
