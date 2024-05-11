@@ -127,10 +127,14 @@ void* ntrb_run_audio_engine(void* const runtime_data_void){
 	pa_error = Pa_StartStream(output_stream);
 	if(pa_error) goto close_stream;
 
+	#ifdef SHORT_AUDIO
+	Pa_Sleep(5 * 1000);
+	#else
 	while(runtime_data->requested_exit == false){
 		Pa_Sleep(ntrb_msecs_per_callback);
 	}
-		
+	#endif
+
 	Pa_StopStream(output_stream);
 	//it's a lot more messier to error handle the cleanup procedures. So we only check at Pa_Terminate().
 	

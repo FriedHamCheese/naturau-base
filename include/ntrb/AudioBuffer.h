@@ -2,6 +2,7 @@
 #define ntrb_AudioBuffer_h
 
 #include "AudioHeader.h"
+#include "BufferSource_WAVfile.h"
 
 #include <pthread.h>
 
@@ -20,10 +21,11 @@ enum ntrb_AudioBufferLoad_Error{
 typedef struct{
 	pthread_rwlock_t buffer_access;
 	float* datapoints;
-	uint8_t* unprocessed_datapoints;
 	size_t monochannel_samples;
-	FILE* aud_file;
-	ntrb_AudioHeader aud_header;
+	
+	union{
+		ntrb_BufferSource_WAVfile wav_file;
+	} source;
 	
 	void* (*load_buffer_callback)(void*);
 	enum ntrb_AudioBufferLoad_Error load_err;	
@@ -58,10 +60,7 @@ enum ntrb_AudioBufferNew_Error ntrb_AudioBuffer_new(ntrb_AudioBuffer* const ret,
 
 enum ntrb_AudioBufferFree_Error ntrb_AudioBuffer_free(ntrb_AudioBuffer* const obj);
 
-enum ntrb_LoadAudheader_status load_wav_header(void* const void_ntrb_AudioBuffer);
 void load_flac_header(void* const void_ntrb_AudioBuffer);
-
-void* load_wav_buffer(void* const void_ntrb_AudioBuffer);
 void* load_flac_buffer(void* const void_ntrb_AudioBuffer);
 
 #endif
