@@ -36,6 +36,7 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 
 #include "_alloc_bytevec.h"
 
+#include <stdlib.h>
 #include <stddef.h>
 #include <stdbool.h>
 
