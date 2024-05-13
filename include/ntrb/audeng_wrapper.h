@@ -12,6 +12,8 @@ The duration in milliseconds which the audio engine plays back the audio channel
 Defined in audeng_wrapper.c
 */
 extern const unsigned long ntrb_msecs_per_callback;
+extern const unsigned long ntrb_std_frame_count;
+
 
 /**
 The function for the audio engine thread.

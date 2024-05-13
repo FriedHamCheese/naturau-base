@@ -6,7 +6,7 @@
 A module for interacting with ntrb_RuntimeCoreData.
 */
 
-#include "AudioDatapoints.h"
+#include "AudioBuffer.h"
 
 #include <stdint.h>
 #include <stdatomic.h>
@@ -22,7 +22,7 @@ typedef struct{
 	///An allocated pointer which points to ntrb_AudioDatapoints.
 	///The datapoints (tracks) which the pointer points to should be ready for deallocation when the datapoints are played through. And should not be in the stack.
 	///In order to access this, you should request a lock from audio_track_rwlock.
-	ntrb_AudioDatapoints** audio_tracks;
+	ntrb_AudioBuffer** audio_tracks;
 	
 	///The number of tracks which audio_tracks hold.
 	///In order to access this, you should request a lock from audio_track_rwlock.	

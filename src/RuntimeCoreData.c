@@ -24,7 +24,7 @@ const ntrb_RuntimeCoreData failed_ntrb_RuntimeCoreData = {
 
 int ntrb_RuntimeCoreData_new(ntrb_RuntimeCoreData* const rcd, const uint16_t track_count){	
 	if(track_count == 0) return ENOMEM;
-	rcd->audio_tracks = ntrb_calloc(track_count, sizeof(ntrb_AudioDatapoints*));
+	rcd->audio_tracks = ntrb_calloc(track_count, sizeof(ntrb_AudioBuffer*));
 	if(rcd->audio_tracks == NULL) return ENOMEM;
 	
 	rcd->audio_track_count = track_count;
@@ -56,24 +56,30 @@ int ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
 }
 
 void ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index){
-	ntrb_free(rcd->audio_tracks[track_index]->bytes);
+	ntrb_AudioBuffer_free(rcd->audio_tracks[track_index]);
 	ntrb_free(rcd->audio_tracks[track_index]);
 	rcd->audio_tracks[track_index] = NULL;
 }
 
 enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCoreData* const runtime_data, const char* filename){
-	ntrb_AudioDatapoints* aud = ntrb_malloc(sizeof(ntrb_AudioDatapoints));
+	ntrb_AudioBuffer* aud = ntrb_malloc(sizeof(ntrb_AudioBuffer));
 	if(aud == NULL) return ntrb_RCD_QueueAudio_MallocError;
 	
-	enum ntrb_LoadStdFmtAudioResult audio_load_result = ntrb_load_std_fmt_audio(aud, filename);
-	if(audio_load_result != ntrb_LoadStdFmtAudioResult_OK){
-		ntrb_free(aud);
-		return ntrb_RCD_QueueAudio_ntrb_LoadStdFmtAudioResult + audio_load_result;
+	const enum ntrb_AudioBufferNew_Error new_audbuf_error = ntrb_AudioBuffer_new(aud, filename, ntrb_std_frame_count);
+	if(new_audbuf_error){
+		printf("ntrb_AudioBufferNew_Error: %d\n", new_audbuf_error);
+		return -1;
 	}
 	
-	bool wrote_track = false;
+	aud->load_buffer_callback(aud);
+	if(aud->load_err){
+		printf("ntrb_AudioBufferLoad_Error: %d\n", aud->load_err);
+		return -1;
+	}	
 	
-	pthread_rwlock_wrlock(&(runtime_data->audio_track_rwlock));
+	bool wrote_track = false;
+	const int acq_wrlock_error = pthread_rwlock_wrlock(&(runtime_data->audio_track_rwlock));
+	if(acq_wrlock_error) return -1;
 	
 	for(uint16_t i = 0; i < runtime_data->audio_track_count; i++){
 		const bool track_empty = runtime_data->audio_tracks[i] == NULL;
@@ -86,7 +92,7 @@ enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCore
 	
 	pthread_rwlock_unlock(&(runtime_data->audio_track_rwlock));
 	if(!wrote_track){
-		ntrb_AudioDatapoints_free(aud);
+		ntrb_AudioBuffer_free(aud);
 		ntrb_free(aud);
 		return ntrb_RCD_QueueAudio_TracksAllFull;
 	}
