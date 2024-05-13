@@ -9,12 +9,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 
 const unsigned long ntrb_msecs_in_sec = 1000;
 const unsigned long ntrb_msecs_per_callback = 100;
-//const unsigned long ntrb_std_monochannel_samples = (ntrb_std_samplerate * ntrb_msecs_per_callback) / ntrb_msecs_in_sec;
-const unsigned long ntrb_std_monochannel_samples = 4800;
+//const unsigned long ntrb_std_frame_count = (ntrb_std_samplerate * ntrb_msecs_per_callback) / ntrb_msecs_in_sec;
+const unsigned long ntrb_std_frame_count = 4800;
 
 static int stream_audio(const void *, void *output_void, unsigned long frameCount, 
 						const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, 
@@ -103,6 +104,7 @@ static PaError get_output_stream_params(PaStreamParameters* const output_params)
 	return paNoError;
 }
 
+//#define SHORT_AUDIO
 void* ntrb_run_audio_engine(void* const runtime_data_void){
 	ntrb_RuntimeCoreData* const runtime_data = (ntrb_RuntimeCoreData*)runtime_data_void;
 	PaError pa_error = paNoError;

@@ -1,4 +1,3 @@
-#include "AudioBuffer.h"
 #include "audeng_wrapper.h"
 #include "RuntimeCoreData.h"
 
@@ -19,7 +18,13 @@ int main(){
 		return -1;
 	}
 	
-	assert(ntrb_RuntimeCoreData_queue_audio(&rcd, "../../ntr-aud/my hair.wav") == 0);
+	const int rcd_queue_err = ntrb_RuntimeCoreData_queue_audio(&rcd, "../../ntr-aud/my hair fl.wav");
+	if(rcd_queue_err){
+		printf("RCD queue: %d\n", rcd_queue_err);
+		ntrb_RuntimeCoreData_free(&rcd);		
+		return -1;
+	}
+	
 	rcd.in_pause_state = false;
 	
 	pthread_t audio_engine_thread;

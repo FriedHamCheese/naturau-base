@@ -65,7 +65,7 @@ enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCore
 	ntrb_AudioBuffer* aud = ntrb_malloc(sizeof(ntrb_AudioBuffer));
 	if(aud == NULL) return ntrb_RCD_QueueAudio_MallocError;
 	
-	const enum ntrb_AudioBufferNew_Error new_audbuf_error = ntrb_AudioBuffer_new(aud, filename, ntrb_std_monochannel_samples);
+	const enum ntrb_AudioBufferNew_Error new_audbuf_error = ntrb_AudioBuffer_new(aud, filename, ntrb_std_frame_count);
 	if(new_audbuf_error){
 		printf("ntrb_AudioBufferNew_Error: %d\n", new_audbuf_error);
 		return -1;
