@@ -40,11 +40,37 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 #include <stddef.h>
 #include <stdbool.h>
 
+#
+
 #ifdef NTRB_MEMDEBUG
 	#define ntrb_malloc(size_bytes) _ntrb_memdebug_malloc(size_bytes, __FILE__, __LINE__)
 	#define ntrb_calloc(elements, typesize) _ntrb_memdebug_calloc(elements, typesize, __FILE__, __LINE__)
-	#define ntrb_realloc(ptr, size_bytes) _ntrb_memdebug_realloc(ptr, size_bytes, __FILE__, __LINE__)
+	#define ntrb_realloc(ptr, size_bytes) _ntrb_memdebug_realloc(ptr, size_bytes, __FILE__, __LINE__, _ntrb_memdebug_unresgistered_realloc_ptr_callback)
 	#define ntrb_free(ptr) _ntrb_memdebug_free(ptr, __FILE__, __LINE__)	
+	
+	typedef struct{
+		void* ptr;
+		size_t allocsize_bytes;
+		const char* callsite_filename;
+		int callsite_line;
+	} _ntrb_memdebug_AllocData;
+	
+	enum ntrb_memdebug_Error{
+		ntrb_memdebug_OK,
+		
+		ntrb_memdebug_AlreadyInit,
+		ntrb_memdebug_NotInit,
+		
+		ntrb_memdebug_AllocError,
+		
+		ntrb_memdebug_RwlockInitError,
+		ntrb_memdebug_RwlockAcqError,
+		ntrb_memdebug_RwlockUnlockError,
+		ntrb_memdebug_RwlockDestroyError,
+		
+	};
+	
+	extern  _ntrb_alloc_bytevec _ntrb_memdebug_alloc_data;
 	
 	/**
 	Older way of initialising the alloc module.
@@ -61,7 +87,7 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 
 	An assert would fail if attempting to initialise the already initialised module.
 	*/	
-	int ntrb_memdebug_init_with_return_value();
+	enum ntrb_memdebug_Error ntrb_memdebug_init_with_return_value();
 	
 	/**
 	Uninitialises the module by freeing the bytevecs and destroying the rwlock.
@@ -74,64 +100,14 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	
 	\param print_summary prints the remaining unallocated memory pointers if set to true. Good and convenient for checking memory leaks after testing your program.
 	*/
-	int ntrb_memdebug_uninit(const bool print_summary);
+	enum ntrb_memdebug_Error ntrb_memdebug_uninit(const bool print_summary);
 	
 	/**
 	Prints the record of unfreed pointers in the record, from allocation or reallocation.
 	
 	Returns 0 if the rwlock of the module has no issues requesting a read lock and unlocking. Else it returns the error value from acquiring a read lock or unlocking the lock. If this function fails, probably not a big deal, it's just printing text.
 	*/
-	int ntrb_memdebug_view();
-
-	/**
-	An array of void* which has been given memory allocation.
-	
-	We add pointers and their information to the appropriate containers if:
-	- We allocate new memory by using ntrb_malloc or ntrb_calloc; 
-	  or allocate with ntrb_realloc by passing a NULL pointer which acts as a malloc (exact behaviour as stdlib realloc).
-	
-	We edit the pointer and its information if:
-	- We called ntrb_realloc with a pointer which is in the record already.
-	
-	And we delete the pointer and its information if:
-	- We ntrb_free a pointer which is in the record.
-	
-	To access the pointer and its information, have an index of the pointer in void* type and access each of the container with ((type_in_container*)(container.base_ptr))[index]. For example ((size_t*)(_ntrb_memdebug_size))[2];
-	
-	We use container.elements as the boundary for seeking through the record, as we need to make sure that the boundary guarantees no garbage value. If we mark an element unused and the element is not at the end, we don't change the .elements value. We only change when we remove the last element of the container, then we subtract sizeof(type_in_container) from container.elements in each of the containers.
-	
-	This is only left exposed for testing the module.
-	
-	Defined in alloc.c
-	*/
-	extern _ntrb_alloc_bytevec _ntrb_memdebug_ptr;
-	
-	/**
-	An array of size_t containing the allocation size of each pointer.
-	
-	This is only left exposed for testing the module. Refer to the documentation on _ntrb_memdebug_ptr for how to access this container properly.
-	
-	Defined in alloc.c
-	*/
-	extern _ntrb_alloc_bytevec _ntrb_memdebug_size;
-	
-	/**
-	An array of const char* containing the filename of each allocation/reallocation site. Typically it's from (double underscore)FILE(double underscore) so don't free any of the pointers in this container.
-	
-	This is only left exposed for testing the module. Refer to the documentation on _ntrb_memdebug_ptr for how to access this container properly.
-	
-	Defined in alloc.c
-	*/
-	extern _ntrb_alloc_bytevec _ntrb_memdebug_filename;
-	
-	/**
-	An array of int which is the line number at each allocation/reallocation site. Typically it's from (double underscore)LINE(double underscore).
-	
-	This is only left exposed for testing the module. Refer to the documentation on _ntrb_memdebug_ptr for how to access this container properly.
-	
-	Defined in alloc.c
-	*/
-	extern _ntrb_alloc_bytevec _ntrb_memdebug_line;
+	enum ntrb_memdebug_Error ntrb_memdebug_view();
 
 	/**
 	Allocates a new pointer with size_bytes bytes of space and keeps a record of: the pointer, allocation size, callsite filename and line.
@@ -153,6 +129,8 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	*/
 	void* _ntrb_memdebug_calloc(const size_t elements, const size_t typesize, const char* const filename, const int line);
 	
+	void _ntrb_memdebug_unresgistered_realloc_ptr_callback(const void* const realloced_ptr, const void* const requested_ptr);
+
 	/**
 	Either allocates, reallocates or shrinks a pointer, and add or edit the record containers.
 	
@@ -164,7 +142,7 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	- If the passed pointer is not in the record when reallocating or shrinking: does the request, but does not add the reallocated or shrunk pointer to the record and warns through stdout.
 	- If the passed pointer is in the record, does the request and edit its information in the record accordingly.
 	*/
-	void* _ntrb_memdebug_realloc(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
+	void* _ntrb_memdebug_realloc(void* const ptr, const size_t size_bytes, const char* const filename, const int line, void (*unregistered_ptr_callback)(const void*, const void*));
 	
 	/**
 	Frees the passed pointer and delete its record from the containers.
@@ -200,7 +178,7 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	
 	\todo get rid of the asserts and replace it with a return boolean or some sort.
 	*/
-	void _ntrb_memdebug_add_element(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
+	bool _ntrb_memdebug_add_element(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
 	
 	/**
 	Marks the space which i_element points to as unused.

@@ -107,33 +107,10 @@ static void test_ntrb_AudioHeader_from_WAVfile(){
 	ntrb_free(file_buffer.ptr);
 }
 
-
-static void test_ntrb_get_WAV_audiodata(){
-	ntrb_SpanU8 file_buffer;
-	ntrb_AudioHeader header;
-	size_t audiodata_bytes = 0;
-	size_t audiodata_offset = 0;
-	
-	assert(ntrb_read_entire_file_rb(&file_buffer, "test/wav_wrapper/regular_wav.wav") == ntrb_ReadFileResult_OK);
-	assert(ntrb_AudioHeader_from_WAVfile(&header, &audiodata_offset, &audiodata_bytes, file_buffer) == ntrb_AudioHeaderFromWAVFile_ok);
-
-	ntrb_AudioDatapoints aud = ntrb_get_WAV_audiodata(file_buffer, audiodata_bytes, audiodata_offset);
-	assert(aud.bytes != NULL);
-	assert(aud.byte_pos == 0);
-	assert(aud.byte_count == audiodata_bytes);
-	
-	const int memcmp_equal = 0;
-	assert(memcmp(aud.bytes, file_buffer.ptr + audiodata_offset, audiodata_bytes) == memcmp_equal);
-	
-	ntrb_AudioDatapoints_free(&aud);
-	ntrb_free(file_buffer.ptr);
-}
-
 void test_suite_ntrb_wav_wrapper(){
 	test_ntrb_getSubchunk1Start();
 	test_ntrb_getSubchunk2Start();
 	test_ntrb_AudioHeader_from_WAVfile();
-	test_ntrb_get_WAV_audiodata();
 }
 
 

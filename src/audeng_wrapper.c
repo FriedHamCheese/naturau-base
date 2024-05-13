@@ -1,5 +1,6 @@
 #include "audeng_wrapper.h"
 
+#include "alloc.h"
 #include "aud_std_fmt.h"
 
 #include "AudioDatapoints.h"
@@ -75,7 +76,7 @@ static int stream_audio(const void *, void *output_void, unsigned long frameCoun
 			//We cannot use pthread_join(), as it would block the execution.
 			//We can know if the buffer has finished being loaded or not by trying to acquire the buffer_access lock.
 			pthread_t thread;
-			const bool thread_create_error = pthread_create(&thread, NULL, current_audiotrack->load_buffer_callback, current_audiotrack) != 0;			
+			const bool thread_create_error = pthread_create(&thread, NULL, current_audiotrack->load_buffer_callback, current_audiotrack) != 0;
 			if(!thread_create_error){
 				//Detach tells the OS to free the thread immediately after it is finished.
 				//If it fails, the OS will take some time to free the thread.
