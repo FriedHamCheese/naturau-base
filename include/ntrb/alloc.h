@@ -175,8 +175,6 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	
 	If there is an empty space between the data in the containers, it adds the information to it (_ntrb_memdebug_add_element_to_unused_space()).
 	If there isn't, try adding it at the end of the containers, and if the container fails to allocate the space for it, assertions will fail.
-	
-	\todo get rid of the asserts and replace it with a return boolean or some sort.
 	*/
 	bool _ntrb_memdebug_add_element(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
 	
