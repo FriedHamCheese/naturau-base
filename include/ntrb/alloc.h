@@ -1,6 +1,12 @@
 #ifndef ntrb_alloc_h
 #define ntrb_alloc_h
 
+#include "_alloc_bytevec.h"
+
+#include <stdlib.h>
+#include <stddef.h>
+#include <stdbool.h>
+
 /**
 \file alloc.h
 A module providing memory management functions. 
@@ -11,9 +17,15 @@ If you have a codebase which uses ntrb and it still has a mix of stdlib memory f
 
 To debug memory management, add -DNTRB_MEMDEBUG to CFLAGS of ntrb and other codebase using ntrb. If you choose not to, simply make sure that ntrb and the code using ntrb are not compiled with -DNTRB_MEMDEBUG enabled.
 
-The ntrb_(func)(...) are macros which transform to the underlying debugging implementations from ntrb if NTRB_MEMDEBUG is defined. If it is not defined, it turns into (func)(...). So ntrb_realloc would transform into _ntrb_memdebug_realloc if debugging is enabled, else just realloc.
+In your int main() of your codebase(s), simply have ntrb_memdebug_init_with_return_value() at the very top,
+and ntrb_memdebug_uninit(true) at the bottom, each guarded with an #ifdef NTRB_MEMDEBUG and an #endif. 
+So your codebase could both operate with or without memory debugging.
 
-\todo For 0.2, merge the 4 bytevecs into 1 and have a struct for the information instead.
+Typically you would give ntrb_memdebug_uninit() a true, which makes it to display any unfreed pointers which are recorded by the debugging implementations before deinitialising the module.
+
+Go through your code and replace malloc, calloc, realloc and free; with ntrb_* macro equivalents. And that's pretty much it :D The parameters for the macros are identical to that of the stdlib counterparts, guaranteeing ease of change.
+
+The ntrb_(func)(...) are macros which transform to the underlying debugging implementations from ntrb if NTRB_MEMDEBUG is defined. If it is not defined, it turns into (func)(...). So ntrb_realloc would transform into _ntrb_memdebug_realloc if debugging is enabled, else just realloc.
 */
 
 /**
@@ -33,21 +45,15 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 A macro which either transforms into the debugging implementation _ntrb_memdebug_free() or stdlib free() depending on if NTRB_MEMDEBUG is defined or not respectively.
 */
 
-
-#include "_alloc_bytevec.h"
-
-#include <stdlib.h>
-#include <stddef.h>
-#include <stdbool.h>
-
-#
-
 #ifdef NTRB_MEMDEBUG
 	#define ntrb_malloc(size_bytes) _ntrb_memdebug_malloc(size_bytes, __FILE__, __LINE__)
 	#define ntrb_calloc(elements, typesize) _ntrb_memdebug_calloc(elements, typesize, __FILE__, __LINE__)
 	#define ntrb_realloc(ptr, size_bytes) _ntrb_memdebug_realloc(ptr, size_bytes, __FILE__, __LINE__, _ntrb_memdebug_unresgistered_realloc_ptr_callback)
 	#define ntrb_free(ptr) _ntrb_memdebug_free(ptr, __FILE__, __LINE__)	
 	
+	/**
+	A struct containing information on an allocation or a reallocation from functions in alloc.c or alloc.h.
+	*/
 	typedef struct{
 		void* ptr;
 		size_t allocsize_bytes;
@@ -55,21 +61,53 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 		int callsite_line;
 	} _ntrb_memdebug_AllocData;
 	
+	/**
+	Generic enum representing errors in alloc.c or alloc.h.
+	*/
 	enum ntrb_memdebug_Error{
+		///Indicates a successful operation from the function.
 		ntrb_memdebug_OK,
 		
+		/**
+		Attempted to initialise the already initialised module.
+	
+		This only gets returned from functions which initialises the module.
+		*/
 		ntrb_memdebug_AlreadyInit,
+		
+		///The module is not yet initialised.
 		ntrb_memdebug_NotInit,
 		
+		///Failed to allocate memory for the record container (_ntrb_memdebug_alloc_data).
 		ntrb_memdebug_AllocError,
 		
+		/**
+		Failed to initialise the rwlock of the module.
+
+		This only gets returned from functions which initialises the module.		
+		*/
 		ntrb_memdebug_RwlockInitError,
+		///Failed to acquire either the read lock or write lock.
 		ntrb_memdebug_RwlockAcqError,
+		///Failed to unlock the rwlock of the module.
 		ntrb_memdebug_RwlockUnlockError,
+		/**
+		Failed to destroy the rwlock of the module.
+		
+		This only gets returned from _ntrb_memdebug_uninit().
+		*/
 		ntrb_memdebug_RwlockDestroyError,
 		
 	};
 	
+	/**
+	The "record" or "record container" which contains information on an allocation or a reallocation made by functions of the module.
+	
+	It contains multiple _ntrb_memdebug_AllocData, each representing a single allocation or reallocation.
+	
+	If an element of _ntrb_memdebug_AllocData in the container has its .ptr as NULL, this indicates an empty space.
+	For performance and efficiency reasons, you would try to write to this first, as the _ntrb_memdebug_add_element_to_unused_space() in _ntrb_memdebug_add_element() does.
+	*/
 	extern  _ntrb_alloc_bytevec _ntrb_memdebug_alloc_data;
 	
 	/**
@@ -81,22 +119,23 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	bool ntrb_memdebug_init();
 	
 	/**
-	Initialises the alloc module by initialising the rwlock of the module and the 4 _ntrb_alloc_bytevec which keep track of memory management information and then marks the module as successfully initialised.
-
-	Returns 0 if all went well. If it returns ENOMEM, it either means the bytevecs couldn't be initialised or the rwlock fails to initialise due to the lack of memory. Anything else would be return values of the pthread_rwlock_init().
-
-	An assert would fail if attempting to initialise the already initialised module.
+	Initialises the alloc module by initialising the rwlock of the module and the record which keep track of memory management information, and then marks the module as successfully initialised.
+	
+	- If the module is already initialised, it returns ntrb_memdebug_AlreadyInit.
+	- If the rwlock initialisation fails, it returns ntrb_memdebug_RwlockInitError.
+	- If the allocation of the record, _ntrb_memdebug_alloc_data, fails; it returns ntrb_memdebug_AllocError.
+	- Else it returns ntrb_memdebug_OK, if any of the mentioned has not occurred.
 	*/	
 	enum ntrb_memdebug_Error ntrb_memdebug_init_with_return_value();
 	
 	/**
-	Uninitialises the module by freeing the bytevecs and destroying the rwlock.
+	Uninitialises the module by freeing the record container and destroying the rwlock.
 	
-	Returns 0 if sucessful. 
-	
-	If an error occurs when trying to lock, unlock or destroy the rwlock, the return value is from either pthread_rwlock_wrlock(), pthread_rwlock_unlock(), or pthread_rwlock_destroy().
-	
-	Because it is difficult to determine if the bytevecs are freed after the rwlock errors or not, it's okay to just let it fail in most cases. Unless you are tight on memory or something, then recursively calling it until it returns 0 may be a viable option.
+	- If the module is not initialised, it returns ntrb_memdebug_NotInit.
+	- If there was an error acquiring the write lock of the module rwlock, it returns ntrb_memdebug_RwlockAcqError.
+	- If there was an error releasing the write lock of the module, the module is identified as uninitialised and the record container is freed.
+	- If there was an error destroying the rwlock of the module, the module is identified as uninitialised and the record container is freed.
+	- Else it returns ntrb_memdebug_OK, if any of the mentioned has not occurred.
 	
 	\param print_summary prints the remaining unallocated memory pointers if set to true. Good and convenient for checking memory leaks after testing your program.
 	*/
@@ -104,43 +143,63 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	
 	/**
 	Prints the record of unfreed pointers in the record, from allocation or reallocation.
-	
-	Returns 0 if the rwlock of the module has no issues requesting a read lock and unlocking. Else it returns the error value from acquiring a read lock or unlocking the lock. If this function fails, probably not a big deal, it's just printing text.
+		
+	- If the module is not initialised, it returns ntrb_memdebug_NotInit.
+	- If there was an error acquiring the read lock of the module rwlock, it returns ntrb_memdebug_RwlockAcqError.
+	- If there was an error releasing the lock of the module, the function will have printed the record and will return ntrb_memdebug_RwlockUnlockError.
+	- Else it returns ntrb_memdebug_OK, if any of the mentioned has not occurred.
 	*/
 	enum ntrb_memdebug_Error ntrb_memdebug_view();
 
 	/**
-	Allocates a new pointer with size_bytes bytes of space and keeps a record of: the pointer, allocation size, callsite filename and line.
+	Allocates a new pointer with size_bytes bytes of space and keeps a record of the pointer, allocation size, callsite filename and line.
 	
-	Returns the allocated pointer if the allocation is successful. If the underlying malloc fails, the function will not write to the record containers and a NULL is returned.
+	Returns the allocated pointer if the allocation is successful. If the underlying malloc fails, the function will not write to the record container and a NULL is returned.
 	
-	If _ntrb_memdebug_rwlock encounters error while locking or unlocking, a message will be printed to stderr.
-	And if any of the record containers failed to allocate space for keeping the record, assertions will fail.
+	- If the rwlock of the module fails to acquire a write lock;
+	  the allocated memory is provided in the return value, but not logged to the record and a message will be printed to stderr regarding the error.
+	- If there isn't sufficient memory for the record container;
+	  the allocated memory is provided in the return value, but not logged to the record and a message will be printed to stderr regarding the error.
+	- If the rwlock of the module fails to release the write lock; 
+	  the allocated memory is provided in the return value, the allocation is logged to the record and a message is printed to stderr regarding the error.
+	- Else, the allocation is logged and no message is printed to stderr.
 	*/
 	void* _ntrb_memdebug_malloc(const size_t size_bytes, const char* const filename, const int line);
 	
 	/**
-	Allocates a new pointer with elements x typesize bytes of space, set every byte to 0 and keeps a record of: the pointer, allocation size, callsite filename and line.
+	Allocates a new pointer with elements x typesize bytes of space, set every byte to 0 and keeps a record of the pointer, allocation size, callsite filename and line.
 	
-	Returns the allocated pointer if the allocation is successful. If the underlying malloc fails, the function will not write to the record containers and a NULL is returned
+	Returns the allocated pointer if the allocation is successful. If the underlying malloc fails, the function will not write to the record container and a NULL is returned.
 	
-	If _ntrb_memdebug_rwlock encounters error while locking or unlocking, a message will be printed to stderr and the record containers will not be accessed.
-	And if any of the containers failed to allocate space for keeping the record, assertions will fail.
+	- If the rwlock of the module fails to acquire a write lock;
+	  the allocated memory is provided in the return value, but not logged to the record and a message will be printed to stderr regarding the error.
+	- If there isn't sufficient memory for the record container;
+	  the allocated memory is provided in the return value, but not logged to the record and a message will be printed to stderr regarding the error.
+	- If the rwlock of the module fails to release the write lock; 
+	  the allocated memory is provided in the return value, the allocation is logged to the record and a message is printed to stderr regarding the error.
+	- Else, the allocation is logged and no message is printed to stderr.
 	*/
 	void* _ntrb_memdebug_calloc(const size_t elements, const size_t typesize, const char* const filename, const int line);
 	
+	/**
+	The callback for _ntrb_memdebug_realloc() when a reallocating or shrinking of a pointer not in the record.
+	
+	This prints a message to stderr.
+	*/
 	void _ntrb_memdebug_unresgistered_realloc_ptr_callback(const void* const realloced_ptr, const void* const requested_ptr);
 
 	/**
 	Either allocates, reallocates or shrinks a pointer, and add or edit the record containers.
 	
-	These are the possible scenarios of calling the function and the behaviour of the function are as follows:
-	- Failed to allocate, reallocate or shrink the memory: returns NULL and does not access the record containers. The passed pointer is left unchanged.
-	- If an error occurs while the _ntrb_memdebug_rwlock is requesting a write lock: a message will be printed in stderr and the record containers would not be changed, which causes inaccuracies of the record.
-	- If an error occurs while the _ntrb_memdebug_rwlock is requesting an unlock: a message will be printed in stderr but the record containers can be mutated.
+	These are the possible scenarios of calling the function:
+	- Failed to allocate, reallocate or shrink the memory: returns NULL and does not access the record container. The passed pointer and its contents are left unchanged.
+	- If an error occurs while the _ntrb_memdebug_rwlock is requesting a write lock: a message will be printed in stderr and the record container would not be accessed, causing inaccuracies of the record.
+	- If an error occurs while the _ntrb_memdebug_rwlock is requesting an unlock: a message will be printed in stderr but the record containers will be accessed.
 	- If the passed pointer is NULL: add the allocated pointer and its callsite information to the record.
 	- If the passed pointer is not in the record when reallocating or shrinking: does the request, but does not add the reallocated or shrunk pointer to the record and warns through stdout.
 	- If the passed pointer is in the record, does the request and edit its information in the record accordingly.
+	
+	\param unregistered_ptr_callback A callback for when the function is requested to reallocate or shrink a pointer which is not in the record.
 	*/
 	void* _ntrb_memdebug_realloc(void* const ptr, const size_t size_bytes, const char* const filename, const int line, void (*unregistered_ptr_callback)(const void*, const void*));
 	
@@ -162,40 +221,45 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	void _ntrb_memdebug_view_no_lock();
 
 	/**
-	Finds unused space between the data in the record containers and tries to add the information to it.
+	Finds unused space between the data in the record container and tries to add the information to it.
 	
 	Returns true if there was an empty space and the function added the information to it. False if there was none and the information was not added.
-	
-	This only checks the space in the _ntrb_memdebug_ptr but write to other containers without checking.
-	It does the job if you have manipulated the containers in the correct behaviour so far.
 	*/
 	bool _ntrb_memdebug_add_element_to_unused_space(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
-	/**
-	Adds the information provided to the record containers.
 	
-	If there is an empty space between the data in the containers, it adds the information to it (_ntrb_memdebug_add_element_to_unused_space()).
-	If there isn't, try adding it at the end of the containers, and if the container fails to allocate the space for it, assertions will fail.
+	/**
+	Adds the information provided to the record container.
+	
+	If there is an empty space between the data in the container, it adds the information to it (_ntrb_memdebug_add_element_to_unused_space()).
+	If there isn't, it tries adding it at the end of the container. And if the container fails to allocate memory for adding the information, the function returns false.
+	If the function successfully added the information to the record, whether it is added to the unused space or not, the function returns true.
 	*/
 	bool _ntrb_memdebug_add_element(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
 	
 	/**
 	Marks the space which i_element points to as unused.
+
+	i_element and element_count are interpreted as n element of _ntrb_memdebug_AllocData, not in bytes.
 	
-	\param i_element index of the data in each of the record containers to mark as unused.
-	\param element_count the elements of any of the containers which we can iterate through without reading garbage. Just pass in (container.elements) / sizeof(type_in_container).
+	\param i_element Index of the data in the record container to mark as unused.
+	\param element_count The elements of _ntrb_memdebug_AllocData in _ntrb_memdebug_alloc_data.
 	*/
 	void _ntrb_memdebug_remove_element(const size_t i_element, const size_t element_count);
 	
 	/**
-	Returns the element index of the pointer in _ntrb_memdebug_ptr.
+	Returns the element index of the pointer in _ntrb_memdebug_alloc_data.
+	
+	i_element is interpreted as element of _ntrb_memdebug_AllocData, not in bytes.	
 	
 	If the pointer is not in the container, it returns -1.
 	*/
 	int_least64_t _ntrb_memdebug_ptr_index(const void* const ptr);
 	
 	/**
-	Overwrites the data in each of the container at i_element with the provided data.
+	Overwrites the data in the record container at i_element with the provided data.
 	
+	i_element is interpreted as element of _ntrb_memdebug_AllocData, not in bytes.
+		
 	This does not perform bounds check.
 	*/
 	void _ntrb_memdebug_replace_element(const size_t i_element, void* const ptr, const size_t size_bytes, const char* const filename, const int line);	
