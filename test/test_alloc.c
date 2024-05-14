@@ -236,7 +236,7 @@ void* _test__ntrb_memdebug_malloc_thread(void* const int_ptr){
 	return ptr;
 }
 
-#define _test__ntrb_memdebug_thread_count 0
+#define _test__ntrb_memdebug_thread_count 10000
 void* ptrs[_test__ntrb_memdebug_thread_count];
 
 static size_t size_increment = 3;

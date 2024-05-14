@@ -27,7 +27,6 @@ void _test__ntrb_memdebug_realloc_count_unregistered_call(const void*, const voi
 
 void test__ntrb_memdebug_realloc();
 
-#define _test__ntrb_memdebug_thread_count 0
 void* _test__ntrb_memdebug_malloc_thread(void* const int_ptr);
 void* _test__ntrb_memdebug_realloc_thread(void* const int_ptr);
 void* _test__ntrb_memdebug_free_thread(void* int_ptr);
@@ -46,6 +45,8 @@ static void test_suite_ntrb_alloc(){
 	test__ntrb_memdebug_calloc();
 	test__ntrb_memdebug_realloc();
 	
+	#ifdef NTRB_MEMDEBUG_TEST_DATA_RACE
 	test__ntrb_memdebug_test_lock();
+	#endif
 	#endif
 }
