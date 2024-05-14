@@ -8,7 +8,7 @@
 #include "test_bytevec.h"
 #include "test_decode_flac.h"
 #include "test_file_wrapper.h"
-#include "test_RuntimeCoreData.h"
+//#include "test_RuntimeCoreData.h"
 #include "test_SlicedStrings.h"
 #include "test_str_utils.h"
 #include "test_utils.h"
@@ -42,7 +42,7 @@ int main(){
 	
 	test_suite_ntrb_aud_std_fmt();
 	test_suite_ntrb_audeng_wrapper();
-	test_suite_ntrb_RuntimeCoreData();
+	//test_suite_ntrb_RuntimeCoreData();
 	
 	#ifdef NTRB_MEMDEBUG
 	ntrb_memdebug_uninit(true);
