@@ -48,13 +48,8 @@ enum ntrb_RCD_QueueAudioReturn{
 	ntrb_RCD_QueueAudio_OK,
 	///Memory allocation error.
 	ntrb_RCD_QueueAudio_MallocError,
-	///This is unused.
-	ntrb_RCD_QueueAudio_SleepInterrupt,
 	///No empty track to add audio to.
 	ntrb_RCD_QueueAudio_TracksAllFull,
-	
-	///Offset for audio loading and converting errors from ntrb_loadStdFmtAudioResult.
-	ntrb_RCD_QueueAudio_ntrb_LoadStdFmtAudioResult = 15,
 };
 
 /**
