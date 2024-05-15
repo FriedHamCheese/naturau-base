@@ -11,12 +11,10 @@ enum ntrb_GetCharStatus ntrb_getc(FILE* const instream, char* const ret){
 	const int getc_result = getc(instream);
 	
 	if(getc_result == EOF){
-		const int ferror_id = ferror(instream);
 		const int feof_id = feof(instream);
-		clearerr(instream);
 		
 		if(feof_id) return ntrb_GetChar_EOF;
-		else return (enum ntrb_GetCharStatus)(ntrb_GetChar_Ferror + ferror_id);		
+		else return ntrb_GetChar_Ferror;
 	}
 	
 	*ret = getc_result;
@@ -25,9 +23,9 @@ enum ntrb_GetCharStatus ntrb_getc(FILE* const instream, char* const ret){
 
 enum ntrb_GetCharStatus ntrb_getsn(const size_t max_strlen, FILE* const instream, char** const ret){
 	/*
-	if an ferror is caught, we free the allocated *(char*) param, remember the ferror value, clear the error, and return the error enum.
-	if an feof is caught, we return the read *(char*) param, remember an EOF has occurred, clear the error, and return EOF enum.
-	if fgets reads without any errors, return the read *(char)* param and return an OK enum.
+	- if an ferror is caught, we free the allocated *(char*) param and the function returns ntrb_GetChar_Ferror.
+	- if an feof is caught, we return the read *(char*) param and return ntrb_GetChar_EOF.
+	- if fgets reads without any errors, return the read *(char)* param and return an OK enum.
 	*/
 	*ret = ntrb_calloc(max_strlen+1, sizeof(char));
 	if(*ret == NULL) return ntrb_GetChar_AllocErr;
@@ -40,11 +38,9 @@ enum ntrb_GetCharStatus ntrb_getsn(const size_t max_strlen, FILE* const instream
 		*ret = NULL;
 		
 		const int feof_status = feof(instream);
-		const int ferror_status = ferror(instream);
-		clearerr(instream);
 		
 		if(feof_status) return ntrb_GetChar_EOF;
-		else return (ntrb_GetChar_Ferror + ferror_status);
+		else return ntrb_GetChar_Ferror;
 	}
 	
 	*ret = ntrb_realloc(*ret, strlen(*ret)+1);
