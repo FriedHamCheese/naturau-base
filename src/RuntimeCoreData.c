@@ -55,10 +55,12 @@ int ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
 	return pthread_rwlock_destroy(&(rcd->audio_track_rwlock));
 }
 
-void ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index){
-	ntrb_AudioBuffer_free(rcd->audio_tracks[track_index]);
+enum ntrb_AudioBufferFree_Error ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index){
+	const enum ntrb_AudioBufferFree_Error aud_free_error = ntrb_AudioBuffer_free(rcd->audio_tracks[track_index]);
 	ntrb_free(rcd->audio_tracks[track_index]);
 	rcd->audio_tracks[track_index] = NULL;
+	
+	return aud_free_error;
 }
 
 enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCoreData* const runtime_data, const char* filename){
@@ -67,20 +69,26 @@ enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCore
 	
 	const enum ntrb_AudioBufferNew_Error new_audbuf_error = ntrb_AudioBuffer_new(aud, filename, ntrb_std_frame_count);
 	if(new_audbuf_error){
-		printf("ntrb_AudioBufferNew_Error: %d\n", new_audbuf_error);
-		return -1;
+		ntrb_free(aud);
+		return ntrb_AudioBufferNew_Error_to_ntrb_RCD_QueueAudioReturn(new_audbuf_error);
 	}
 	
 	aud->load_buffer_callback(aud);
-	if(aud->load_err){
-		printf("ntrb_AudioBufferLoad_Error: %d\n", aud->load_err);
-		return -1;
-	}	
+	const enum ntrb_RCD_QueueAudioReturn aud_load_err = ntrb_AudioBufferLoad_Error_to_ntrb_RCD_QueueAudioReturn(aud->load_err);
+	if(aud_load_err){
+		ntrb_AudioBuffer_free(aud);
+		ntrb_free(aud);
+		return aud_load_err;
+	}
 	
-	bool wrote_track = false;
 	const int acq_wrlock_error = pthread_rwlock_wrlock(&(runtime_data->audio_track_rwlock));
-	if(acq_wrlock_error) return -1;
+	if(acq_wrlock_error){
+		ntrb_AudioBuffer_free(aud);
+		ntrb_free(aud);		
+		return ntrb_RCD_QueueAudio_AcqWritelockError;
+	}
 	
+	bool wrote_track = false;	
 	for(uint16_t i = 0; i < runtime_data->audio_track_count; i++){
 		const bool track_empty = runtime_data->audio_tracks[i] == NULL;
 		if(track_empty){
@@ -89,12 +97,45 @@ enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCore
 			break;
 		}
 	}
-	
-	pthread_rwlock_unlock(&(runtime_data->audio_track_rwlock));
+
 	if(!wrote_track){
+		pthread_rwlock_unlock(&(runtime_data->audio_track_rwlock));
 		ntrb_AudioBuffer_free(aud);
 		ntrb_free(aud);
 		return ntrb_RCD_QueueAudio_TracksAllFull;
 	}
-	else return ntrb_RCD_QueueAudio_OK;
+	
+	const int rwlock_unlock_error = pthread_rwlock_unlock(&(runtime_data->audio_track_rwlock));
+	if(rwlock_unlock_error) return ntrb_RCD_QueueAudio_RwlockUnlockError;
+	
+	return ntrb_RCD_QueueAudio_OK;
+}
+
+enum ntrb_RCD_QueueAudioReturn ntrb_AudioBufferNew_Error_to_ntrb_RCD_QueueAudioReturn(const enum ntrb_AudioBufferNew_Error arg){
+	switch(arg){
+		case ntrb_AudioBufferNew_AllocError: 			return ntrb_RCD_QueueAudio_MallocError;
+		case ntrb_AudioBufferNew_FileOpenError:			return ntrb_RCD_QueueAudio_FileOpenError;
+		case ntrb_AudioBufferNew_FileReadError:		 	return ntrb_RCD_QueueAudio_FileReadError;
+		case ntrb_AudioBufferNew_InvalidAudFiletype: 	return ntrb_RCD_QueueAudio_InvalidAudFiletype;
+		case ntrb_AudioBufferNew_WAVheaderError: 		return ntrb_RCD_QueueAudio_WAVheaderError;
+		case ntrb_AudioBufferNew_RwlockInitError: 		return ntrb_RCD_QueueAudio_RwlockInitError;
+		case ntrb_AudioBufferNew_FLACcontainerError:	return ntrb_RCD_QueueAudio_FLACcontainerError;
+		case ntrb_AudioBufferNew_InvalidAudFormat:		return ntrb_RCD_QueueAudio_InvalidAudFormat;
+		case ntrb_AudioBufferNew_UnknownError:			return ntrb_RCD_QueueAudio_NewAudUnknownError;
+		
+		default:
+		return ntrb_RCD_QueueAudio_OK;
+	}
+}
+
+enum ntrb_RCD_QueueAudioReturn ntrb_AudioBufferLoad_Error_to_ntrb_RCD_QueueAudioReturn(const enum ntrb_AudioBufferLoad_Error arg){
+	switch(arg){
+		case ntrb_AudioBufferLoad_AcqWritelockError:	return ntrb_RCD_QueueAudio_AcqWritelockError;
+		case ntrb_AudioBufferLoad_UnequalRead:			return ntrb_RCD_QueueAudio_WAVUnequalRead;
+		
+		case ntrb_AudioBufferLoad_StdaudConversionError:
+			return ntrb_RCD_QueueAudio_StdaudConversionError;
+		default:
+			return ntrb_RCD_QueueAudio_OK;
+	}
 }

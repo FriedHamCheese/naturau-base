@@ -50,7 +50,28 @@ enum ntrb_RCD_QueueAudioReturn{
 	ntrb_RCD_QueueAudio_MallocError,
 	///No empty track to add audio to.
 	ntrb_RCD_QueueAudio_TracksAllFull,
+	
+	ntrb_RCD_QueueAudio_FileOpenError,
+	ntrb_RCD_QueueAudio_FileReadError,
+	ntrb_RCD_QueueAudio_InvalidAudFiletype,
+	ntrb_RCD_QueueAudio_WAVheaderError,	
+	ntrb_RCD_QueueAudio_FLACcontainerError,
+	ntrb_RCD_QueueAudio_InvalidAudFormat,
+	ntrb_RCD_QueueAudio_NewAudUnknownError,	
+
+	ntrb_RCD_QueueAudio_StdaudConversionError,
+	ntrb_RCD_QueueAudio_WAVUnequalRead,
+	ntrb_RCD_QueueAudio_FLACBadData,
+
+	ntrb_RCD_QueueAudio_RwlockInitError,
+	ntrb_RCD_QueueAudio_AcqWritelockError,
+	ntrb_RCD_QueueAudio_RwlockUnlockError,
+	
+	ntrb_RCD_QueueAudio_UnknownError,
 };
+
+enum ntrb_RCD_QueueAudioReturn ntrb_AudioBufferNew_Error_to_ntrb_RCD_QueueAudioReturn(const enum ntrb_AudioBufferNew_Error arg);
+enum ntrb_RCD_QueueAudioReturn ntrb_AudioBufferLoad_Error_to_ntrb_RCD_QueueAudioReturn(const enum ntrb_AudioBufferLoad_Error arg);
 
 /**
 A value for returning an object which indicates a failure.
@@ -90,7 +111,7 @@ track_index should be a value between 0 to rcd->audio_tracks - 1.
 
 It does not perform bounds check or NULL check of the track pointer.
 */
-void ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index);
+enum ntrb_AudioBufferFree_Error ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index);
 
 /**
 Loads an audio track from an audio file with the provided filename to an empty track in runtime_data.
