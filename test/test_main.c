@@ -6,7 +6,6 @@
 #include "test_audeng_wrapper.h"
 #include "test_AudioDatapoints.h"
 #include "test_bytevec.h"
-#include "test_decode_flac.h"
 #include "test_file_wrapper.h"
 //#include "test_RuntimeCoreData.h"
 #include "test_SlicedStrings.h"
@@ -38,7 +37,6 @@ int main(){
 
 	test_suite_ntrb_file_wrapper();
 	test_suite_ntrb_wav_wrapper();
-	test_suite_ntrb_decode_flac();
 	
 	test_suite_ntrb_aud_std_fmt();
 	test_suite_ntrb_audeng_wrapper();

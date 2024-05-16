@@ -6,7 +6,6 @@
 
 #include "wav_wrapper.h"
 #include "file_wrapper.h"
-#include "decode_flac.h"
 
 #include "utils.h"
 #include "alloc.h"
