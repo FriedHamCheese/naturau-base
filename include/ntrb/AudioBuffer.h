@@ -19,6 +19,11 @@ enum ntrb_AudioBufferLoad_Error{
 	ntrb_AudioBufferLoad_RwlockUnlockError,
 	
 	ntrb_AudioBufferLoad_FLACBadData,
+	ntrb_AudioBufferLoad_OGGError,
+	ntrb_AudioBufferLoad_SeekError,	
+	ntrb_AudioBufferLoad_Aborted,	
+	ntrb_AudioBufferLoad_AllocError,	
+	
 };
 
 typedef struct{

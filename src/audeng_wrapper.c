@@ -14,9 +14,9 @@
 #include <stdbool.h>
 
 const unsigned long ntrb_msecs_in_sec = 1000;
-const unsigned long ntrb_msecs_per_callback = 100;
+const unsigned long ntrb_msecs_per_callback = 25;
 //const unsigned long ntrb_std_frame_count = (ntrb_std_samplerate * ntrb_msecs_per_callback) / ntrb_msecs_in_sec;
-const unsigned long ntrb_std_frame_count = 4800;
+const unsigned long ntrb_std_frame_count = 1200;
 
 static int stream_audio(const void *, void *output_void, unsigned long frameCount, 
 						const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, 
@@ -54,6 +54,10 @@ static int stream_audio(const void *, void *output_void, unsigned long frameCoun
 				continue;
 			}
 			
+			for(unsigned long i = 0; i < float_count; i++){
+				output[i] += (current_audiotrack->datapoints)[i];
+			}
+
 			//If an audio loading error from previous call occurred, we free the buffer.
 			//This mostly will be from the audio loader indicating an EOF of the audio file. 
 			//But we also free it if there was an actual error.
@@ -64,11 +68,7 @@ static int stream_audio(const void *, void *output_void, unsigned long frameCoun
 				ntrb_RuntimeCoreData_free_track(runtime_data, track_id);
 				continue;
 			}
-			
-			for(unsigned long i = 0; i < float_count; i++){
-				output[i] += (current_audiotrack->datapoints)[i];
-			}
-			
+
 			//Free current_audiotrack->buffer_access.
 			pthread_rwlock_unlock(&(current_audiotrack->buffer_access));
 	

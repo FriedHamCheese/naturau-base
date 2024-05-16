@@ -19,6 +19,8 @@ typedef struct{
 	ntrb_AudioHeader aud_header;
 } ntrb_BufferSource_FLACfile;
 
+enum ntrb_AudioBufferLoad_Error FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(const FLAC__StreamDecoderState arg);
+
 int ntrb_BufferSource_FLACfile_new(void* const void_ntrb_AudioBuffer, const char* const filename, const size_t frame_count);
 void ntrb_BufferSource_FLACfile_free(ntrb_BufferSource_FLACfile* const ret);
 

@@ -89,7 +89,12 @@ void* ntrb_BufferSource_WAVfile_load_buffer(void* const void_ntrb_AudioBuffer){
 		return NULL;
 	}
 
-	memset(wav_source->read_bytes, 0, wav_source->bytes_to_read);
+	if(wav_source->audiodataSize == 0){
+		audbuf->load_err = ntrb_AudioBufferLoad_EOF;
+		memset(audbuf->datapoints, 0, audbuf->monochannel_samples * ntrb_std_audchannels * sizeof(float));
+		pthread_rwlock_unlock(&(audbuf->buffer_access));	
+		return NULL;
+	}
 	
 	const size_t clamped_bytes_to_read = ntrb_clamp_u64(wav_source->bytes_to_read, 0, wav_source->audiodataSize);
 	
@@ -102,11 +107,6 @@ void* ntrb_BufferSource_WAVfile_load_buffer(void* const void_ntrb_AudioBuffer){
 		
 	//No overflows from subtraction, the clamp is always lesser or equal to audiodataSize.
 	wav_source->audiodataSize -= clamped_bytes_to_read;
-	if(wav_source->audiodataSize == 0){
-		audbuf->load_err = ntrb_AudioBufferLoad_EOF;
-		pthread_rwlock_unlock(&(audbuf->buffer_access));		
-		return NULL;
-	}
 	
 	ntrb_AudioDatapoints stdaud;
 	const ntrb_AudioDatapoints unprocessed_aud = {.bytes = wav_source->read_bytes, .byte_pos = 0, .byte_count = bytes_read};
