@@ -22,37 +22,54 @@ const ntrb_RuntimeCoreData failed_ntrb_RuntimeCoreData = {
 	.in_pause_state = true
 };
 
-int ntrb_RuntimeCoreData_new(ntrb_RuntimeCoreData* const rcd, const uint16_t track_count){	
-	if(track_count == 0) return ENOMEM;
+enum ntrb_RuntimeCoreData_Error ntrb_RuntimeCoreData_new(ntrb_RuntimeCoreData* const rcd, const uint16_t track_count){
+	if(track_count == 0) return ntrb_RuntimeCoreData_AllocError;
+	
 	rcd->audio_tracks = ntrb_calloc(track_count, sizeof(ntrb_AudioBuffer*));
-	if(rcd->audio_tracks == NULL) return ENOMEM;
+	if(rcd->audio_tracks == NULL) 
+		return ntrb_RuntimeCoreData_AllocError;
 	
 	rcd->audio_track_count = track_count;
 	rcd->requested_exit = false;
 	rcd->in_pause_state = true;
 	
-	return pthread_rwlock_init(&(rcd->audio_track_rwlock), NULL);
+	const int rwlock_init_error = pthread_rwlock_init(&(rcd->audio_track_rwlock), NULL);
+	if(rwlock_init_error){
+		ntrb_free(rcd->audio_tracks);
+		return ntrb_RuntimeCoreData_RwlockInitError;
+	}
+	
+	return ntrb_RuntimeCoreData_OK;
 }
 
-int ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
-	pthread_rwlock_wrlock(&(rcd->audio_track_rwlock));
+enum ntrb_RuntimeCoreData_Error ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd){
+	const int acq_writelock_error = pthread_rwlock_wrlock(&(rcd->audio_track_rwlock));
+	if(acq_writelock_error) return ntrb_RuntimeCoreData_AcqWritelockError;
 	
 	if(rcd->audio_tracks != NULL){
-		for(size_t i = 0; i < rcd->audio_track_count; i++){			
-			if(rcd->audio_tracks[i] != NULL)
-				ntrb_RuntimeCoreData_free_track(rcd, i);
+		for(size_t i = 0; i < rcd->audio_track_count; i++){
+			if(rcd->audio_tracks[i] == NULL) continue;
+			
+			const int free_track_error = ntrb_RuntimeCoreData_free_track(rcd, i);
+			if(free_track_error)
+				fprintf(stderr, "[Error]: ntrb_RuntimeCoreData_free(): unable to free track %llu (ntrb_AudioBufferFree_Error: %d).", i, free_track_error);
 		}
+		
 		ntrb_free(rcd->audio_tracks);
 		rcd->audio_tracks = NULL;
-	}	
+	}
+	
 	rcd->audio_track_count = 0;
-	
-	pthread_rwlock_unlock(&(rcd->audio_track_rwlock));
-	
 	rcd->requested_exit = true;
-	rcd->in_pause_state = true;
+	rcd->in_pause_state = true;	
+
+	const int rwlock_unlock_error = pthread_rwlock_unlock(&(rcd->audio_track_rwlock));
+	if(rwlock_unlock_error) return ntrb_RuntimeCoreData_RwlockUnlockError;
+
+	const int rwlock_destroy_error = pthread_rwlock_destroy(&(rcd->audio_track_rwlock));
+	if(rwlock_destroy_error) return ntrb_RuntimeCoreData_RwlockDestroyError;
 	
-	return pthread_rwlock_destroy(&(rcd->audio_track_rwlock));
+	return ntrb_RuntimeCoreData_OK;	
 }
 
 enum ntrb_AudioBufferFree_Error ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index){

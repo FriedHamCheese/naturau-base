@@ -40,6 +40,16 @@ typedef struct{
 	atomic_bool in_pause_state;
 } ntrb_RuntimeCoreData;
 
+enum ntrb_RuntimeCoreData_Error{
+	ntrb_RuntimeCoreData_OK,
+	ntrb_RuntimeCoreData_AllocError,
+	ntrb_RuntimeCoreData_RwlockInitError,
+	
+	ntrb_RuntimeCoreData_AcqWritelockError,
+	ntrb_RuntimeCoreData_RwlockUnlockError,
+	ntrb_RuntimeCoreData_RwlockDestroyError,
+};
+
 /**
 Enum for errors while loading (queueing) the audio track.
 */
@@ -92,7 +102,7 @@ Returns 0 if sucessfully initialised rcd. If it failed to allocate memory, ENOME
 Else, the value is from pthread_rwlock_init().
 
 */
-int ntrb_RuntimeCoreData_new(ntrb_RuntimeCoreData* const rcd, const uint16_t track_count);
+enum ntrb_RuntimeCoreData_Error ntrb_RuntimeCoreData_new(ntrb_RuntimeCoreData* const rcd, const uint16_t track_count);
 
 /**
 Frees each of the tracks in rcd->audio_tracks if it isn't NULL, free rcd->audio_tracks itself, 
@@ -102,7 +112,7 @@ The function can handle rcd->audio_tracks and its tracks being NULL, and will pr
 
 \return return value of pthread_rwlock_destroy(). If it isn't 0, the function couldn't destroy the rwlock, which is fine in most cases.
 */
-int ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd);
+enum ntrb_RuntimeCoreData_Error ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* const rcd);
 
 /**
 Frees a track of *rcd which is in rcd->audio_tracks[track_index] and sets its track pointer to NULL.
