@@ -29,8 +29,16 @@ void* user_input_loop(void* const runtime_core_data_void){
 			continue;
 		}
 		
-		ntrb_SlicedStrings sliced_strs = ntrb_SlicedStrings_slice(user_input_str, strlen(user_input_str));
+		char* const whitespace_trimmed_input = ntrb_trim_whitespace(user_input_str);
 		ntrb_free(user_input_str);
+		if(whitespace_trimmed_input == NULL){
+			fprintf(stderr, "[Error]: %s: %d: Could not allocate memory for clean input.\n", __FILE__, __LINE__);
+			fflush(stderr);
+			continue;			
+		}
+		
+		ntrb_SlicedStrings sliced_strs = ntrb_SlicedStrings_slice(whitespace_trimmed_input, strlen(whitespace_trimmed_input));
+		ntrb_free(whitespace_trimmed_input);
 		if(sliced_strs.str_ptrs == NULL){
 			fprintf(stderr, "[Error]: %s: %d: Error parsing user input.\n", __FILE__, __LINE__);
 			fflush(stderr);	
