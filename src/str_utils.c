@@ -70,6 +70,36 @@ char* ntrb_trim_duplicate_separators(const char* const untrimmed_str, const size
 	return trimmed_str;
 }
 
+char* ntrb_trim_whitespace(const char* const untrimmed_str){
+	const int untrimmed_strlen = strlen(untrimmed_str);
+	int first_nonwhitespace_character_index = untrimmed_strlen;
+	
+	for(int i = 0; i < untrimmed_strlen; i++){
+		if(untrimmed_str[i] != ' '){
+			first_nonwhitespace_character_index = i;
+			break;
+		}
+	}
+	
+	const bool all_whitespace = first_nonwhitespace_character_index == untrimmed_strlen;
+	if(all_whitespace) return ntrb_calloc(1, sizeof(char));
+	
+	int last_nonwhitespace_character_index = untrimmed_strlen;
+	for(int i = untrimmed_strlen-1; i >= first_nonwhitespace_character_index; i--){
+		if(untrimmed_str[i] != ' '){
+			first_nonwhitespace_character_index = i;
+			break;
+		}
+	}
+	
+	const int trimmed_strlen = (last_nonwhitespace_character_index - first_nonwhitespace_character_index) + 1;
+	char* trimmed_str = ntrb_calloc(trimmed_strlen + 1, sizeof(char));
+	if(trimmed_str == NULL) return NULL;
+	
+	memcpy(trimmed_str, untrimmed_str + first_nonwhitespace_character_index, trimmed_strlen);
+	return trimmed_str;
+}
+
 char* ntrb_get_filetype(const char* const filename){	
 	const char* filetype_separator = strrchr(filename, '.');
 	if(!filetype_separator) return NULL;

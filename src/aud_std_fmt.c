@@ -215,11 +215,11 @@ enum ntrb_StdAudFmtConversionResult ntrb_to_standard_format(ntrb_AudioDatapoints
 	if(to_2ch_result != ntrb_StdAudFmtConversion_OK)
 		return to_2ch_result;
 	
-	//audF32_96k.bytes Alloc
-	const enum ntrb_StdAudFmtConversionResult to_96k_result = ntrb_to_std_samplerate(ret_aud, audF32_2ch, orig_header->SampleRate);
+	//ret_aud.bytes alloc
+	const enum ntrb_StdAudFmtConversionResult to_std_samplerate_result = ntrb_to_std_samplerate(ret_aud, audF32_2ch, orig_header->SampleRate);
 	ntrb_AudioDatapoints_free(&audF32_2ch);
-	if(to_96k_result != ntrb_StdAudFmtConversion_OK)
-		return to_96k_result;
+	if(to_std_samplerate_result != ntrb_StdAudFmtConversion_OK)
+		return to_std_samplerate_result;
 	
 	return ntrb_StdAudFmtConversion_OK;
 }

@@ -48,6 +48,8 @@ Returns NULL if the function failed to allocate the space for the string.
 */
 char* ntrb_trim_duplicate_separators(const char* const untrimmed_str, const size_t str_len, const char separator);
 
+char* ntrb_trim_whitespace(const char* const untrimmed_str);
+
 /**
 Gets the filetype from the argument.
 

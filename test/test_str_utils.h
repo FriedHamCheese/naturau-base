@@ -76,6 +76,28 @@ static void test_ntrb_trim_duplicate_separators(){
 	ntrb_free(returned_str2);
 }
 
+static void test_ntrb_trim_whitespace(){
+	char* const trimmed_front_and_back_str = ntrb_trim_whitespace("  hello world! ");
+	assert(trimmed_front_and_back_str != NULL);
+	assert(strcmp(trimmed_front_and_back_str, "hello world!") == 0);
+	ntrb_free(trimmed_front_and_back_str);
+	
+	char* const trimmed_front_only_str = ntrb_trim_whitespace(" hi!");
+	assert(trimmed_front_only_str != NULL);
+	assert(strcmp(trimmed_front_only_str, "hi!") == 0);
+	ntrb_free(trimmed_front_only_str);
+	
+	char* const trimmed_back_only_str = ntrb_trim_whitespace("hello2!  ");
+	assert(trimmed_back_only_str != NULL);
+	assert(strcmp(trimmed_back_only_str, "hello2!") == 0);
+	ntrb_free(trimmed_back_only_str);
+	
+	char* const all_whitespace_trimmed_str = ntrb_trim_whitespace("    ");
+	assert(all_whitespace_trimmed_str != NULL);
+	assert(strcmp(all_whitespace_trimmed_str, "") == 0);
+	ntrb_free(all_whitespace_trimmed_str);
+}
+
 static void test_ntrb_get_filetype(){
 	char* const filetype_1 = ntrb_get_filetype("I.love.cookies!");
 	assert(filetype_1 != NULL);
@@ -95,6 +117,7 @@ static void test_suite_ntrb_str_utils(){
 	test_ntrb_getc();
 	test_ntrb_getsn();
 	test_ntrb_trim_duplicate_separators();
+	test_ntrb_trim_whitespace();
 	test_ntrb_get_filetype();
 }
 
