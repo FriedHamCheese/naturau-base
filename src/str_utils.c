@@ -87,7 +87,7 @@ char* ntrb_trim_whitespace(const char* const untrimmed_str){
 	int last_nonwhitespace_character_index = untrimmed_strlen;
 	for(int i = untrimmed_strlen-1; i >= first_nonwhitespace_character_index; i--){
 		if(untrimmed_str[i] != ' '){
-			first_nonwhitespace_character_index = i;
+			last_nonwhitespace_character_index = i;
 			break;
 		}
 	}

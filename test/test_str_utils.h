@@ -96,6 +96,11 @@ static void test_ntrb_trim_whitespace(){
 	assert(all_whitespace_trimmed_str != NULL);
 	assert(strcmp(all_whitespace_trimmed_str, "") == 0);
 	ntrb_free(all_whitespace_trimmed_str);
+	
+	char* const no_whitespace_str = ntrb_trim_whitespace("nope");
+	assert(no_whitespace_str != NULL);
+	assert(strcmp(no_whitespace_str, "nope") == 0);
+	ntrb_free(no_whitespace_str);	
 }
 
 static void test_ntrb_get_filetype(){
