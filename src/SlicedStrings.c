@@ -81,10 +81,7 @@ ntrb_SlicedStrings ntrb_SlicedStrings_slice_sep(const char* const str, const siz
 	
 	ntrb_SlicedStrings slices = ntrb_SlicedStrings_slice_without_trimming(no_duplicate_sep_str, strlen(no_duplicate_sep_str), separator);
 	ntrb_free(no_duplicate_sep_str);
-	if(slices.str_ptrs == NULL){
-		ntrb_free(no_duplicate_sep_str);		
-		return failed_ntrb_SlicedStrings;
-	}
+	if(slices.str_ptrs == NULL) return failed_ntrb_SlicedStrings;
 	
 	for(size_t i = 0; i < slices.elem; i++){
 		const size_t slice_str_len = strlen(slices.str_ptrs[i]);
