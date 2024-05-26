@@ -1,9 +1,10 @@
 SRCDIR := ./src
-HEADERDIR := $(SRCDIR)
+HEADERDIR := ./include/ntrb
 
 OBJDIR := ./bin
 
 SRCFILES := $(wildcard $(SRCDIR)/*.c)
+HEADERFILES := $(wildcard $(HEADERDIR)/*.h)
 OBJFILES := $(SRCFILES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 CC := cc
@@ -19,6 +20,9 @@ path_debug:
 	@echo
 	@echo SRCDIR: $(SRCDIR)
 	@echo SRCFILES: $(SRCFILES)
+	@echo
+	@echo HEADERDIR: $(HEADERDIR)
+	@echo HEADERFILES: $(HEADERFILES)
 	@echo
 	@echo OBJDIR: $(OBJDIR)
 	@echo OBJFILES: $(OBJFILES)
@@ -36,7 +40,7 @@ path_debug:
 build: $(OBJFILES)
 
 %.o: %.c
-$(OBJDIR)/%.o: $(SRCDIR)/%.c Makefile | $(OBJDIR) 
+$(OBJDIR)/%.o: $(SRCDIR)/%.c $(HEADERFILES) Makefile | $(OBJDIR) 
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR):
@@ -65,7 +69,7 @@ build_test: $(TESTEXEC)
 $(TESTEXEC): $(TEST_OBJFILES) $(OBJFILES)
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 	
-$(TEST_OBJDIR)/%.o: $(TEST_DIR)/%.c Makefile | $(TEST_OBJDIR) 
+$(TEST_OBJDIR)/%.o: $(TEST_DIR)/%.c $(SRCFILES) $(HEADERFILES) Makefile | $(TEST_OBJDIR) 
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TEST_OBJDIR):
