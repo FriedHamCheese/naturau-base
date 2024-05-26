@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdbool.h>
 
+#ifdef NTRB_MEMDEBUG
 bool _test__ntrb_memdebug_element_equal(const size_t i, const void* const ptr, const size_t allocsize, const char* const filename, const int line){
 	const _ntrb_memdebug_AllocData data = ((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[i];
 	
@@ -294,3 +295,4 @@ void test__ntrb_memdebug_test_lock(){
 	
 	assert(ntrb_memdebug_uninit(false) == 0);
 }
+#endif
