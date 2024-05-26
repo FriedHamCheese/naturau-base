@@ -74,8 +74,4 @@ enum ntrb_LoadAudheader_status{
 enum ntrb_AudioBufferNew_Error ntrb_AudioBuffer_new(ntrb_AudioBuffer* const ret, const char* const filename, const size_t stdaud_frame_count);
 
 enum ntrb_AudioBufferFree_Error ntrb_AudioBuffer_free(ntrb_AudioBuffer* const obj);
-
-void load_flac_header(void* const void_ntrb_AudioBuffer);
-void* load_flac_buffer(void* const void_ntrb_AudioBuffer);
-
 #endif
