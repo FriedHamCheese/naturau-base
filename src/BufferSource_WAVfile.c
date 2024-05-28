@@ -89,9 +89,10 @@ void* ntrb_BufferSource_WAVfile_load_buffer(void* const void_ntrb_AudioBuffer){
 		return NULL;
 	}
 
+	memset(audbuf->datapoints, 0, audbuf->monochannel_samples * ntrb_std_audchannels * sizeof(float));
+	
 	if(wav_source->audiodataSize == 0){
 		audbuf->load_err = ntrb_AudioBufferLoad_EOF;
-		memset(audbuf->datapoints, 0, audbuf->monochannel_samples * ntrb_std_audchannels * sizeof(float));
 		pthread_rwlock_unlock(&(audbuf->buffer_access));	
 		return NULL;
 	}
