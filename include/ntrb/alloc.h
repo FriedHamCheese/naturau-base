@@ -101,7 +101,7 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	};
 	
 	/**
-	The "record" or "record container" which contains information on an allocation or a reallocation made by functions of the module.
+	The "record" or "record container" which contains information on allocations or reallocations made by functions of the module.
 	
 	It contains multiple _ntrb_memdebug_AllocData, each representing a single allocation or reallocation.
 	
@@ -133,8 +133,8 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	
 	- If the module is not initialised, it returns ntrb_memdebug_NotInit.
 	- If there was an error acquiring the write lock of the module rwlock, it returns ntrb_memdebug_RwlockAcqError.
-	- If there was an error releasing the write lock of the module, the module is identified as uninitialised and the record container is freed.
-	- If there was an error destroying the rwlock of the module, the module is identified as uninitialised and the record container is freed.
+	- If there was an error releasing the write lock of the module, the record container is now freed and the module is identified as uninitialised.
+	- If there was an error destroying the rwlock of the module, the record container is now freed and the module is identified as uninitialised.
 	- Else it returns ntrb_memdebug_OK, if any of the mentioned has not occurred.
 	
 	\param print_summary prints the remaining unallocated memory pointers if set to true. Good and convenient for checking memory leaks after testing your program.
