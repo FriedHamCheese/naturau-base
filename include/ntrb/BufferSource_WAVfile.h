@@ -19,7 +19,17 @@ typedef struct{
 int ntrb_BufferSource_WAVfile_new(ntrb_BufferSource_WAVfile* const ret, const char* const filename, const size_t frame_count);
 int ntrb_BufferSource_WAVfile_free(ntrb_BufferSource_WAVfile* const ret);
 
-int ntrb_BufferSource_WAVfile_load_header(ntrb_BufferSource_WAVfile* const ret);
+/**
+
+*/
+enum ntrb_LoadAudheader_status{
+	ntrb_LoadAudheader_OK,
+	ntrb_LoadAudheader_FileError,
+	
+	ntrb_LoadAudheader_WAVHeaderConversionError,
+};
+
+enum ntrb_LoadAudheader_status ntrb_BufferSource_WAVfile_load_header(ntrb_BufferSource_WAVfile* const ret);
 void* ntrb_BufferSource_WAVfile_load_buffer(void* const void_ntrb_AudioBuffer);
 
 

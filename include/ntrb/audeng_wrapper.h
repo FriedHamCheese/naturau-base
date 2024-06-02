@@ -18,9 +18,6 @@ extern const unsigned long ntrb_std_frame_count;
 /**
 The function for the audio engine thread.
 
-It plays the audio tracks from runtime_data_void which is a pointer to a RuntimeCoreData object
-and deletes an audio track if it reaches the end of the track.
-
 If any errors occur while initialising or uninitialising the audio engine, the error would be printed to stderr and the function would exit early.
 
 The function only returns NULL. You shouldn't check the return value, it's for conforming with pthread.

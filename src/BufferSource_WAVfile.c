@@ -59,7 +59,7 @@ int ntrb_BufferSource_WAVfile_free(ntrb_BufferSource_WAVfile* const ret){
 	return fclose(ret->aud_file);
 }
 
-int ntrb_BufferSource_WAVfile_load_header(ntrb_BufferSource_WAVfile* const ret){
+enum ntrb_LoadAudheader_status ntrb_BufferSource_WAVfile_load_header(ntrb_BufferSource_WAVfile* const ret){
 	ntrb_SpanU8 file_buffer;
 	
 	const size_t max_header_boundary_bytes = 65535;
