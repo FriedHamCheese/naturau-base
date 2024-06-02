@@ -1,0 +1,25 @@
+/**
+\page conventions Conventions
+
+There are only 2 things I'd like to mention for the consistency of the codebase or something that might confuse people badly.
+Anything else is probably tolerable I guess.
+
+# Initialising a Struct Parameter
+In ntrb, a function which takes in the pointer of a struct to initialise (usually in ntrb_Type_new(ntrb_Type\*) format) 
+expects the pointer to contain a valid memory address of the object, but the object is yet to be initialised. I.e., pass the address of a stack variable, 
+or a pointer of a heap allocated memory enough to contain the struct.
+
+This is paradoxical of how most C structs are initialised and has a good chance of giving segfaults to anyone using ntrb.
+
+\todo This should be mentioned in every function possible in 0.3
+
+# Naming Export Declarations
+Within the ntrb codebase, if a variable, struct, or function is to meant to be exported (not used in one file only, the static keyword),
+put ntrb_ in front of it.
+- Like ntrb_std_samplerate, ntrb_AudioBuffer and ntrb_malloc() respectively.
+
+If a variable or function is related to a struct, the struct name is the prefix for the declaration.
+For example ntrb_AudioBuffer is a struct, and has ntrb_AudioBuffer_new() as the function to initialise it.
+
+Except for failure return values of a struct, like failed_ntrb_AudioDatapoints. Put failed_ in front of the struct name.
+*/
