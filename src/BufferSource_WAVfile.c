@@ -20,25 +20,13 @@ int ntrb_BufferSource_WAVfile_new(ntrb_BufferSource_WAVfile* const ret, const ch
 	ret->aud_file = fopen(filename, "rb");
 	if(ret->aud_file == NULL) return ntrb_AudioBufferNew_FileOpenError;
 	
-	const enum ntrb_LoadAudheader_status audheader_load_status = ntrb_BufferSource_WAVfile_load_header(ret);
-	if(audheader_load_status != ntrb_LoadAudheader_OK){
+	const enum ntrb_AudioBufferNew_Error audheader_load_status = ntrb_BufferSource_WAVfile_load_header(ret);
+	if(audheader_load_status != ntrb_AudioBufferNew_OK){
 		fclose(ret->aud_file);
-		
-		switch(audheader_load_status){
-			case ntrb_LoadAudheader_FileError:
-			return ntrb_AudioBufferNew_FileReadError;
-			
-			case ntrb_LoadAudheader_WAVHeaderConversionError:
-			return ntrb_AudioBufferNew_WAVheaderError;
-			
-			//C warns about the OK flag too so here it is D:
-			default:
-			break;
-		}
+		return audheader_load_status;
 	}
 	
 	const float unprocessed_samplerate_over_stdaud_samplerate = (float)(ret->aud_header.SampleRate) / (float)ntrb_std_samplerate;
-	
 	const float samples_to_read = unprocessed_samplerate_over_stdaud_samplerate * (float)frame_count * (float)(ret->aud_header.NumChannels);
 	
 	const size_t bytes_to_read = floor(samples_to_read) * (ret->aud_header.BitsPerSample / 8);
@@ -59,24 +47,25 @@ int ntrb_BufferSource_WAVfile_free(ntrb_BufferSource_WAVfile* const ret){
 	return fclose(ret->aud_file);
 }
 
-enum ntrb_LoadAudheader_status ntrb_BufferSource_WAVfile_load_header(ntrb_BufferSource_WAVfile* const ret){
+int ntrb_BufferSource_WAVfile_load_header(ntrb_BufferSource_WAVfile* const ret){
 	ntrb_SpanU8 file_buffer;
 	
 	const size_t max_header_boundary_bytes = 65535;
 	const enum ntrb_ReadFileResult read_file_result = ntrb_readsome_from_file_rb(&file_buffer, ret->aud_file, max_header_boundary_bytes);
-	if(read_file_result != ntrb_ReadFileResult_OK) return ntrb_LoadAudheader_FileError;
-
-	const enum ntrb_AudioHeaderFromWAVFileStatus wav_header_status = ntrb_AudioHeader_from_WAVfile_2(&(ret->aud_header), &(ret->audiodataOffset), &(ret->audiodataSize), file_buffer);
+	if(read_file_result != ntrb_ReadFileResult_OK) return ntrb_AudioBufferNew_FileReadError;
+	
+	size_t audiodataOffset = 0;
+	const enum ntrb_AudioHeaderFromWAVFileStatus wav_header_status = ntrb_AudioHeader_from_WAVfile_2(&(ret->aud_header), &(audiodataOffset), &(ret->audiodataSize), file_buffer);
 	ntrb_free(file_buffer.ptr);
 	
-	if(fseek(ret->aud_file, ret->audiodataOffset, SEEK_SET) != 0){
-		return ntrb_LoadAudheader_FileError;
+	if(fseek(ret->aud_file, audiodataOffset, SEEK_SET) != 0){
+		return ntrb_AudioBufferNew_FileReadError;
 	}
 	
 	if(wav_header_status != ntrb_AudioHeaderFromWAVFile_ok)
-		return ntrb_LoadAudheader_WAVHeaderConversionError;	
+		return ntrb_AudioBufferNew_WAVheaderError;	
 	
-	return ntrb_LoadAudheader_OK;	
+	return ntrb_AudioBufferNew_OK;	
 }
 
 void* ntrb_BufferSource_WAVfile_load_buffer(void* const void_ntrb_AudioBuffer){
