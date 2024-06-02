@@ -12,7 +12,15 @@
 #include <string.h>
 #include <stdbool.h>
 
-static FLAC__StreamDecoderWriteStatus write_and_convert_to_stdaud(const FLAC__StreamDecoder*, const FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *void_ntrb_AudioBuffer){
+static FLAC__StreamDecoderWriteStatus read_FLAC_frame(const FLAC__StreamDecoder*, const FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *void_ntrb_AudioBuffer){
+	/*
+	This function iterates over each of the audio frames in an FLAC frame.
+	Every iteration first checks if the buffer in ntrb_BufferSource_FLACfile is full.
+	If it is: exit out of the function. ntrb_BufferSource_FLACfile_load_buffer() will then process the buffer of the ntrb_BufferSource_FLACfile and writes it to ntrb_AudioBuffer.
+	If it isn't: keep filling the buffer of ntrb_BufferSource_FLACfile until it is full, as well as keep track of the audio frame of the FLAC file.
+	  ntrb_BufferSource_FLACfile_load_buffer() needs the audio frame value to jump back to the unfinished frame.
+	*/
+	
 	ntrb_AudioBuffer* const aud = void_ntrb_AudioBuffer;
 
 	for(size_t i_monochannel_sample = 0; i_monochannel_sample < frame->header.blocksize; i_monochannel_sample++){
@@ -51,6 +59,7 @@ static void read_metadata(const FLAC__StreamDecoder*, const FLAC__StreamMetadata
 }
 
 static void error_callback(const FLAC__StreamDecoder*, FLAC__StreamDecoderErrorStatus, void *void_ntrb_AudioBuffer){
+	//4/5 of the errors are related to bad data, so we'll just generalise it.
 	((ntrb_AudioBuffer*)void_ntrb_AudioBuffer)->load_err = ntrb_AudioBufferLoad_FLACBadData;
 }
 
@@ -62,7 +71,7 @@ int ntrb_BufferSource_FLACfile_new(void* const void_ntrb_AudioBuffer, const char
 	aud->source.flac_file.decoder = FLAC__stream_decoder_new();
 	if(aud->source.flac_file.decoder == NULL) return ntrb_AudioBufferNew_AllocError;
 		
-	const FLAC__StreamDecoderInitStatus decoder_init_error = FLAC__stream_decoder_init_file(aud->source.flac_file.decoder, filename, write_and_convert_to_stdaud, read_metadata, error_callback, void_ntrb_AudioBuffer);
+	const FLAC__StreamDecoderInitStatus decoder_init_error = FLAC__stream_decoder_init_file(aud->source.flac_file.decoder, filename, read_FLAC_frame, read_metadata, error_callback, void_ntrb_AudioBuffer);
 	
 	if(decoder_init_error){
 		FLAC__stream_decoder_delete(aud->source.flac_file.decoder);
@@ -126,12 +135,12 @@ void* ntrb_BufferSource_FLACfile_load_buffer(void* const void_ntrb_AudioBuffer){
 	
 	memset(aud->datapoints, 0, aud->monochannel_samples * ntrb_std_audchannels * sizeof(float));
 	
-	//This actually calls write_and_convert_to_stdaud().
-	//We seek the decoder to the .current_frame, which will call the callback which fills the buffer.
+	//This actually calls read_FLAC_frame().
+	//We seek the decoder to the ntrb_BufferSource_FLACfile.current_frame, which will call the callback which fills the buffer.
 	FLAC__stream_decoder_seek_absolute(aud->source.flac_file.decoder, aud->source.flac_file.current_frame);
 	aud->load_err = FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(FLAC__stream_decoder_get_state(aud->source.flac_file.decoder));
 
-	//And we keep calling the callback until the *read_bytes is fully filled.
+	//And we keep calling the callback until the ntrb_BufferSource_FLACfile.read_bytes is fully filled.
 	while(aud->source.flac_file.bytes_in_buffer < aud->source.flac_file.buffersize_bytes && !(aud->load_err)){
 		FLAC__stream_decoder_process_single(aud->source.flac_file.decoder);
 		aud->load_err = FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(FLAC__stream_decoder_get_state(aud->source.flac_file.decoder));

@@ -1,6 +1,16 @@
 #ifndef ntrb_BufferSource_FLACfile_h
 #define ntrb_BufferSource_FLACfile_h
 
+/**
+\file BufferSource_FLACfile.h
+
+A module providing audio loading from FLAC file to ntrb_AudioBuffer.
+
+\note FLAC frame differs from our frame definition.
+  FLAC frame means an encoded data chunk, while our frame means 1 datapoint which does not take audio channels into account.
+  \todo add definition here. 
+*/
+
 #include "AudioHeader.h"
 
 #include "FLAC/stream_decoder.h"
@@ -8,22 +18,61 @@
 #include <stdio.h>
 #include <stdint.h>
 
+/**
+A struct containing variables required for loading audio from FLAC file.
+
+The struct contains ntrb_BufferSource_FLACfile.read_bytes which contains the raw bytes decoded from ntrb_BufferSource_FLACfile.decoder.
+The ntrb_BufferSource_FLACfile_load_buffer() function will keep decoding the FLAC frames until the buffer is full,
+which is indicated by ntrb_BufferSource_FLACfile.bytes_in_buffer being equal to ntrb_BufferSource_FLACfile.buffersize_bytes.
+
+ntrb_BufferSource_FLACfile.current_frame keeps track of the audio frame we have read to,
+so ntrb_BufferSource_FLACfile_load_buffer() can jump to it and decode a partial or full FLAC frame.
+*/
 typedef struct{
+	///The decoder object of the FLAC file.
 	FLAC__StreamDecoder* decoder;
+	/**
+	A buffer containing the bytes of audio data read directly from the decoder. 
+	It has the size of ntrb_BufferSource_FLACfile.buffersize_bytes bytes.
+	*/
 	uint8_t* read_bytes;
+	///The size of ntrb_BufferSource_FLACfile.read_bytes.
 	uint64_t buffersize_bytes;
-	
+	///Keeps track of how many bytes read_bytes currently contain. 
 	uint64_t bytes_in_buffer;
+	///The audio frame (not FLAC frame) which the decoder has decoded to.
 	uint64_t current_frame;
-	
+	///This contains the information of the FLAC file from its metadata.
 	ntrb_AudioHeader aud_header;
 } ntrb_BufferSource_FLACfile;
 
+/**
+A function redirecting values in FLAC__StreamDecoderState to ntrb_AudioBufferLoad_Error values.
+
+See the redirected equivalents in BufferSource_FLACfile.c
+*/
 enum ntrb_AudioBufferLoad_Error FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(const FLAC__StreamDecoderState arg);
 
+/**
+Initialises the ntrb_BufferSource_FLACfile in void_ntrb_AudioBuffer once casted to ntrb_AudioBuffer 
+and decodes the STREAMINFO part of the FLAC metadata of the file.
+
+\param[out] void_ntrb_AudioBuffer The ntrb_AudioBuffer object which the function will write to its ntrb_BufferSource_FLACfile.
+\param[in]  filename The filename of the FLAC file to read from.
+\param[in]  frame_count The amount of standard format audio frames which the ntrb_BufferSource_FLACfile needs to write to its ntrb_AudioBuffer.
+
+\returns values in enum ntrb_AudioBufferNew_Error representing errors while initialising the object.
+
+\todo why is this taking the entire ntrb_AudioBuffer when it only writes to itself in it? - 0.3 fix ok?
+*/
 int ntrb_BufferSource_FLACfile_new(void* const void_ntrb_AudioBuffer, const char* const filename, const size_t frame_count);
+
+///Frees resources in ret.
 void ntrb_BufferSource_FLACfile_free(ntrb_BufferSource_FLACfile* const ret);
 
+/**
+Loads unprocessed audio from FLAC file and writes the processed audio to void_ntrb_AudioBuffer casted to ntrb_AudioBuffer type.
+*/
 void* ntrb_BufferSource_FLACfile_load_buffer(void* const void_ntrb_AudioBuffer);
 
 #endif
