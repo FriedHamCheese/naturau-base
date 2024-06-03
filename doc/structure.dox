@@ -1,0 +1,62 @@
+/**
+\page structure An Overview of ntrb Structure
+
+List of the audio components in ntrb, from top of the call stack to the bottom.
+The lesser the number, the higher it is in the stack.
+
+- 1: PortAudio, ntrb_run_audio_engine() and its audio loading callback in audeng_wrapper.c.
+
+  Initialises the audio engine and mixes the audio from each the audio tracks from its given ntrb_RuntimeCoreData.
+  In its audio loading callback, it will have to dispatch audio loading for each of its track.
+  
+  The ntrb_run_audio_engine() has a void* return type for pthread thread conformance.
+  Typically there would be the thread for the audio engine function and another for user input which interacts with ntrb_RuntimeCoreData.
+  
+- 1: ntrb_RuntimeCoreData
+  
+  Contains the controls of the audio playback as its variables, 
+  and adds or deletes the audio tracks which the audio engine callback will mix as the final audio output.
+
+- 1: Note: for high-level interactions with ntrb, the level 1's are the only things to interact with :D
+
+- 2: ntrb_AudioBuffer
+
+  In ntrb, this is a single audio track. Its datapoints buffer will be read by the audio engine callback.
+  The buffer will have to contain exactly the same amount of standard audio format samples as the output buffer of
+  the audio engine callback.
+  
+  It also contains its source-specific loading callback and its data for loading audio 
+  which will have to provide processed audio to the buffer.  
+    
+- 3: Source-specific ntrb_AudioBuffer audio loaders (currently BufferSource_WAVfile and BufferSource_FLACfile)
+  
+  Provide a source-specific audio loading from a source type. It must be able to fill
+  ntrb_AudioBuffer's buffer with standard audio format samples.
+  
+  Typically it will load an unprocessed audio, converts it to standard audio format and writes it to 
+  ntrb_AudioBuffer's buffer.
+  
+  And in most cases, it will need to have data and variables of what it is doing. 
+  ntrb_AudioBuffer does provide a place to add its source-specific data, although you also have to provide
+  methods to initialise and deinitialise the data as well.
+  
+  You should read from the source just enough to fill the buffer. Don't load the entire audio and process it.
+  That destroys the audio streaming concept which 0.2 is literally about. ok thanks
+  
+- 4: Functions converting unprocessed audio to standard audio in aud_std_fmt.h.
+
+  Functions to convert int16 to float32 sample format, any sample rate to any other sample rate and mono to stereo.
+  
+- 5: ntrb_AudioHeader
+  
+  A struct containing enough information of the unprocessed audio for converting it to standard audio format.
+  
+- 5: ntrb_AudioDatapoints
+  
+  A struct containing audio samples in bytes and its buffer size.
+  This was used more prevalently in 0.1 before 0.2 moves to audio streaming with ntrb_AudioBuffer,
+  hence its byte_pos.
+
+
+Yea that's it I think. Anything else is general purpose or is not related to audio enough.
+*/
