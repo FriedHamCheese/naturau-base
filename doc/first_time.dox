@@ -1,0 +1,211 @@
+/**
+\page first_time Starting Off Fresh with ntrb
+
+In this guide, we use Makefile as the build tool, so your project directory name should not contain spaces.
+
+# Placement of Your Project Directory
+In ntrb style, projects would exist in the same parent directory of the ntrb directory.
+```
+./parent:
+ |_ naturau-base
+ |_ your-project
+```
+But it doesn't really matter. As long as you are able to compile with ntrb, all good :D
+
+# Files in Your Project
+We assume you would like to start off fresh with ntrb. 
+So in your project directory, have an empty main.c and an empty Makefile.
+
+We also assume you will be calling `make` from your project directory.
+So our directory paths down the guide will be from the perspective of your project directory.
+
+# Test Including ntrb Headers
+First, we test if your project is able to include ntrb correctly or not.
+
+In your main.c, have an empty int main() which returns 0, 
+and an #include "ntrb/RuntimeCoreData.h"
+
+```
+main.c:
+
+#include "ntrb/RuntimeCoreData.h"
+
+int main(){
+	return 0;
+}
+```
+
+We recommend to have ntrb includes in your code in the `#include "ntrb\..."` format. 
+That way, it is clear where you are including from.
+
+To do this, your Makefile CFLAGS will contain the -I in this format:
+> -I../naturau-base/include
+
+For your Makefile, we will make it able to generate an executable from only your main.c:
+```
+CFLAGS := -Wall -Wextra -I../naturau-base/include -I../flac-1.4.3/include -DFLAC__NO_DLL -DNTRB_MEMDEBUG
+LDFLAGS :=
+LDLIBS := 
+
+#Remove the line below if not using GCC, this fixes ld not detecting __main
+LD := $(CC)
+
+#Replace .exe if needed
+build.exe: main.o
+	$(LD) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+main.o: main.c
+	$(CC) $(CFLAGS) -c $< -o $@
+	
+.PHONY: clean	
+clean:
+	rm ./build.exe
+	rm ./main.o	
+```
+
+We also needed to include libFLAC headers as well, because ntrb headers contain their includes.
+For -DFLAC__NO_DLL, it is also required both in ntrb and your project because we chose to statically link with libFLAC,
+and libFLAC headers will disable dllexport if it detects the symbol.
+
+The -DNTRB_MEMDEBUG defines the NTRB_MEMDEBUG symbol, this symbol is for memory debug within ntrb and the projects using ntrb.
+By default, it is present in ntrb Makefile, so you've just compiled ntrb to have memory debugging. 
+If you want to use it, make sure ntrb and your projects compiles with it. If you don't, recompile ntrb and your projects both without the flag.
+For now, we keep it on.
+
+Type in `make` in your terminal with its working directory being your project directory, and it should output build.exe.
+
+# Test Linking with ntrb Objects
+Well, we need some code from ntrb, so let's try to play a .wav file in main.c:
+```
+#include "ntrb/alloc.h"
+#include "ntrb/audeng_wrapper.h"
+#include "ntrb/RuntimeCoreData.h"
+
+#include <assert.h>
+#include <stdbool.h>
+
+int main(){
+	#ifdef NTRB_MEMDEBUG
+	assert(ntrb_memdebug_init_with_return_value() == ntrb_memdebug_OK);
+	#endif
+	
+	ntrb_RuntimeCoreData rcd;
+	const size_t track_count = 2;
+	assert(ntrb_RuntimeCoreData_new(&rcd, track_count) == ntrb_RuntimeCoreData_OK);
+	
+	const char* const aud_filename = "audio.wav";
+	ntrb_RuntimeCoreData_queue_audio(&rcd, aud_filename);
+	
+	rcd.in_pause_state = false;
+	
+	ntrb_run_audio_engine(&rcd);
+	
+	#ifdef NTRB_MEMDEBUG
+	assert(ntrb_memdebug_uninit(true) == ntrb_memdebug_OK);
+	#endif
+	return 0;
+}
+```
+
+## So, what is going on in each line?
+```
+#ifdef NTRB_MEMDEBUG
+assert(ntrb_memdebug_init_with_return_value() == ntrb_memdebug_OK);
+#endif
+```
+This initialises the memdebug module. It quits if there is something wrong,
+but that is highly unlikely. 
+The #ifdef guard is there to conditionally initialise the module if the symbol is defined.
+
+```
+ntrb_RuntimeCoreData rcd;
+const size_t track_count = 2;
+assert(ntrb_RuntimeCoreData_new(&rcd, track_count) == ntrb_RuntimeCoreData_OK);
+```
+This initialises an ntrb_RuntimeCoreData object.
+We need this object with the ntrb_run_audio_engine() function to get the audio engine loop running.
+We specified we want to have 2 audio tracks being able to play simultaneously. 
+Yep, because ntrb audio engine loop is designed for mixing audio, and it can do theoretically
+(size_t limit) tracks, if your system is able to do that. We are getting ahead of ourselves here :D
+
+```
+const char* const aud_filename = "audio.wav";
+ntrb_RuntimeCoreData_queue_audio(&rcd, aud_filename);
+```
+This queues up an audio track "audio.wav" in the compiler call directory perspective, 
+I.e., your project directory perspective.
+
+```
+rcd.in_pause_state = false;
+```
+By default, the RuntimeCoreData object will pause the audio playback,
+so we unpause it.
+
+```
+ntrb_run_audio_engine(&rcd);
+```
+This initialises the audio engine and the audio playback callback.
+
+```
+#ifdef NTRB_MEMDEBUG
+assert(ntrb_memdebug_uninit(true) == ntrb_memdebug_OK);
+#endif
+```
+This deinitialises the memory debugging module and prints out any unfreed resources to stdout.
+Although the code execution won't reach here because the audio engine loop is stuck in an infinite loop.
+To stop the loop, you must set ntrb_RuntimeCoreData.requested_exit to true, the engine will playback the last callback and exit.
+But you really can't since there the execution is single threaded. So for now, you can't D:
+
+Another way to do this, is to uncomment the SHORT_AUDIO declaration in audeng_wrapper.c 
+and recompile both ntrb and your project.
+This forces the audio engine loop to exit after a period of time.
+
+## Alright, let's link
+Here's a Makefile which links the object files in ntrb with your executable:
+```
+CFLAGS := -Wall -Wextra -I../naturau-base/include -I../flac-1.4.3/include -DFLAC__NO_DLL -DNTRB_MEMDEBUG
+LDFLAGS := 
+LDLIBS := -lportaudio -L../flac-1.4.3/bin/src/libFLAC -lFLAC
+
+NTRB_OBJS := $(wildcard ../naturau-base/bin/*.o)
+
+#Remove the line below if not using GCC
+LD := $(CC)
+
+build.exe: main.o $(NTRB_OBJS)
+	$(LD) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+main.o: main.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY: clean	
+clean:
+	rm ./build.exe
+	rm ./main.o
+```
+Doxygen is broken, help
+
+We added the PortAudio lib file, the FLAC lib file and the path to it, and the object files.
+
+Note that the WAV file you've chosen for playback must be in
+- int16 or float32 sample format
+- Any sample rate
+- Mono or stereo-interleaved audio channel encoding.
+  For stereo, the first sample of a frame must be the left channel.
+
+You can also try an FLAC file as well! 
+The encoding support is almost identical to that of the WAV file,
+but can only do int16 sample format.
+
+We recommend you try switching things on and off, try different things, 
+like the memory debugging enabled and disabled, the SHORT_AUDIO flag, or playing multiple audio tracks at once (more than 2 is possible!).
+
+You've got the surface level of ntrb! 
+The example code in the ntrb directory is a step up of this. Try figuring out what it does!
+Hint: ability to queue audio and pause playback while the engine is playing the audio (multithreading!).
+
+Figure out the project structure from the structure overview page and tinker around, 
+or explore how naturau extends the functionality of ntrb!
+
+Good luck!
+*/

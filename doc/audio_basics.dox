@@ -10,7 +10,7 @@ There are 3 things needed to be known in order to properly encode the audio for 
 
 # Few Audio Terms
 But before we start discussing each of these, we need to establish a common understanding of the terms used in naturau-base.
-- Sample: In naturau-base, this means a single datapoint. Yep.
+- Sample: In naturau-base, this means a single datapoint.
 - Frame:  In naturau-base, this means a single interval.
 
   In a single frame, there can be multiple samples which all represent a single interval.
@@ -32,7 +32,7 @@ But before we start discussing each of these, we need to establish a common unde
   The same audio encoded in stereo and mono would be pretty much the same, one has 2x samples of the other,
   but the sample rate remains the same.
   
-  This is because "sample rate" actually means the amount of intervals of audio in a single second.
+  This is because "sample rate" actually means the amount of intervals for audio in a single second.
   
 - Sample format: how each of the samples are encoded. You can encode 0.5 as 0.5 in float32,
   32,768 in int16 or 2,147,483,648 in int32. They all mean nearly the same, 
