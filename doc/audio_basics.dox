@@ -1,0 +1,63 @@
+/**
+\page audio_basics Fundamentals of Low-level Audio
+
+Low-level audio all boils down to an array of datapoints representing audio.
+
+There are 3 things needed to be known in order to properly encode the audio for an audio engine:
+- The sample format which the audio engine uses
+- The sample rate which the audio engine uses
+- The encoding of each audio channel which the audio engine uses.
+
+# Few Audio Terms
+But before we start discussing each of these, we need to establish a common understanding of the terms used in naturau-base.
+- Sample: In naturau-base, this means a single datapoint. Yep.
+- Frame:  In naturau-base, this means a single interval.
+
+  In a single frame, there can be multiple samples which all represent a single interval.
+  Think of a stereo audio. The sample count is always 2x of the frame count, but the audio length
+  is equal to the frame count.
+  This is because a single interval needs to have each sample for each of the audio channel, hence the 2x.
+  
+  This is also sometimes called "monochannel samples" in naturau-base code, 
+  because if a frame only contains a single sample, then the amount of frames and samples would be the same.
+  
+- Sample rate: This actually means the amount of intervals (frames) in a single second.
+
+  Yep. Confusing.
+  
+  Basically, you can have a 7.1 audio encoded audio next to the same audio but in stereo encoding,
+  and you would still see their sample rates being the same. 
+  Even when obviously the 7.1 would contain 4x the "sample rate" of the stereo counterpart. 
+  
+  The same audio encoded in stereo and mono would be pretty much the same, one has 2x samples of the other,
+  but the sample rate remains the same.
+  
+  This is because "sample rate" actually means the amount of intervals of audio in a single second.
+  
+- Sample format: how each of the samples are encoded. You can encode 0.5 as 0.5 in float32,
+  32,768 in int16 or 2,147,483,648 in int32. They all mean nearly the same, 
+  aside from the -16 taking half the space of the -32 counterparts, but losing precision.
+  
+# How Does an Audio Engine Play an Audio?
+An audio engine needs to establish how the audio will be presented to it to play.
+As mentioned previously, it needs to specify the sample format, the sample rate and how each channels are encoded,
+but also needs to specify how many frames it requires.
+
+PortAudio, the audio engine which naturau-base uses, 
+requires the user (naturau-base) to have a callback which fills its output buffer every now and then.
+
+The parameters of the audio engine can be set when initialising it. This is why in public examples of audio players,
+they would take the specifications of the audio file and then initialise the engine with it.
+That is certainly a way to do it, but in a more complex audio playback, often you would need to standardise the parameters.
+
+naturau-base uses 48k sample rate, float32 datapoints, stereo encoded audio with ntrb_std_frame_count frames per callback, or
+ntrb_msecs_per_callback milliseconds per callback.
+
+That's pretty much it. Give the output buffer the correctly encoded audio, and it should play properly.
+The thing with low-level audio is that, there is truly no limits. Aside from not knowing.
+
+Before jumping into naturau-base, perhaps give PortAudio itself a try. Get down into the mud with the examples given by PortAudio.
+Write something that outputs a sound of your choice. That's a good way to learn low-level audio. 
+
+Also PortAudio uses interleaved stereo, each of the frames in the output buffer has the left channel datapoint first, then followed by the right.
+*/
