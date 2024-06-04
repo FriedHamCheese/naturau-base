@@ -4,3 +4,4 @@
 *.dll
 /doc/html
 /doc/latex
+extern_path.make

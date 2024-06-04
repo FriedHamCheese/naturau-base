@@ -43,12 +43,13 @@ To do this, your Makefile CFLAGS will contain the -I in this format:
 
 For your Makefile, we will make it able to generate an executable from only your main.c:
 ```
-CFLAGS := -Wall -Wextra -I../naturau-base/include -I../flac-1.4.3/include -DFLAC__NO_DLL -DNTRB_MEMDEBUG
+CFLAGS := -Wall -Wextra -I../naturau-base/include -IlibFLACinclude -IPortAudioInclude -DFLAC__NO_DLL -DNTRB_MEMDEBUG
 LDFLAGS :=
 LDLIBS := 
 
-#Remove the line below if not using GCC, this fixes ld not detecting __main
-LD := $(CC)
+CC := gcc
+#ld will not detect __main, so we call gcc for linking to fix that.
+LD := gcc
 
 #Replace .exe if needed
 build.exe: main.o
@@ -62,6 +63,9 @@ clean:
 	rm ./build.exe
 	rm ./main.o	
 ```
+
+Replace -IlibFLACinclude with the path to the libFLAC include directory, 
+-IPortAudioInclude with the path to PortAudio include directory, or remove either or both if not needed.
 
 We also needed to include libFLAC headers as well, because ntrb headers contain their includes.
 For -DFLAC__NO_DLL, it is also required both in ntrb and your project because we chose to statically link with libFLAC,
@@ -163,14 +167,15 @@ This forces the audio engine loop to exit after a period of time.
 ## Alright, let's link
 Here's a Makefile which links the object files in ntrb with your executable:
 ```
-CFLAGS := -Wall -Wextra -I../naturau-base/include -I../flac-1.4.3/include -DFLAC__NO_DLL -DNTRB_MEMDEBUG
+CFLAGS := -Wall -Wextra -I../naturau-base/include -IlibFLACinclude -IPortAudioInclude -DFLAC__NO_DLL -DNTRB_MEMDEBUG
 LDFLAGS := 
-LDLIBS := -lportaudio -L../flac-1.4.3/bin/src/libFLAC -lFLAC
+LDLIBS := -LPortAudioBuild -LlibFLACbuild -lportaudio -lFLAC
 
 NTRB_OBJS := $(wildcard ../naturau-base/bin/*.o)
 
-#Remove the line below if not using GCC
-LD := $(CC)
+CC := gcc
+#ld will not detect __main, so we call gcc for linking to fix that.
+LD := gcc
 
 build.exe: main.o $(NTRB_OBJS)
 	$(LD) $(LDFLAGS) $^ $(LDLIBS) -o $@
@@ -184,6 +189,13 @@ clean:
 	rm ./main.o
 ```
 Doxygen is broken, help
+
+Again, replace -IlibFLACinclude with the path to the libFLAC include directory, 
+-IPortAudioInclude with the path to PortAudio include directory, or remove either or both if not needed.
+
+Similarly for -LPortAudioBuild and -LlibFLACbuild:
+replace it with the path to the directory of libPortAudio.a and libFLAC.a respectively,
+or remove either or both if not needed.
 
 We added the PortAudio lib file, the FLAC lib file and the path to it, and the object files.
 
