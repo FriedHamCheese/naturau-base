@@ -1,7 +1,7 @@
 /**
 \page conventions Conventions
 
-There are only 2 things I'd like to mention for the consistency of the codebase or something that might confuse people badly.
+There are only a few things I'd like to mention for the consistency of the codebase or something that might confuse people badly.
 Anything else is probably tolerable I guess.
 
 # Initialising a Struct Parameter
@@ -12,6 +12,23 @@ or a pointer of a heap allocated memory enough to contain the struct.
 This is paradoxical of how most C structs are initialised and has a good chance of giving segfaults to anyone using ntrb.
 
 \todo This should be mentioned in every function possible in 0.3
+
+# Memory Management
+In ntrb codebase, all of the memory management must be done with the conditional macros in alloc.h.
+For the users of ntrb, we recommend using it too, by simply including alloc.h and adding `ntrb_`
+in front of stdlib memory management functions. The parameters are identical to the stdlib counterparts.
+But it's also fine to not use it as well :D
+
+The alloc module keeps track of your memory allocation, reallocation and freeing;
+because using memory debugging programs slows down your code, or I haven't used valgrind idk.
+Even if the memory debugging is on or off, it is virtually indistinguishable with or without it.
+
+You can see what you have allocated or reallocated with ntrb_memdebug_view() or passing true to ntrb_memdebug_uninit().
+The module prevents unrecognised freeing as well.
+
+To use or not use it, both ntrb and your project must be compiled with or without -DNTRB_MEMDEBUG in the same way.
+If ntrb is compiled with the symbol defined, but your project doesn't, an assert comparing two values will throw because your project has not initialised the module.
+If the inverse happens, you'll get compiler errors due to how the symbol controls the visiblity of the module.
 
 # Naming Export Declarations
 Within the ntrb codebase, if a variable, struct, or function is to meant to be exported (not used in one file only, the static keyword),
