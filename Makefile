@@ -7,10 +7,12 @@ SRCFILES := $(wildcard $(SRCDIR)/*.c)
 HEADERFILES := $(wildcard $(HEADERDIR)/*.h)
 OBJFILES := $(SRCFILES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
+include extern_path.make
+
 CC := cc
-CFLAGS := -Wall -Wextra -g3 -I./include -I./include/ntrb -I../flac-1.4.3/include -DFLAC__NO_DLL -DNTRB_MEMDEBUG
+CFLAGS := -Wall -Wextra -g3 -I$(PORTAUDIO_INCLUDEDIR) -I$(FLAC_INCLUDEDIR) -I./include -I./include/ntrb -DFLAC__NO_DLL -DNTRB_MEMDEBUG
 LDFLAGS :=
-LDLIBS :=  -lportaudio -L../flac-1.4.3/bin/src/libFLAC -lFLAC
+LDLIBS :=  -L$(PORTAUDIO_LIBDIR) -L$(FLAC_LIBDIR) -lportaudio -lFLAC
 
 .PHONY: all
 all: build build_test
