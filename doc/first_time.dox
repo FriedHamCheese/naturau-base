@@ -103,6 +103,7 @@ int main(){
 	rcd.in_pause_state = false;
 	
 	ntrb_run_audio_engine(&rcd);
+	ntrb_RuntimeCoreData_free(&rcd);
 	
 	#ifdef NTRB_MEMDEBUG
 	assert(ntrb_memdebug_uninit(true) == ntrb_memdebug_OK);
