@@ -9,7 +9,7 @@ There are 3 things needed to be known in order to properly encode the audio for 
 - The encoding of each audio channel which the audio engine uses.
 
 # Few Audio Terms
-But before we start discussing each of these, we need to establish a common understanding of the terms used in naturau-base.
+But before we start discussing, we need to establish a common understanding of the terms used in naturau-base.
 - Sample: In naturau-base, this means a single datapoint.
 - Frame:  In naturau-base, this means a single interval.
 
@@ -38,6 +38,15 @@ But before we start discussing each of these, we need to establish a common unde
   32,768 in int16 or 2,147,483,648 in int32. They all mean nearly the same, 
   aside from the -16 taking half the space of the -32 counterparts, but losing precision.
   
+- Standard audio format (ntrb only): An audio encoded in 48k sample rate, float32 datapoints (samples),
+  and stereo-interleaved audio encoding with each of the audio frame containing the left sample first, followed by the right.
+  
+- Processed audio (ntrb only): Audio which is guaranteed to be in the standard audio format.
+  Typically after conversions in aud_std_fmt.h.
+  
+- Unprocessed audio (ntrb only): Audio which is not guaranteed to be in the standard audio format.
+  Typically from reading from a source but not yet converted to standard audio format.
+  
 # How Does an Audio Engine Play an Audio?
 An audio engine needs to establish how the audio will be presented to it to play.
 As mentioned previously, it needs to specify the sample format, the sample rate and how each channels are encoded,
@@ -50,8 +59,9 @@ The parameters of the audio engine can be set when initialising it. This is why 
 they would take the specifications of the audio file and then initialise the engine with it.
 That is certainly a way to do it, but in a more complex audio playback, often you would need to standardise the parameters.
 
-naturau-base uses 48k sample rate, float32 datapoints, stereo encoded audio with ntrb_std_frame_count frames per callback, or
-ntrb_msecs_per_callback milliseconds per callback.
+As described in the definition of "standard audio format",
+naturau-base uses 48k sample rate, float32 datapoints, stereo-interleaved encoding for each frame,
+and the output buffer to the audio engine is ntrb_std_frame_count frames.
 
 That's pretty much it. Give the output buffer the correctly encoded audio, and it should play properly.
 The thing with low-level audio is that, there is truly no limits. Aside from not knowing.
