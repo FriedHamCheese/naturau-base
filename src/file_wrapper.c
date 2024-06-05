@@ -68,50 +68,21 @@ enum ntrb_ReadFileResult ntrb_read_entire_file_rb(ntrb_SpanU8* const buffer, con
 	return result;
 }
 
-enum ntrb_ReadFileResult ntrb_read_entire_file_rb_ptr(ntrb_SpanU8* const buffer, FILE* const file){
-	enum ntrb_ReadFileResult result = ntrb_ReadFileResult_OK;	
-	
-	//Filesize should not be a negative number, otherwise the filesize function failed to get the filesize.
-	const long int minimum_normal_filesize_return = 0;
-	const long int filesize_bytes = ntrb_get_filesize_bytes(file);
-	if(filesize_bytes < minimum_normal_filesize_return){
-		result = ntrb_ReadFileResult_FilesizeError;
-		goto close_file;
-	}
-	
-	//buffer Alloc, this ptr is the return value
-	buffer->ptr = (uint8_t*)ntrb_calloc(filesize_bytes, sizeof(uint8_t));
-	if(buffer->ptr == NULL){
-		result = ntrb_ReadFileResult_CallocError;
-		goto close_file;
-	}
-	
-	const size_t bytes_read = fread(buffer->ptr, sizeof(uint8_t), filesize_bytes, file);
-	buffer->elem = bytes_read;
-	
-	//This cast is fine. 
-	//It only causes issues when filesize_bytes has a signed bit, which is checked before reaching here.
-	if(bytes_read != (size_t)filesize_bytes){
-		//eof would never happen, because read binary reads all the characters/bytes
-		
-		//ferror happened, we choose to not return buffer which may contain errors.
-		ntrb_free(buffer->ptr);
-		buffer->ptr = NULL;
-		result = ntrb_ReadFileResult_FileReadError;
-	}
-	
-	close_file:
-	//file Free
-	fclose(file);
-	
-	return result;	
-}
-
 enum ntrb_ReadFileResult ntrb_readsome_from_file_rb(ntrb_SpanU8* const buffer, FILE* const file, const size_t bytes_to_read){
-	const long int filesize_bytes = ntrb_get_filesize_bytes(file);
-	if(filesize_bytes < 0) return ntrb_ReadFileResult_FilesizeError;
+	const long current_filepos = ftell(file);
+	if(current_filepos == -1) return ntrb_ReadFileResult_FilesizeError;
+	if(fseek(file, 0, SEEK_END) != 0) return ntrb_ReadFileResult_FilesizeError;
 	
-	const size_t clamped_bytes_to_read = ntrb_clamp_u64(bytes_to_read, 0, filesize_bytes);
+	const long end_filepos = ftell(file);
+	if(end_filepos == -1){
+		fseek(file, current_filepos, SEEK_SET);
+		return ntrb_ReadFileResult_FilesizeError;
+	}
+	const long filesize_left = end_filepos - current_filepos;
+	if(fseek(file, current_filepos, SEEK_SET) != 0) return ntrb_ReadFileResult_FileReadError;
+	if(filesize_left == 0) return ntrb_ReadFileResult_EOF;
+	
+	const size_t clamped_bytes_to_read = ntrb_clamp_u64(bytes_to_read, 0, filesize_left);
 	
 	buffer->ptr = ntrb_calloc(clamped_bytes_to_read, sizeof(uint8_t));
 	if(buffer->ptr == NULL) return ntrb_ReadFileResult_CallocError;
@@ -119,11 +90,7 @@ enum ntrb_ReadFileResult ntrb_readsome_from_file_rb(ntrb_SpanU8* const buffer, F
 	const size_t bytes_read = fread(buffer->ptr, sizeof(uint8_t), clamped_bytes_to_read, file);
 	buffer->elem = bytes_read;
 	
-	//This cast is fine. 
-	//It only causes issues when filesize_bytes has a signed bit, which is checked before reaching here.
 	if(bytes_read != clamped_bytes_to_read){
-		//eof would never happen, because we have clamped_bytes_to_read to prevent overreading.
-		
 		//ferror happened, we choose to not return buffer which may contain errors.
 		ntrb_free(buffer->ptr);
 		buffer->ptr = NULL;

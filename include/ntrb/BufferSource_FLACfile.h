@@ -7,8 +7,7 @@
 A module providing audio loading from FLAC file to ntrb_AudioBuffer.
 
 \note FLAC frame differs from our frame definition.
-  FLAC frame means an encoded data chunk, while our frame means 1 datapoint which does not take audio channels into account.
-  \todo add definition here. 
+  FLAC frame means an encoded data chunk, while our frame means a single smallest interval of audio.
 */
 
 #include "AudioHeader.h"
@@ -54,8 +53,8 @@ See the redirected equivalents in BufferSource_FLACfile.c
 enum ntrb_AudioBufferLoad_Error FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(const FLAC__StreamDecoderState arg);
 
 /**
-Initialises the ntrb_BufferSource_FLACfile in void_ntrb_AudioBuffer once casted to ntrb_AudioBuffer 
-and decodes the STREAMINFO part of the FLAC metadata of the file.
+Initialises the ntrb_BufferSource_FLACfile in void_ntrb_AudioBuffer once casted to ntrb_AudioBuffer,
+decodes the STREAMINFO part of the FLAC metadata of the file and writes it to ntrb_BufferSource_FLACfile in ntrb_AudioBuffer.
 
 \param[out] void_ntrb_AudioBuffer The ntrb_AudioBuffer object which the function will write to its ntrb_BufferSource_FLACfile.
 \param[in]  filename The filename of the FLAC file to read from.

@@ -18,6 +18,7 @@ enum ntrb_ReadFileResult{
 	ntrb_ReadFileResult_FilesizeError,	///< Error from getting filesize.
 	ntrb_ReadFileResult_CallocError,	///< Error from allocating memory to contain the file contents.
 	ntrb_ReadFileResult_FileReadError,	///< Error from reading file contents.
+	ntrb_ReadFileResult_EOF				///< An end of file has been reached.
 };
 
 ///Returns the filesize in bytes. Returns -1 if an error occured.
@@ -26,10 +27,27 @@ long int ntrb_get_filesize_bytes(FILE* const file);
 /**
 Reads the file contents from a file from the provided filename which the filename may be a relative path from the program callsite or an absolute filepath. Then allocates memory to the provided uninitialised ntrb_SpanU8 and writes the file contents to it. buffer->elem is set to the filesize of the file.
 
+buffer must be an uninitialised ntrb_SpanU8.
+
 All errors guarantee the provided buffer is deallocated if the function allocates it.
 */
 enum ntrb_ReadFileResult ntrb_read_entire_file_rb(ntrb_SpanU8* const buffer, const char* filename);
-enum ntrb_ReadFileResult ntrb_read_entire_file_rb_ptr(ntrb_SpanU8* const buffer, FILE* const file);
+
+/**
+Reads [remaining_filesize, bytes_to_read] bytes from *file.
+
+\param[out] buffer An uninitialised ntrb_SpanU8.
+\param[in]  file A FILE* of an initialised file descriptor.
+\param[in]  bytes_to_read The amount of bytes to try to read.
+
+If any errors occurred, the buffer contents will be freed.
+
+\return ntrb_ReadFileResult_FilesizeError if any errors occurred while detemining the remaining filesize.
+  If an filesize related error occurs, the function will seek the file position back to where it was.
+\return ntrb_ReadFileResult_FileReadError if an error occurred while seeking the file position back
+  after successfully determining the remaining filesize, or an ferror occurs.
+\return ntrb_ReadFileResult_CallocError if an error occurred when attempting to allocate buffer.
+*/
 enum ntrb_ReadFileResult ntrb_readsome_from_file_rb(ntrb_SpanU8* const buffer, FILE* const file, const size_t bytes_to_read);
 
 #endif

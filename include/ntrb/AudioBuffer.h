@@ -7,8 +7,7 @@ A module providing the ntrb_AudioBuffer: an abstracted audio buffer,
 functions for creating and deleting the type, and enums for reporting errors relating to the type.
 
 To add the support for your source, your module must contain the function for loading the audio from the source type.
-1. You would add the function in ntrb_AudioBuffer_new() in the if(strcmp()) section. 
-2. Create your else if which sets ntrb_AudioBuffer.load_buffer_callback to your function.
+Create your else-if which sets ntrb_AudioBuffer.load_buffer_callback to your function in the if(strcmp()) section of ntrb_AudioBuffer_new().
 Refer to the documentation of ntrb_AudioBuffer.load_buffer_callback for the requirements of your audio loading function.
   
 In most cases, loading an audio from a source requires variables to keep track of the audio loading.
