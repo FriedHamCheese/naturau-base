@@ -47,12 +47,12 @@ enum ntrb_RuntimeCoreData_Error ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* 
 	if(acq_writelock_error) return ntrb_RuntimeCoreData_AcqWritelockError;
 	
 	if(rcd->audio_tracks != NULL){
-		for(size_t i = 0; i < rcd->audio_track_count; i++){
+		for(uint16_t i = 0; i < rcd->audio_track_count; i++){
 			if(rcd->audio_tracks[i] == NULL) continue;
 			
 			const int free_track_error = ntrb_RuntimeCoreData_free_track(rcd, i);
 			if(free_track_error)
-				fprintf(stderr, "[Error]: ntrb_RuntimeCoreData_free(): unable to free track %llu (ntrb_AudioBufferFree_Error: %d).", i, free_track_error);
+				fprintf(stderr, "[Error]: ntrb_RuntimeCoreData_free(): unable to free track %hu (ntrb_AudioBufferFree_Error: %d).", i, free_track_error);
 		}
 		
 		ntrb_free(rcd->audio_tracks);
@@ -72,7 +72,7 @@ enum ntrb_RuntimeCoreData_Error ntrb_RuntimeCoreData_free(ntrb_RuntimeCoreData* 
 	return ntrb_RuntimeCoreData_OK;	
 }
 
-enum ntrb_AudioBufferFree_Error ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const size_t track_index){
+enum ntrb_AudioBufferFree_Error ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCoreData* const rcd, const uint16_t track_index){
 	const enum ntrb_AudioBufferFree_Error aud_free_error = ntrb_AudioBuffer_free(rcd->audio_tracks[track_index]);
 	ntrb_free(rcd->audio_tracks[track_index]);
 	rcd->audio_tracks[track_index] = NULL;

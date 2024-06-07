@@ -131,7 +131,7 @@ This initialises an ntrb_RuntimeCoreData object.
 We need this object with the ntrb_run_audio_engine() function to get the audio engine loop running.
 We specified we want to have 2 audio tracks being able to play simultaneously. 
 Yep, because ntrb audio engine loop is designed for mixing audio, and it can do theoretically
-(size_t limit) tracks, if your system is able to do that. We are getting ahead of ourselves here :D
+(uint16_t limit) tracks. We are getting ahead of ourselves here :D
 
 ```
 const char* const aud_filename = "audio.wav";
