@@ -21,6 +21,8 @@ static void test__ntrb_alloc_bytevec_reserve(){
 	_ntrb_alloc_bytevec v = _ntrb_alloc_bytevec_new(300);
 	assert(v.base_ptr != NULL);
 	
+	//Verify that the last element of the container before extension,
+	//is the same after the extension.
 	v.elements = 300;
 	*(v.base_ptr + v.elements - 1) = 97;
 	
