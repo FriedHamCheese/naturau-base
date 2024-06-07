@@ -142,23 +142,24 @@ void test__ntrb_memdebug_malloc(){
 	assert(ntrb_memdebug_init());
 	
 	const size_t allocsize = 26;
-	void* const ptr = _ntrb_memdebug_malloc(allocsize, __FILE__, __LINE__);
+	const int mock_line = 9;
+	void* const ptr = _ntrb_memdebug_malloc(allocsize, __FILE__, mock_line);
 	assert(ptr);
 	
-	assert( _ntrb_memdebug_alloc_data.elements == sizeof(_ntrb_memdebug_AllocData) );
-	assert( ((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[0].ptr == ptr );
-	assert( ((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[0].allocsize_bytes == allocsize );
+	assert(_ntrb_memdebug_alloc_data.elements == sizeof(_ntrb_memdebug_AllocData));
+	assert(_test__ntrb_memdebug_element_equal(0, ptr, allocsize, __FILE__, mock_line));
 	
 	_ntrb_memdebug_free(ptr, __FILE__, __LINE__);
-	ntrb_memdebug_uninit(false);	
+	ntrb_memdebug_uninit(false);
 }
 
 void test__ntrb_memdebug_calloc(){
 	assert(ntrb_memdebug_init());
 	
 	const size_t elements = 5;
+	const int mock_line = 9;	
 	const size_t typesize = sizeof(uint32_t);
-	void* const ptr = _ntrb_memdebug_calloc(elements, typesize, __FILE__, __LINE__);
+	void* const ptr = _ntrb_memdebug_calloc(elements, typesize, __FILE__, mock_line);
 	assert(ptr);
 	
 	const size_t bytes = elements * typesize;
@@ -166,9 +167,8 @@ void test__ntrb_memdebug_calloc(){
 		assert(((uint8_t*)ptr)[i] == 0);
 	}
 	
-	assert( _ntrb_memdebug_alloc_data.elements == sizeof(_ntrb_memdebug_AllocData) );
-	assert( ((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[0].ptr == ptr );
-	assert( ((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[0].allocsize_bytes == bytes );
+	assert(_ntrb_memdebug_alloc_data.elements == sizeof(_ntrb_memdebug_AllocData));
+	assert(_test__ntrb_memdebug_element_equal(0, ptr, bytes, __FILE__, mock_line));
 	
 	_ntrb_memdebug_free(ptr, __FILE__, __LINE__);
 	ntrb_memdebug_uninit(false);
