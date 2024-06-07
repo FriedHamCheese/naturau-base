@@ -27,35 +27,41 @@ void _test__ntrb_memdebug_free_all(){
 void test__ntrb_memdebug_add_element_to_unused_space(){
 	assert(ntrb_memdebug_init());
 	
+	int some_int_to_have_its_pointer_used = 35;
+	
 	const size_t ptr_count = 5;
+	assert(_ntrb_alloc_bytevec_reserve(&_ntrb_memdebug_alloc_data, ptr_count * sizeof(_ntrb_memdebug_AllocData)));
 	for(size_t i = 0; i < ptr_count; i++){
-		assert(_ntrb_memdebug_malloc(i, __FILE__, __LINE__));
+		//The record contain pointers pointing to stack. Don't free it.
+		const _ntrb_memdebug_AllocData alloc_data = {&some_int_to_have_its_pointer_used, 0, 0, 0};
+		_ntrb_alloc_bytevec_append(&_ntrb_memdebug_alloc_data, sizeof(_ntrb_memdebug_AllocData), &alloc_data);
 	}
-		
+
 	const size_t i_testing_ptr = 3;
-	_ntrb_memdebug_free(((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[i_testing_ptr].ptr, __FILE__, __LINE__);
+	((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[i_testing_ptr].ptr = NULL;
 	
 	const size_t alloc_size = 27;
 	const int mock_line = 9;
-	void* const ptr = malloc(alloc_size);
-	assert(ptr);
+	void* const ptr = &some_int_to_have_its_pointer_used;
 
 	assert(_ntrb_memdebug_add_element_to_unused_space(ptr, alloc_size, __FILE__, mock_line));
 	assert(_test__ntrb_memdebug_element_equal(i_testing_ptr, ptr, alloc_size, __FILE__, mock_line));
 	
-	_test__ntrb_memdebug_free_all();
+	//The pointers in the record contain stack addresses which we shouldn't free.	
 	ntrb_memdebug_uninit(false);
 }
 
 void test__ntrb_memdebug_add_element(){
 	assert(ntrb_memdebug_init());
 	
+	int some_int_to_have_its_pointer_used = 35;
+	
 	//test appending elements
 	const size_t ptr_count = 7;
 	for(size_t i = 0; i < ptr_count; i++){
 		const size_t allocsize = 30;
 		const int line = 100;
-		void* const ptr = malloc(allocsize);
+		void* const ptr = &some_int_to_have_its_pointer_used;
 
 		assert(_ntrb_memdebug_add_element(ptr, allocsize, __FILE__, line));
 		assert( _ntrb_memdebug_alloc_data.elements == sizeof(_ntrb_memdebug_AllocData)*(i+1) );
@@ -66,63 +72,68 @@ void test__ntrb_memdebug_add_element(){
 	const size_t i_testing_ptr = 4;
 	assert(i_testing_ptr < ptr_count);
 	
-	_ntrb_memdebug_free(((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[i_testing_ptr].ptr, __FILE__, __LINE__);
+	((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[i_testing_ptr].ptr = NULL;
 	
 	const size_t allocsize = 50;
 	const int line = 125;
-	void* const ptr = malloc(allocsize);	
+	void* const ptr = &some_int_to_have_its_pointer_used;	
 	_ntrb_memdebug_add_element(ptr, allocsize, __FILE__, line);
 	
 	assert( _ntrb_memdebug_alloc_data.elements == sizeof(_ntrb_memdebug_AllocData)*ptr_count );
 	assert(_test__ntrb_memdebug_element_equal(i_testing_ptr, ptr, allocsize, __FILE__, line));
 	
-	_test__ntrb_memdebug_free_all();
+	//The pointers in the record contain stack addresses which we shouldn't free.
 	ntrb_memdebug_uninit(false);	
 }
 
 void test__ntrb_memdebug_remove_element(){
 	assert(ntrb_memdebug_init());
 	
+	int some_int_to_have_its_pointer_used = 35;	
+	
 	const size_t ptr_count = 11;
 	for(size_t i = 0; i < ptr_count; i++){
-		assert(_ntrb_memdebug_malloc(27, __FILE__, __LINE__));
+		assert(_ntrb_memdebug_add_element(&some_int_to_have_its_pointer_used, 1, __FILE__, __LINE__));
 	}
-	
+
+	//test removing an element	
 	const size_t i_testing_ptr = 3;
-	
-	//test removing an element
-	void* const ptr_1 = ((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[i_testing_ptr].ptr;
-	free(ptr_1);
 	_ntrb_memdebug_remove_element(i_testing_ptr, ptr_count);
 	assert( _ntrb_memdebug_alloc_data.elements == sizeof(_ntrb_memdebug_AllocData)*ptr_count );
 	assert(_test__ntrb_memdebug_element_equal(i_testing_ptr, NULL, 0, NULL, 0));
 	
 	//testing removing the last element
 	const size_t last_i = ptr_count - 1;
-	void* const ptr_2 = ((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[last_i].ptr;
-	free(ptr_2);
 	_ntrb_memdebug_remove_element(last_i, ptr_count);
 	assert( _ntrb_memdebug_alloc_data.elements == sizeof(_ntrb_memdebug_AllocData) * (ptr_count-1));
 	assert(_test__ntrb_memdebug_element_equal(last_i, NULL, 0, NULL, 0));
 
-	_test__ntrb_memdebug_free_all();
+	//The pointers in the record contain stack addresses which we shouldn't free.
 	ntrb_memdebug_uninit(false);
 }
 
 void test__ntrb_memdebug_ptr_index(){
 	assert(ntrb_memdebug_init());
-	
-	assert(_ntrb_memdebug_malloc(27, __FILE__, __LINE__));
-	void* const ptr = _ntrb_memdebug_malloc(36, __FILE__, __LINE__);
-	assert(ptr);
-	assert(_ntrb_memdebug_malloc(31, __FILE__, __LINE__));
-	assert(_ntrb_memdebug_malloc(82, __FILE__, __LINE__));
-	assert(_ntrb_memdebug_malloc(79, __FILE__, __LINE__));
-	
-	assert(_ntrb_memdebug_ptr_index(ptr) == 1);
 
-	_test__ntrb_memdebug_free_all();
-	assert(_ntrb_memdebug_ptr_index(ptr) == -1);
+	int some_int_to_have_its_pointer_used = 35;	
+	int other_int_to_have_its_pointer_used = 89;
+	
+	assert(_ntrb_memdebug_add_element(&other_int_to_have_its_pointer_used, 36, __FILE__, __LINE__));
+	assert(_ntrb_memdebug_add_element(&other_int_to_have_its_pointer_used, 36, __FILE__, __LINE__));
+	assert(_ntrb_memdebug_add_element(&some_int_to_have_its_pointer_used, 36, __FILE__, __LINE__));	
+	assert(_ntrb_memdebug_add_element(&other_int_to_have_its_pointer_used, 36, __FILE__, __LINE__));
+	assert(_ntrb_memdebug_add_element(&other_int_to_have_its_pointer_used, 36, __FILE__, __LINE__));
+
+	assert(_ntrb_memdebug_ptr_index(&some_int_to_have_its_pointer_used) == 2);
+	
+	const size_t ptr_count = _ntrb_memdebug_alloc_data.elements / sizeof(_ntrb_memdebug_AllocData);
+	for(size_t i = 0; i < ptr_count; i++){
+		((_ntrb_memdebug_AllocData*)(_ntrb_memdebug_alloc_data.base_ptr))[i].ptr = NULL;
+	}
+
+	assert(_ntrb_memdebug_ptr_index(&some_int_to_have_its_pointer_used) == -1);
+	
+	//The pointers in the record contain stack addresses which we shouldn't free.	
 	ntrb_memdebug_uninit(false);
 }
 
