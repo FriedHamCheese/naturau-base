@@ -1,7 +1,7 @@
 #ifndef _ntrb_alloc_bytevec_h
 #define _ntrb_alloc_bytevec_h
 
-/**
+/*
 Copyright 2024 Pawikan Boonnaum
 
 This file is part of naturau-base/ntrb.

@@ -1,7 +1,7 @@
 #ifndef ntrb_AudioHeader_h
 #define ntrb_AudioHeader_h
 
-/**
+/*
 Copyright 2024 Pawikan Boonnaum
 
 This file is part of naturau-base/ntrb.

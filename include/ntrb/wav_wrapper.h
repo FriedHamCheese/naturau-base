@@ -1,7 +1,7 @@
 #ifndef ntrb_wav_wrapper_h
 #define ntrb_wav_wrapper_h
 
-/**
+/*
 Copyright 2024 Pawikan Boonnaum
 
 This file is part of naturau-base/ntrb.

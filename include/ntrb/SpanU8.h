@@ -1,7 +1,7 @@
 #ifndef ntrb_SpanU8_h
 #define ntrb_SpanU8_h
 
-/**
+/*
 Copyright 2024 Pawikan Boonnaum
 
 This file is part of naturau-base/ntrb.

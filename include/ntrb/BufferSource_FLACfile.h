@@ -1,7 +1,7 @@
 #ifndef ntrb_BufferSource_FLACfile_h
 #define ntrb_BufferSource_FLACfile_h
 
-/**
+/*
 Copyright 2024 Pawikan Boonnaum
 
 This file is part of naturau-base/ntrb.
