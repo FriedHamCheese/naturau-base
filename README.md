@@ -38,6 +38,21 @@ int main(){
 Although, naturau-base is more designed towards being extended, modified or included in your projects. See naturau.
 There is truly no right or wrong way of using naturau-base. As long as you are able to make what you want, all the power to you :D
 
+## Extension/modification
+As mentioned above, no right or wrong way of using ntrb. If you need examples of extensions or modifications
+see [naturau](https://github.com/FriedHamCheese/naturau). Use ntrb's original code as a guideline for how things should be done, then extend or modify it to fit your code.
+
+Here's an example of naturau_AudioTrack, essentially an ntrb_AudioBuffer with audio loudness multiplier and an audio effector struct:
+```
+typedef struct{
+	ntrb_AudioBuffer output_buffer;
+	
+	float amplitude_multiplier;
+	naturau_AudioEffector audio_effector;
+} naturau_AudioTrack;
+```
+Modifications to audeng_wrapper and RuntimeCoreData are also present in naturau, since the original revolves around the  ntrb_AudioBuffer struct.
+
 # Building ntrb
 *This is a verbatim of the building documentation in the Doxygen documentation*
 
