@@ -122,10 +122,12 @@ typedef struct{
 	} source;
 	
 	/**
+	\todo unclear on who has to acquire the rwlock. Also good idea to point out that the loading function should be resistant to calling after load_err is set.
+	
 	A pointer to a source-specific reading function.
 	
 	A few specifications of the function:
-	- The function will be called in a multithreaded environment has to be mulithreaded-safe.
+	- The function will be called in a multithreaded environment and has to be mulithreaded-safe.
 	  Just by acquiring pthread_rwlock_wrlock() before writing, and unlocking by pthread_rwlock_unlock() after writing.
 	- The void* return is for pthread_t, and in ntrb and naturau, we don't care what it returns. Just return NULL.
 	- The void* parameter will be casted to the ntrb_AudioBuffer* which the function would write to.
@@ -190,6 +192,10 @@ enum ntrb_AudioBufferFree_Error{
 	ntrb_AudioBufferFree_RwlockDestroyError,
 };
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
+
 /**
 A function which initialises an ntrb_AudioBuffer object in *ret.
 
@@ -213,4 +219,9 @@ For the specifications of the modification, refer to the Detailed Description pa
 else the very top comment of this file.
 */
 enum ntrb_AudioBufferFree_Error ntrb_AudioBuffer_free(ntrb_AudioBuffer* const obj);
+
+#ifdef __cplusplus
+};
+#endif
+
 #endif

@@ -49,6 +49,10 @@ Defined in SlicedStrings.c
 */
 extern const size_t ntrb_slice_string_max_len;
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
+
 /**
 Creates a new ntrb_SlicedStrings and allocates its char** to store (str_count) char pointers, 
 and (str_count) substrings each with its own allocated ntrb_slice_string_max_len + 1 bytes of space.
@@ -121,5 +125,9 @@ Concatenates the strings in the object to a single, separately allocated string.
 Returns the concatenated string which is separately allocated, NULL if allocation error occured.
 */
 char* ntrb_SlicedStrings_concat_strs(const ntrb_SlicedStrings slices, const size_t beg, const size_t end, const char separator);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

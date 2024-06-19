@@ -42,6 +42,10 @@ enum ntrb_StdAudFmtConversionResult{
 	ntrb_StdAudFmtConversion_UnsupportedChannels,	///< Could not convert from that amount of channels
 };
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
+
 /**
 Separately allocates the float32 conversion from the provided int16 argument.
 
@@ -153,5 +157,9 @@ Returns a separately allocated ret_aud, which is orig converted to float32 stere
 \param[in] orig_header The header which comes with orig when reading an audio file.
 */
 enum ntrb_StdAudFmtConversionResult ntrb_to_standard_format(ntrb_AudioDatapoints* const ret_aud, const ntrb_AudioDatapoints orig, const ntrb_AudioHeader* const orig_header);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

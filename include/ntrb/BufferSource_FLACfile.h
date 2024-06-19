@@ -58,12 +58,16 @@ typedef struct{
 	ntrb_AudioHeader aud_header;
 } ntrb_BufferSource_FLACfile;
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
+
 /**
 A function redirecting values in FLAC__StreamDecoderState to ntrb_AudioBufferLoad_Error values.
 
 See the redirected equivalents in BufferSource_FLACfile.c
 */
-enum ntrb_AudioBufferLoad_Error FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(const FLAC__StreamDecoderState arg);
+int FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(const FLAC__StreamDecoderState arg);
 
 /**
 Initialises the ntrb_BufferSource_FLACfile in void_ntrb_AudioBuffer once casted to ntrb_AudioBuffer,
@@ -86,5 +90,9 @@ void ntrb_BufferSource_FLACfile_free(ntrb_BufferSource_FLACfile* const ret);
 Loads unprocessed audio from FLAC file and writes the processed audio to void_ntrb_AudioBuffer casted to ntrb_AudioBuffer type.
 */
 void* ntrb_BufferSource_FLACfile_load_buffer(void* const void_ntrb_AudioBuffer);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

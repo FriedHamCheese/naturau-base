@@ -21,7 +21,6 @@ A module providing bytevec: a variable length array container, for the alloc mod
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-
 /**
 A variable length array container for the alloc module specifically.
 
@@ -49,6 +48,10 @@ If the base_ptr is NULL, this indicates a failure from a function and the contai
 Defined in _alloc_bytevec.c
 */
 extern const _ntrb_alloc_bytevec failed__ntrb_alloc_bytevec;
+
+#ifdef __cplusplus
+extern "C"{	
+#endif
 
 /**
 Initialises a new _ntrb_alloc_bytevec object.
@@ -89,5 +92,9 @@ bool _ntrb_alloc_bytevec_append(_ntrb_alloc_bytevec* const obj, const size_t typ
 Frees the base_ptr, then sets it to NULL and sets both the elements and capacity to 0.
 */
 void _ntrb_alloc_bytevec_free(_ntrb_alloc_bytevec* const obj);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif
