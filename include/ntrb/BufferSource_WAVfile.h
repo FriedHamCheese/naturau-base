@@ -53,6 +53,10 @@ typedef struct{
 	size_t audiodataSize;
 } ntrb_BufferSource_WAVfile;
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
+
 /**
 Initialises an uninitialised ntrb_BufferSource_WAVfile object in *ret.
 
@@ -90,5 +94,9 @@ and writes it to void_ntrb_AudioBuffer which will be casted to an ntrb_AudioBuff
 The void* is for pthread_t. The function returns NULL both in success and errors.
 */
 void* ntrb_BufferSource_WAVfile_load_buffer(void* const void_ntrb_AudioBuffer);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

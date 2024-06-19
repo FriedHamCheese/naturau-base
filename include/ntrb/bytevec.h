@@ -47,6 +47,10 @@ Defined in bytevec.c
 */
 extern const ntrb_bytevec failed_ntrb_bytevec;
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
+
 /**
 Initialises a new ntrb_bytevec object.
 The base_ptr gets allocated with alloc_bytes bytes of heap memory.
@@ -87,5 +91,9 @@ bool ntrb_bytevec_append(ntrb_bytevec* const obj, const size_t typesize, const v
 Frees the base_ptr, then sets it to NULL and sets both the elements and capacity to 0.
 */
 void ntrb_bytevec_free(ntrb_bytevec* const obj);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

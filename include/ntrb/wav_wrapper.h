@@ -26,6 +26,10 @@ A module for reading WAV files.
 #include <stdio.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
+
 /**
 Returns the PaSampleFormat equivalent from the two provided arguments.
 If there is no equivalent, it returns paCustomFormat, indicating an unknown format.
@@ -101,4 +105,9 @@ Returns a separately allocated buffer containing the audio data from wavfile.
 You get two latter parameters from ntrb_AudioHeader_from_WAVfile().
 */
 ntrb_AudioDatapoints ntrb_get_WAV_audiodata(const ntrb_SpanU8 wavfile, const size_t audiodata_size, const size_t audiodata_offset);
+
+#ifdef __cplusplus
+};
+#endif
+
 #endif

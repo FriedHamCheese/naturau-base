@@ -45,6 +45,10 @@ Defined in AudioDatapoints.c
 */
 extern const ntrb_AudioDatapoints failed_ntrb_AudioDatapoints;
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
+
 /**
 Allocates a fixed size array of size_bytes bytes, 0 set the array, set byte_count to size_bytes and byte_pos to 0.
 
@@ -66,5 +70,9 @@ ntrb_AudioDatapoints ntrb_AudioDatapoints_copy(const ntrb_AudioDatapoints orig);
 Frees obj->bytes, sets it to NULL, and set byte_count and byte_pos to 0.
 */
 void ntrb_AudioDatapoints_free(ntrb_AudioDatapoints* const obj);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

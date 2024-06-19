@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdbool.h>
-
 /*
 Copyright 2024 Pawikan Boonnaum
 
@@ -57,6 +56,10 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 \def ntrb_free(ptr)
 A macro which either transforms into the debugging implementation _ntrb_memdebug_free() or stdlib free() depending on if NTRB_MEMDEBUG is defined or not respectively.
 */
+
+#ifdef __cplusplus
+extern "C"{	
+#endif
 
 #ifdef NTRB_MEMDEBUG
 	#define ntrb_malloc(size_bytes) _ntrb_memdebug_malloc(size_bytes, __FILE__, __LINE__)
@@ -122,15 +125,15 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	For performance and efficiency reasons, you would try to write to this first, as the _ntrb_memdebug_add_element_to_unused_space() in _ntrb_memdebug_add_element() does.
 	*/
 	extern  _ntrb_alloc_bytevec _ntrb_memdebug_alloc_data;
-	
+
 	/**
 	Older way of initialising the alloc module.
 
 	It calls the newer ntrb_memdebug_init_with_return_value() and returns true if the underlying function returns 0.
 	Else it returns false.
 	*/	
-	bool ntrb_memdebug_init();
 	
+	bool ntrb_memdebug_init();
 	/**
 	Initialises the alloc module by initialising the rwlock of the module and the record which keep track of memory management information, and then marks the module as successfully initialised.
 	
@@ -140,7 +143,7 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	- Else it returns ntrb_memdebug_OK, if any of the mentioned has not occurred.
 	*/	
 	enum ntrb_memdebug_Error ntrb_memdebug_init_with_return_value();
-	
+
 	/**
 	Uninitialises the module by freeing the record container and destroying the rwlock.
 	
@@ -282,4 +285,10 @@ A macro which either transforms into the debugging implementation _ntrb_memdebug
 	#define ntrb_realloc(ptr, size_bytes) realloc(ptr, size_bytes)
 	#define ntrb_free(ptr) free(ptr)
 #endif
+
+
+#ifdef __cplusplus
+};
+#endif
+
 #endif

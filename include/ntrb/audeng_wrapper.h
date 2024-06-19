@@ -27,6 +27,9 @@ Defined in audeng_wrapper.c
 extern const unsigned long ntrb_msecs_per_callback;
 extern const unsigned long ntrb_std_frame_count;
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
 
 /**
 The function for the audio engine thread.
@@ -41,5 +44,9 @@ void* ntrb_run_audio_engine(void* const runtime_data_void);
 A function returning the amount of frames in a single millisecond of the argument
 */
 unsigned long ntrb_frames_for_msec(const unsigned long samplerate);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

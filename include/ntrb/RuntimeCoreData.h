@@ -20,10 +20,9 @@ A module containing ntrb_RuntimeCoreData and functions for interacting with it.
 */
 
 #include "AudioBuffer.h"
+#include "cpp_include_compat.h"
 
 #include <stdint.h>
-#include <stdatomic.h>
-
 #include <pthread.h>
 
 /**
@@ -115,6 +114,10 @@ enum ntrb_RCD_QueueAudioReturn{
 	ntrb_RCD_QueueAudio_UnknownError,
 };
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
+
 ///Converts values in ntrb_AudioBufferNew_Error to values in ntrb_RCD_QueueAudioReturn.
 enum ntrb_RCD_QueueAudioReturn ntrb_AudioBufferNew_Error_to_ntrb_RCD_QueueAudioReturn(const enum ntrb_AudioBufferNew_Error arg);
 ///Converts values in ntrb_AudioBufferLoad_Error to values in ntrb_RCD_QueueAudioReturn.
@@ -160,5 +163,9 @@ enum ntrb_AudioBufferFree_Error ntrb_RuntimeCoreData_free_track(ntrb_RuntimeCore
 
 ///Creates and loads an audio track from an audio file with the provided filename to an empty track in runtime_data.
 enum ntrb_RCD_QueueAudioReturn ntrb_RuntimeCoreData_queue_audio(ntrb_RuntimeCoreData* const runtime_data, const char* filename);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

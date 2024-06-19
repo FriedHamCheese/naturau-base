@@ -34,6 +34,14 @@ typedef struct{
 } ntrb_AudioHeader;
 
 ///A function which prints the contents of the provided header to the stream.
-void ntrb_AudioHeader_print(const ntrb_AudioHeader header, FILE* const printstream);
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+ void ntrb_AudioHeader_print(const ntrb_AudioHeader header, FILE* const printstream);
+ 
+#ifdef __cplusplus
+};
+#endif
 
 #endif

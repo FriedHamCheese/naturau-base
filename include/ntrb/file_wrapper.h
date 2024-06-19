@@ -34,6 +34,10 @@ enum ntrb_ReadFileResult{
 	ntrb_ReadFileResult_EOF				///< An end of file has been reached.
 };
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
+
 ///Returns the filesize in bytes. Returns -1 if an error occured.
 long int ntrb_get_filesize_bytes(FILE* const file);
 
@@ -62,5 +66,9 @@ If any errors occurred, the buffer contents will be freed.
 \return ntrb_ReadFileResult_CallocError if an error occurred when attempting to allocate buffer.
 */
 enum ntrb_ReadFileResult ntrb_readsome_from_file_rb(ntrb_SpanU8* const buffer, FILE* const file, const size_t bytes_to_read);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

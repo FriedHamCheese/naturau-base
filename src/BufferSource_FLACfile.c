@@ -186,7 +186,7 @@ void* ntrb_BufferSource_FLACfile_load_buffer(void* const void_ntrb_AudioBuffer){
 	return NULL;
 }
 
-enum ntrb_AudioBufferLoad_Error FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(const FLAC__StreamDecoderState arg){
+int FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(const FLAC__StreamDecoderState arg){
 	switch(arg){
 		case FLAC__STREAM_DECODER_END_OF_STREAM:	return ntrb_AudioBufferLoad_EOF;
 		case FLAC__STREAM_DECODER_OGG_ERROR:		return ntrb_AudioBufferLoad_OGGError;

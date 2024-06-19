@@ -31,6 +31,10 @@ enum ntrb_GetCharStatus{
 	ntrb_GetChar_Ferror,    ///< Recieved an ferror while reading FILE*
 };
 
+#ifdef __cplusplus
+extern "C"{	
+#endif
+
 /**
 Gets a character from the provided FILE* and writes it to ret.
 
@@ -73,5 +77,9 @@ Returns a valid string if the filetype exists. Else it returns NULL.
 So "filename." or "filename" is going to return NULL. ".filetype" does return "filetype" as the string.
 */
 char* ntrb_get_filetype(const char* const filename);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif
