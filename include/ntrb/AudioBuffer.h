@@ -109,6 +109,10 @@ typedef struct{
 	*/
 	size_t monochannel_samples;
 	
+	///\todo doc this
+	size_t stdaud_buffer_first_frame;
+	size_t stdaud_next_buffer_first_frame;
+	
 	/**
 	A union containing source-specifc data required to read the audio from a source.
 	
@@ -144,7 +148,7 @@ typedef struct{
 	The audio engine loop will acknowledge and act on the error **after** the buffer contents is read from,
 	which means the buffer must contain no garbage in almost every type of error.
 	*/
-	enum ntrb_AudioBufferLoad_Error load_err;	
+	enum ntrb_AudioBufferLoad_Error load_err;
 } ntrb_AudioBuffer;
 
 /**

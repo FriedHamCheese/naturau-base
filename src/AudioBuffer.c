@@ -70,6 +70,9 @@ enum ntrb_AudioBufferNew_Error ntrb_AudioBuffer_new(ntrb_AudioBuffer* const ret,
 		return ntrb_AudioBufferNew_AllocError;
 	}
 	
+	ret->stdaud_buffer_first_frame = 0;
+	ret->stdaud_next_buffer_first_frame = 0;
+	
 	return ntrb_AudioBufferNew_OK;
 }
 
