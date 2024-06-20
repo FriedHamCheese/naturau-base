@@ -40,6 +40,9 @@ enum ntrb_AudioBufferNew_Error ntrb_AudioBuffer_new(ntrb_AudioBuffer* const ret,
 	if(filetype == NULL)
 		return ntrb_AudioBufferNew_InvalidAudFiletype;
 
+	ret->stdaud_buffer_first_frame = 0;
+	ret->stdaud_next_buffer_first_frame = 0;
+
 	enum ntrb_AudioBufferNew_Error source_init_error = ntrb_AudioBufferNew_OK;
 	if(strcmp(filetype, "wav") == 0){
 		ret->load_buffer_callback = ntrb_BufferSource_WAVfile_load_buffer;
@@ -69,9 +72,6 @@ enum ntrb_AudioBufferNew_Error ntrb_AudioBuffer_new(ntrb_AudioBuffer* const ret,
 		ntrb_AudioBuffer_free(ret);
 		return ntrb_AudioBufferNew_AllocError;
 	}
-	
-	ret->stdaud_buffer_first_frame = 0;
-	ret->stdaud_next_buffer_first_frame = 0;
 	
 	return ntrb_AudioBufferNew_OK;
 }
