@@ -105,7 +105,7 @@ static int stream_audio(const void *, void *output_void, unsigned long frameCoun
 }
 
 
-static PaError get_output_stream_params(PaStreamParameters* const output_params){
+PaError ntrb_get_output_stream_params(PaStreamParameters* const output_params){
 	output_params->device = Pa_GetDefaultOutputDevice();
 	if(output_params->device == paNoDevice) return paDeviceUnavailable;
 	
@@ -128,7 +128,7 @@ void* ntrb_run_audio_engine(void* const runtime_data_void){
 	if(pa_error) goto print_err;
 		
 	PaStreamParameters output_stream_params;
-	pa_error = get_output_stream_params(&output_stream_params);
+	pa_error = ntrb_get_output_stream_params(&output_stream_params);
 	if(pa_error) goto uninit_pa;
 	
 	//output_stream Alloc

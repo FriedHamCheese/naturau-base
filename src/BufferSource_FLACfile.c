@@ -161,7 +161,7 @@ void* ntrb_BufferSource_FLACfile_load_buffer(void* const void_ntrb_AudioBuffer){
 	aud->stdaud_next_buffer_first_frame += aud->monochannel_samples;
 	
 	ntrb_AudioDatapoints stdaud;
-	const ntrb_AudioDatapoints unprocessed_aud = {.bytes = aud->source.flac_file.read_bytes, .byte_pos = 0, .byte_count = aud->source.flac_file.bytes_in_buffer};
+	const ntrb_AudioDatapoints unprocessed_aud = {.bytes = aud->source.flac_file.read_bytes, .byte_pos = 0, .byte_count = aud->source.flac_file.buffersize_bytes};
 	const enum ntrb_StdAudFmtConversionResult stdaud_conversion_error = ntrb_to_standard_format(&stdaud, unprocessed_aud, &(aud->source.flac_file.aud_header));
 	if(stdaud_conversion_error){
 		aud->load_err = ntrb_AudioBufferLoad_StdaudConversionError;
