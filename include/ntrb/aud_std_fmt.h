@@ -115,41 +115,6 @@ If the function failed to allocate the return container, it returns failed_ntrb_
 ntrb_AudioDatapoints ntrb_to_samplerate(const ntrb_AudioDatapoints orig, const uint32_t orig_samplerate, const uint32_t dest_samplerate);
 
 /**
-Returns a separately allocated ret_aud which is either a clone of orig or a float32 converted orig, if orig is float32 or int16 respectively.
-
-- If an ntrb_StdAudFmtConversion_AllocFailure is returned, ret_aud couldn't be allocated.
-- If an ntrb_StdAudFmtConversion_UnknownSampleFormat is returned, originalFormat is not supported.
-*/
-enum ntrb_StdAudFmtConversionResult ntrb_to_std_sample_fmt(ntrb_AudioDatapoints* const ret_aud, const ntrb_AudioDatapoints orig, const PaSampleFormat originalFormat);
-
-/**
-Returns a separately allocated ret_aud which is either a clone of orig or a stereo converted orig, if orig is stereo or mono respectively.
-
-orig must be in float32 format.
-
-- If an ntrb_StdAudFmtConversion_AllocFailure is returned, ret_aud couldn't be allocated.
-- If an ntrb_StdAudFmtConversion_UnsupportedChannels is returned, audchannels is not supported.
-
-\param[out] ret_aud Uninitialised ntrb_AudioDatapoints for output.
-\param[in] orig
-\param[in] audchannels Audio channel count of orig.
-*/
-enum ntrb_StdAudFmtConversionResult ntrb_to_std_aud_channels(ntrb_AudioDatapoints* const ret_aud, const ntrb_AudioDatapoints orig, const uint8_t audchannels);
-
-/**
-Returns a separately allocated ret_aud which is either a copy of orig or one converted to 48khz sample rate.
-
-orig must be in stereo channeled float32.
-
-If an ntrb_StdAudFmtConversion_AllocFailure is returned, ret_aud couldn't be allocated.
-
-\param[out] ret_aud Uninitialised ntrb_AudioDatapoints for output.
-\param[in] orig
-\param[in] samplerate Sample rate of orig.
-*/
-enum ntrb_StdAudFmtConversionResult ntrb_to_std_samplerate(ntrb_AudioDatapoints* const ret_aud, const ntrb_AudioDatapoints orig, const uint32_t samplerate);
-
-/**
 Returns a separately allocated ret_aud, which is orig converted to float32 stereo 48khz format.
 
 \param[out] ret_aud Uninitialised ntrb_AudioDatapoints for output.
