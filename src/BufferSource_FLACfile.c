@@ -157,7 +157,10 @@ void* ntrb_BufferSource_FLACfile_load_buffer(void* const void_ntrb_AudioBuffer){
 		aud->load_err = FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(FLAC__stream_decoder_get_state(aud->source.flac_file.decoder));
 	}
 	
-	if(aud->load_err) return NULL;
+	if(aud->load_err){
+		pthread_rwlock_unlock(&(aud->buffer_access));		
+		return NULL;
+	}
 	
 	aud->stdaud_buffer_first_frame = aud->stdaud_next_buffer_first_frame;
 	aud->stdaud_next_buffer_first_frame += aud->monochannel_samples;
