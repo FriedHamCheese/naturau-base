@@ -1,6 +1,8 @@
 #ifndef ntrb_audengwrapper_h
 #define ntrb_audengwrapper_h
 
+#include "portaudio.h"
+
 /*
 Copyright 2024 Pawikan Boonnaum
 
@@ -30,6 +32,8 @@ extern const unsigned long ntrb_std_frame_count;
 #ifdef __cplusplus
 extern "C"{	
 #endif
+
+PaError ntrb_get_output_stream_params(PaStreamParameters* const output_params);
 
 /**
 The function for the audio engine thread.

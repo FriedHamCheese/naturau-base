@@ -46,11 +46,16 @@ typedef struct{
 	ntrb_AudioHeader aud_header;
 	
 	/**
+	\todo !!!
+	\attention nope
 	It initially contains the amount of bytes of audio data in the file.
 	But in every call of ntrb_BufferSource_WAVfile_load_buffer(), this gets reduced by ntrb_BufferSource_WAVfile.bytes_to_read.
 	If this reaches 0 during the subtraction in the function, it indicates and end of file and the function stops reading the file.
 	*/
 	size_t audiodataSize;
+	size_t audiodataOffset;
+	
+	float file_samplerate_over_stdaud;
 } ntrb_BufferSource_WAVfile;
 
 #ifdef __cplusplus

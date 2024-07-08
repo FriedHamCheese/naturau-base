@@ -174,64 +174,41 @@ ntrb_AudioDatapoints ntrb_to_samplerate(const ntrb_AudioDatapoints orig, const u
 }
 
 //input could be in any sample format, any channels, any samplerates.
-enum ntrb_StdAudFmtConversionResult ntrb_to_std_sample_fmt(ntrb_AudioDatapoints* const ret_aud, const ntrb_AudioDatapoints orig, const PaSampleFormat originalFormat){
-	if(originalFormat == paInt16){
-		*ret_aud = ntrb_AudioDatapoints_i16_to_f32(orig);
-	}
-	else if(originalFormat == ntrb_std_sample_fmt){
-		*ret_aud = ntrb_AudioDatapoints_copy(orig);
-	}
-	else return ntrb_StdAudFmtConversion_UnknownSampleFormat;
-
-	if(ret_aud->bytes == NULL) 
-		return ntrb_StdAudFmtConversion_AllocFailure;
-	else return ntrb_StdAudFmtConversion_OK;
-}
-
-//input must be in float32 sample format.
-enum ntrb_StdAudFmtConversionResult ntrb_to_std_aud_channels(ntrb_AudioDatapoints* const ret_aud, const ntrb_AudioDatapoints orig, const uint8_t audchannels){
-	if(audchannels == ntrb_std_audchannels){
-		*ret_aud = ntrb_AudioDatapoints_copy(orig);
-	}
-	else if(audchannels == 1){
-		*ret_aud = ntrb_mono_to_xchannels(orig, 2);
-	}
-	else return ntrb_StdAudFmtConversion_UnsupportedChannels;
-	
-	if(ret_aud->bytes == NULL) return ntrb_StdAudFmtConversion_AllocFailure;
-	else return ntrb_StdAudFmtConversion_OK;
-}
-
-//input must be in stereo float32 sample format.
-enum ntrb_StdAudFmtConversionResult ntrb_to_std_samplerate(ntrb_AudioDatapoints* const ret_aud, const ntrb_AudioDatapoints orig, const uint32_t samplerate){
-	*ret_aud = ntrb_to_samplerate(orig, samplerate, ntrb_std_samplerate);				
-	
-	if(ret_aud->bytes == NULL) 
-		return ntrb_StdAudFmtConversion_AllocFailure;
-	else return ntrb_StdAudFmtConversion_OK;
-}
-
-//input could be in any sample format, any channels, any samplerates.
 enum ntrb_StdAudFmtConversionResult ntrb_to_standard_format(ntrb_AudioDatapoints* const ret_aud, const ntrb_AudioDatapoints orig, const ntrb_AudioHeader* const orig_header){
+	ntrb_AudioDatapoints prev = orig;
+	ntrb_AudioDatapoints current;
+
+	if(orig_header->AudioFormat != paFloat32)
+		current = ntrb_AudioDatapoints_i16_to_f32(orig);
+	else
+		current = ntrb_AudioDatapoints_copy(orig);
 	
-	ntrb_AudioDatapoints audF32;
-	//audF32.bytes Alloc
-	const enum ntrb_StdAudFmtConversionResult to_f32_result = ntrb_to_std_sample_fmt(&audF32, orig, orig_header->AudioFormat);
-	if(to_f32_result != ntrb_StdAudFmtConversion_OK)
-		return to_f32_result;
+	if(current.bytes == NULL)
+		return ntrb_StdAudFmtConversion_AllocFailure;
 	
-	ntrb_AudioDatapoints audF32_2ch;
-	const enum ntrb_StdAudFmtConversionResult to_2ch_result = ntrb_to_std_aud_channels(&audF32_2ch, audF32, orig_header->NumChannels);
-	//ret_aud.bytes Alloc
-	ntrb_AudioDatapoints_free(&audF32);
-	if(to_2ch_result != ntrb_StdAudFmtConversion_OK)
-		return to_2ch_result;
+	if(orig_header->NumChannels == 1){
+		if(prev.bytes != orig.bytes) ntrb_AudioDatapoints_free(&prev);		
+		
+		prev = current;
+		current = ntrb_mono_to_xchannels(prev, ntrb_std_audchannels);
+		if(current.bytes == NULL){
+			if(prev.bytes != orig.bytes) ntrb_AudioDatapoints_free(&prev);
+			return ntrb_StdAudFmtConversion_AllocFailure;
+		}
+	}
 	
-	//ret_aud.bytes alloc
-	const enum ntrb_StdAudFmtConversionResult to_std_samplerate_result = ntrb_to_std_samplerate(ret_aud, audF32_2ch, orig_header->SampleRate);
-	ntrb_AudioDatapoints_free(&audF32_2ch);
-	if(to_std_samplerate_result != ntrb_StdAudFmtConversion_OK)
-		return to_std_samplerate_result;
+	if(orig_header->SampleRate != ntrb_std_samplerate){
+		if(prev.bytes != orig.bytes) ntrb_AudioDatapoints_free(&prev);
+		prev = current;
+		current = ntrb_to_samplerate(prev, orig_header->SampleRate, ntrb_std_samplerate);
+		if(current.bytes == NULL){
+			if(prev.bytes != orig.bytes) ntrb_AudioDatapoints_free(&prev);
+			return ntrb_StdAudFmtConversion_AllocFailure;
+		}
+	}
+
+	if(prev.bytes != orig.bytes) ntrb_AudioDatapoints_free(&prev);	
+	*ret_aud = current;
 	
 	return ntrb_StdAudFmtConversion_OK;
 }

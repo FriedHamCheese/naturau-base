@@ -44,6 +44,8 @@ int ntrb_BufferSource_WAVfile_new(ntrb_BufferSource_WAVfile* const ret, const ch
 	const size_t bytes_to_read = floor(samples_to_read) * (ret->aud_header.BitsPerSample / 8);
 	ret->bytes_to_read = bytes_to_read;
 	
+	ret->file_samplerate_over_stdaud = (float)(ret->aud_header.SampleRate) / (float)ntrb_std_samplerate;
+	
 	ret->read_bytes = ntrb_calloc(bytes_to_read, sizeof(uint8_t));
 	
 	if(ret->read_bytes == NULL){
@@ -66,11 +68,10 @@ int ntrb_BufferSource_WAVfile_load_header(ntrb_BufferSource_WAVfile* const ret){
 	const enum ntrb_ReadFileResult read_file_result = ntrb_readsome_from_file_rb(&file_buffer, ret->aud_file, max_header_boundary_bytes);
 	if(read_file_result != ntrb_ReadFileResult_OK) return ntrb_AudioBufferNew_FileReadError;
 	
-	size_t audiodataOffset = 0;
-	const enum ntrb_AudioHeaderFromWAVFileStatus wav_header_status = ntrb_AudioHeader_from_WAVfile_2(&(ret->aud_header), &(audiodataOffset), &(ret->audiodataSize), file_buffer);
+	const enum ntrb_AudioHeaderFromWAVFileStatus wav_header_status = ntrb_AudioHeader_from_WAVfile_2(&(ret->aud_header), &(ret->audiodataOffset), &(ret->audiodataSize), file_buffer);
 	ntrb_free(file_buffer.ptr);
 	
-	if(fseek(ret->aud_file, audiodataOffset, SEEK_SET) != 0){
+	if(fseek(ret->aud_file, ret->audiodataOffset, SEEK_SET) != 0){
 		return ntrb_AudioBufferNew_FileReadError;
 	}
 	
@@ -92,23 +93,29 @@ void* ntrb_BufferSource_WAVfile_load_buffer(void* const void_ntrb_AudioBuffer){
 
 	memset(audbuf->datapoints, 0, audbuf->monochannel_samples * ntrb_std_audchannels * sizeof(float));
 	
-	if(wav_source->audiodataSize == 0){
+	const float file_sample_to_fetch_from = (float)audbuf->stdaud_next_buffer_first_frame * wav_source->file_samplerate_over_stdaud * (float)wav_source->aud_header.NumChannels;
+	const size_t file_bytes_to_fetch_from = (file_sample_to_fetch_from * (wav_source->aud_header.BitsPerSample / 8));
+	
+	const size_t clamped_file_bytes_to_fetch_from = ntrb_clamp_u64(file_bytes_to_fetch_from, 0, wav_source->audiodataSize);
+	
+	const size_t audiodataSizeLeft = wav_source->audiodataSize - clamped_file_bytes_to_fetch_from;
+	if(audiodataSizeLeft == 0){
 		audbuf->load_err = ntrb_AudioBufferLoad_EOF;
 		pthread_rwlock_unlock(&(audbuf->buffer_access));	
 		return NULL;
 	}
 	
-	const size_t clamped_bytes_to_read = ntrb_clamp_u64(wav_source->bytes_to_read, 0, wav_source->audiodataSize);
-	
+	const size_t clamped_bytes_to_read = ntrb_clamp_u64(wav_source->bytes_to_read, 0, audiodataSizeLeft);
+	fseek(wav_source->aud_file, wav_source->audiodataOffset + clamped_file_bytes_to_fetch_from, SEEK_SET);
 	const size_t bytes_read = fread(wav_source->read_bytes, sizeof(uint8_t), clamped_bytes_to_read, wav_source->aud_file);
 	if(bytes_read != clamped_bytes_to_read){
 		audbuf->load_err = ntrb_AudioBufferLoad_UnequalRead;
 		pthread_rwlock_unlock(&(audbuf->buffer_access));
 		return NULL;
 	}
-		
-	//No overflows from subtraction, the clamp is always lesser or equal to audiodataSize.
-	wav_source->audiodataSize -= clamped_bytes_to_read;
+
+	audbuf->stdaud_buffer_first_frame = audbuf->stdaud_next_buffer_first_frame;
+	audbuf->stdaud_next_buffer_first_frame += audbuf->monochannel_samples;
 	
 	ntrb_AudioDatapoints stdaud;
 	const ntrb_AudioDatapoints unprocessed_aud = {.bytes = wav_source->read_bytes, .byte_pos = 0, .byte_count = bytes_read};

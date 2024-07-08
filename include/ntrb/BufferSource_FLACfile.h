@@ -52,10 +52,10 @@ typedef struct{
 	uint64_t buffersize_bytes;
 	///Keeps track of how many bytes read_bytes currently contain. 
 	uint64_t bytes_in_buffer;
-	///The audio frame (not FLAC frame) which the decoder has decoded to.
-	uint64_t current_frame;
 	///This contains the information of the FLAC file from its metadata.
 	ntrb_AudioHeader aud_header;
+	
+	float file_samplerate_over_stdaud;
 } ntrb_BufferSource_FLACfile;
 
 #ifdef __cplusplus
