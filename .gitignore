@@ -5,3 +5,4 @@
 /doc/html
 /doc/latex
 extern_path.make
+makeconfig.make

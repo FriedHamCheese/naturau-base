@@ -7,12 +7,12 @@ SRCFILES := $(wildcard $(SRCDIR)/*.c)
 HEADERFILES := $(wildcard $(HEADERDIR)/*.h)
 OBJFILES := $(SRCFILES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
-include extern_path.make
+include makeconfig.make
 
 CC := cc
-CFLAGS := -Wall -Wextra -g3 -I$(PORTAUDIO_INCLUDEDIR) -I$(FLAC_INCLUDEDIR) -I./include -I./include/ntrb -DFLAC__NO_DLL -DNTRB_MEMDEBUG
+CFLAGS := -Wall -Wextra -g3 $(NTRB_DEPENDENCY_INCLUDES) $(NTRB_COMPILING_SYMBOLS) -I./include -I./include/ntrb
 LDFLAGS :=
-LDLIBS :=  -L$(PORTAUDIO_LIBDIR) -L$(FLAC_LIBDIR) -lportaudio -lFLAC
+LDLIBS := $(NTRB_LINKING_DEPENDENCIES)
 
 .PHONY: all
 all: build build_test
