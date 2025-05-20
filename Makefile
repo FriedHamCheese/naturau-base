@@ -10,9 +10,9 @@ OBJFILES := $(SRCFILES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 include makeconfig.make
 
 CC := cc
-CFLAGS := -Wall -Wextra -g3 $(NTRB_DEPENDENCY_INCLUDES) $(NTRB_COMPILING_SYMBOLS) -I./include -I./include/ntrb
+CFLAGS := -Wall -Wextra -g3 -I$(NTRB_PORTAUDIO_INCLUDE) -I$(NTRB_FLAC_INCLUDE) -I./include -I./include/ntrb $(NTRB_COMPILING_SYMBOLS)
 LDFLAGS :=
-LDLIBS := $(NTRB_LINKING_DEPENDENCIES)
+LDLIBS := -L$(NTRB_PORTAUDIO_LIBDIR) -L$(NTRB_FLAC_LIBDIR) $(NTRB_LIBS)
 
 .PHONY: all
 all: build build_test
@@ -39,7 +39,10 @@ path_debug:
 	
 
 .PHONY: build
-build: $(OBJFILES)
+build: ./bin/libntrb.a
+
+./bin/libntrb.a: $(OBJFILES) Makefile | $(OBJDIR)
+	$(AR) r $@  $(OBJFILES)
 
 %.o: %.c
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(HEADERFILES) Makefile | $(OBJDIR) 

@@ -1,0 +1,9 @@
+D:/Programs/msys64/home/Waffles/naturau-base/dependencies/portaudio/build/CMakeFiles/portaudio.dir
+D:/Programs/msys64/home/Waffles/naturau-base/dependencies/portaudio/build/CMakeFiles/portaudio_static.dir
+D:/Programs/msys64/home/Waffles/naturau-base/dependencies/portaudio/build/CMakeFiles/uninstall.dir
+D:/Programs/msys64/home/Waffles/naturau-base/dependencies/portaudio/build/CMakeFiles/edit_cache.dir
+D:/Programs/msys64/home/Waffles/naturau-base/dependencies/portaudio/build/CMakeFiles/rebuild_cache.dir
+D:/Programs/msys64/home/Waffles/naturau-base/dependencies/portaudio/build/CMakeFiles/list_install_components.dir
+D:/Programs/msys64/home/Waffles/naturau-base/dependencies/portaudio/build/CMakeFiles/install.dir
+D:/Programs/msys64/home/Waffles/naturau-base/dependencies/portaudio/build/CMakeFiles/install/local.dir
+D:/Programs/msys64/home/Waffles/naturau-base/dependencies/portaudio/build/CMakeFiles/install/strip.dir

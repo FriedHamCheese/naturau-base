@@ -1,12 +1,12 @@
 EXECFILE := ./build.exe
 EXTERN_OBJFILES := $(wildcard ../bin/*.o)
 
-include ../extern_path.make
+include ../makeconfig.make
 
 CC := gcc
-CFLAGS := -Wall -Wextra -g3 -I../$(PORTAUDIO_INCLUDEDIR) -I../$(FLAC_INCLUDEDIR) -I../include/ntrb -DFLAC__NO_DLL -DNTRB_MEMDEBUG
+CFLAGS := -Wall -Wextra -g3 -I../$(NTRB_PORTAUDIO_INCLUDE) -I../$(NTRB_FLAC_INCLUDE) -I../include/ntrb $(NTRB_COMPILING_SYMBOLS)
 LDFLAGS :=
-LDLIBS := -L../$(PORTAUDIO_LIBDIR) -L../$(FLAC_LIBDIR) -lportaudio -lFLAC
+LDLIBS := -L../$(NTRB_PORTAUDIO_LIBDIR) -L../$(NTRB_FLAC_LIBDIR) $(NTRB_LIBS)
 
 $(EXECFILE): main.o $(EXTERN_OBJFILES)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@ 

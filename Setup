@@ -1,0 +1,33 @@
+.PHONY: all
+all: portaudio libflac
+
+.PHONY: portaudio
+portaudio:
+	@echo
+	@echo Building PortAudio
+	-mkdir ./dependencies/portaudio/build
+	cmake -G Ninja -S ./dependencies/portaudio -B ./dependencies/portaudio/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+	cmake --build ./dependencies/portaudio/build
+	cp ./dependencies/portaudio/build/libportaudio.dll ./
+	
+.PHONY: libflac
+libflac:
+	@echo
+	@echo Building libFLAC
+	-mkdir ./dependencies/flac/build
+	cmake -G "MSYS Makefiles" -S ./dependencies/flac -B ./dependencies/flac/build 
+	make -C ./dependencies/flac/build/
+	cp ./dependencies/flac/build/objs/libFLAC.dll ./
+	
+.PHONY: clean
+clean: clean_portaudio clean_libflac
+
+.PHONY: clean_portaudio
+clean_portaudio:
+	rm -rf ./dependencies/portaudio/build
+	rm ./libportaudio.dll
+	
+.PHONY: clean_libflac
+clean_libflac:
+	rm -rf ./dependencies/flac/build	
+	rm ./libFLAC.dll	
