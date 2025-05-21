@@ -23,6 +23,7 @@ A module providing audio loading from FLAC file to ntrb_AudioBuffer.
   FLAC frame means an encoded data chunk, while our frame means a single smallest interval of audio.
 */
 
+#include "export.h"
 #include "AudioHeader.h"
 
 #include "FLAC/stream_decoder.h"
@@ -67,7 +68,7 @@ A function redirecting values in FLAC__StreamDecoderState to ntrb_AudioBufferLoa
 
 See the redirected equivalents in BufferSource_FLACfile.c
 */
-int FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(const FLAC__StreamDecoderState arg);
+NTRB_DLL_VISIBILITY int FLAC__StreamDecoderState_to_ntrb_AudioBufferLoad_Error(const FLAC__StreamDecoderState arg);
 
 /**
 Initialises the ntrb_BufferSource_FLACfile in void_ntrb_AudioBuffer once casted to ntrb_AudioBuffer,
@@ -81,15 +82,15 @@ decodes the STREAMINFO part of the FLAC metadata of the file and writes it to nt
 
 \todo why is this taking the entire ntrb_AudioBuffer when it only writes to itself in it? - 0.3 fix ok?
 */
-int ntrb_BufferSource_FLACfile_new(void* const void_ntrb_AudioBuffer, const char* const filename, const size_t frame_count);
+NTRB_DLL_VISIBILITY int ntrb_BufferSource_FLACfile_new(void* const void_ntrb_AudioBuffer, const char* const filename, const size_t frame_count);
 
 ///Frees resources in ret.
-void ntrb_BufferSource_FLACfile_free(ntrb_BufferSource_FLACfile* const ret);
+NTRB_DLL_VISIBILITY void ntrb_BufferSource_FLACfile_free(ntrb_BufferSource_FLACfile* const ret);
 
 /**
 Loads unprocessed audio from FLAC file and writes the processed audio to void_ntrb_AudioBuffer casted to ntrb_AudioBuffer type.
 */
-void* ntrb_BufferSource_FLACfile_load_buffer(void* const void_ntrb_AudioBuffer);
+NTRB_DLL_VISIBILITY void* ntrb_BufferSource_FLACfile_load_buffer(void* const void_ntrb_AudioBuffer);
 
 #ifdef __cplusplus
 };

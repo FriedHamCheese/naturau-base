@@ -18,6 +18,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 \file BufferSource_WAVfile.h
 A module providing audio loading from WAV file to ntrb_AudioBuffer.
 */
+#include "export.h"
 #include "AudioHeader.h"
 
 #include <stdio.h>
@@ -71,14 +72,14 @@ Initialises an uninitialised ntrb_BufferSource_WAVfile object in *ret.
 
 \return values in enum ntrb_AudioBufferNew_Error reporting an error.
 */
-int ntrb_BufferSource_WAVfile_new(ntrb_BufferSource_WAVfile* const ret, const char* const filename, const size_t frame_count);
+NTRB_DLL_VISIBILITY int ntrb_BufferSource_WAVfile_new(ntrb_BufferSource_WAVfile* const ret, const char* const filename, const size_t frame_count);
 
 /**
 Frees resources in the ntrb_BufferSource_WAVfile object.
 
 \return values in enum ntrb_AudioBufferFree_Error reporting an error.
 */
-int ntrb_BufferSource_WAVfile_free(ntrb_BufferSource_WAVfile* const ret);
+NTRB_DLL_VISIBILITY int ntrb_BufferSource_WAVfile_free(ntrb_BufferSource_WAVfile* const ret);
 
 /**
 Reads the header within the first 65535 bytes of the file, writes the read header to the ntrb_AudioHeader in ret, 
@@ -90,7 +91,7 @@ and seek the position of the file to the beginning of the audio data.
 \param ret An ntrb_BufferSource_WAVfile, with its FILE* initialised, to write the read header to its ntrb_AudioHeader.
 \return values in enum ntrb_AudioBufferNew_Error representing errors.
 */
-int ntrb_BufferSource_WAVfile_load_header(ntrb_BufferSource_WAVfile* const ret);
+NTRB_DLL_VISIBILITY int ntrb_BufferSource_WAVfile_load_header(ntrb_BufferSource_WAVfile* const ret);
 
 /**
 Reads the unprocessed audio from the WAV file, processes it to be in standard audio format, 
@@ -98,7 +99,7 @@ and writes it to void_ntrb_AudioBuffer which will be casted to an ntrb_AudioBuff
 
 The void* is for pthread_t. The function returns NULL both in success and errors.
 */
-void* ntrb_BufferSource_WAVfile_load_buffer(void* const void_ntrb_AudioBuffer);
+NTRB_DLL_VISIBILITY void* ntrb_BufferSource_WAVfile_load_buffer(void* const void_ntrb_AudioBuffer);
 
 #ifdef __cplusplus
 };

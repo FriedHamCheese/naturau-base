@@ -24,10 +24,10 @@ clean: clean_portaudio clean_libflac
 
 .PHONY: clean_portaudio
 clean_portaudio:
-	rm -rf ./dependencies/portaudio/build
-	rm ./libportaudio.dll
+	-rm -rf ./dependencies/portaudio/build
+	-rm ./libportaudio.dll
 	
 .PHONY: clean_libflac
 clean_libflac:
-	rm -rf ./dependencies/flac/build	
-	rm ./libFLAC.dll	
+	-rm -rf ./dependencies/flac/build	
+	-rm ./libFLAC.dll	

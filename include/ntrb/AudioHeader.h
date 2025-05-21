@@ -19,6 +19,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 A module providing ntrb_AudioHeader and a function printing it to a FILE*.
 */
 
+#include "export.h"
 #include "portaudio.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -38,7 +39,7 @@ typedef struct{
 extern "C"{
 #endif
 
- void ntrb_AudioHeader_print(const ntrb_AudioHeader header, FILE* const printstream);
+NTRB_DLL_VISIBILITY void ntrb_AudioHeader_print(const ntrb_AudioHeader header, FILE* const printstream);
  
 #ifdef __cplusplus
 };

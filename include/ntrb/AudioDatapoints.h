@@ -20,6 +20,8 @@ A module providing the ntrb_AudioDatapoints, a struct containing a fixed sized a
 and functions for manipulating it.
 */
 
+#include "export.h"
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -43,7 +45,7 @@ A value for failure return of a function or memory allocation.
 
 Defined in AudioDatapoints.c
 */
-extern const ntrb_AudioDatapoints failed_ntrb_AudioDatapoints;
+NTRB_DLL_VISIBILITY extern const ntrb_AudioDatapoints failed_ntrb_AudioDatapoints;
 
 #ifdef __cplusplus
 extern "C"{	
@@ -54,7 +56,7 @@ Allocates a fixed size array of size_bytes bytes, 0 set the array, set byte_coun
 
 If the allocation failed, the function returns failed_ntrb_AudioDatapoints. Else it returns a valid object.
 */
-ntrb_AudioDatapoints ntrb_AudioDatapoints_new(const size_t size_bytes);
+NTRB_DLL_VISIBILITY ntrb_AudioDatapoints ntrb_AudioDatapoints_new(const size_t size_bytes);
 
 /**
 Returns a separately allocated clone of orig. 
@@ -64,12 +66,12 @@ The byte_count and byte_pos of the cloned object is also identical to that of th
 
 Returns failed_ntrb_AudioDatapoints if the function could not allocate the space for the new object.
 */
-ntrb_AudioDatapoints ntrb_AudioDatapoints_copy(const ntrb_AudioDatapoints orig);
+NTRB_DLL_VISIBILITY ntrb_AudioDatapoints ntrb_AudioDatapoints_copy(const ntrb_AudioDatapoints orig);
 
 /**
 Frees obj->bytes, sets it to NULL, and set byte_count and byte_pos to 0.
 */
-void ntrb_AudioDatapoints_free(ntrb_AudioDatapoints* const obj);
+NTRB_DLL_VISIBILITY void ntrb_AudioDatapoints_free(ntrb_AudioDatapoints* const obj);
 
 #ifdef __cplusplus
 };

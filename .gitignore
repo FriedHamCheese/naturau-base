@@ -8,3 +8,4 @@ extern_path.make
 makeconfig.make
 ./dependencies/libflac/build
 ./dependencies/portaudio/build
+bin/libntrb.a

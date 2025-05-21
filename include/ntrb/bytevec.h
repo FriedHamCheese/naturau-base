@@ -19,6 +19,8 @@ You should have received a copy of the GNU Lesser General Public License along w
 A module providing bytevec: a variable length array and functions for manipulating it.
 */
 
+#include "export.h"
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -45,7 +47,7 @@ If the base_ptr is NULL, this indicates a failure from a function and the contai
 
 Defined in bytevec.c
 */
-extern const ntrb_bytevec failed_ntrb_bytevec;
+NTRB_DLL_VISIBILITY extern const ntrb_bytevec failed_ntrb_bytevec;
 
 #ifdef __cplusplus
 extern "C"{	
@@ -62,7 +64,7 @@ If alloc_bytes is 0, the behaviour depends on the implementation of malloc.
 If malloc returns NULL when allocating with 0 bytes, the function returns failed_ntrb_bytevec. 
 Else, it returns a valid object and should be usable.
 */
-ntrb_bytevec ntrb_bytevec_new(const size_t alloc_bytes);
+NTRB_DLL_VISIBILITY ntrb_bytevec ntrb_bytevec_new(const size_t alloc_bytes);
 
 /**
 Reserves additional_bytes bytes ahead from obj->capacity, so the new capacity would be additional_bytes + obj->capacity.
@@ -72,7 +74,7 @@ If the function fails, it returns false and the state of the container is left u
 If succeeded, returns true, and the obj->base_ptr has the exact amount of additional space requested and obj->capacity is incremented by additional_bytes.
 obj->elements does not change.
 */
-bool ntrb_bytevec_reserve(ntrb_bytevec* const obj, const size_t additional_bytes);
+NTRB_DLL_VISIBILITY bool ntrb_bytevec_reserve(ntrb_bytevec* const obj, const size_t additional_bytes);
 
 /**
 Adds the value at the end of the container.
@@ -85,12 +87,12 @@ If the typesize is more than the type of the value argument, memcpy would read t
 
 The function returns true if the append process is successful. If the container required additional space and was not able to allocate the required space, the state of the container is left unchanged and the function returns false.
 */
-bool ntrb_bytevec_append(ntrb_bytevec* const obj, const size_t typesize, const void* const value);
+NTRB_DLL_VISIBILITY bool ntrb_bytevec_append(ntrb_bytevec* const obj, const size_t typesize, const void* const value);
 
 /**
 Frees the base_ptr, then sets it to NULL and sets both the elements and capacity to 0.
 */
-void ntrb_bytevec_free(ntrb_bytevec* const obj);
+NTRB_DLL_VISIBILITY void ntrb_bytevec_free(ntrb_bytevec* const obj);
 
 #ifdef __cplusplus
 };

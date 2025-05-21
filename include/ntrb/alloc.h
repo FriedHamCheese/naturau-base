@@ -1,6 +1,7 @@
 #ifndef ntrb_alloc_h
 #define ntrb_alloc_h
 
+#include "export.h"
 #include "_alloc_bytevec.h"
 
 #include <stdlib.h>
@@ -124,7 +125,7 @@ extern "C"{
 	If an element of _ntrb_memdebug_AllocData in the container has its .ptr as NULL, this indicates an empty space.
 	For performance and efficiency reasons, you would try to write to this first, as the _ntrb_memdebug_add_element_to_unused_space() in _ntrb_memdebug_add_element() does.
 	*/
-	extern  _ntrb_alloc_bytevec _ntrb_memdebug_alloc_data;
+	NTRB_DLL_VISIBILITY  extern  _ntrb_alloc_bytevec _ntrb_memdebug_alloc_data;
 
 	/**
 	Older way of initialising the alloc module.
@@ -133,7 +134,7 @@ extern "C"{
 	Else it returns false.
 	*/	
 	
-	bool ntrb_memdebug_init();
+	NTRB_DLL_VISIBILITY bool ntrb_memdebug_init();
 	/**
 	Initialises the alloc module by initialising the rwlock of the module and the record which keep track of memory management information, and then marks the module as successfully initialised.
 	
@@ -142,7 +143,7 @@ extern "C"{
 	- If the allocation of the record, _ntrb_memdebug_alloc_data, fails; it returns ntrb_memdebug_AllocError.
 	- Else it returns ntrb_memdebug_OK, if any of the mentioned has not occurred.
 	*/	
-	enum ntrb_memdebug_Error ntrb_memdebug_init_with_return_value();
+	NTRB_DLL_VISIBILITY enum ntrb_memdebug_Error ntrb_memdebug_init_with_return_value();
 
 	/**
 	Uninitialises the module by freeing the record container and destroying the rwlock.
@@ -155,7 +156,7 @@ extern "C"{
 	
 	\param print_summary prints the remaining unallocated memory pointers if set to true. Good and convenient for checking memory leaks after testing your program.
 	*/
-	enum ntrb_memdebug_Error ntrb_memdebug_uninit(const bool print_summary);
+	NTRB_DLL_VISIBILITY enum ntrb_memdebug_Error ntrb_memdebug_uninit(const bool print_summary);
 	
 	/**
 	Prints the record of unfreed pointers in the record, from allocation or reallocation.
@@ -165,7 +166,7 @@ extern "C"{
 	- If there was an error releasing the lock of the module, the function will have printed the record and will return ntrb_memdebug_RwlockUnlockError.
 	- Else it returns ntrb_memdebug_OK, if any of the mentioned has not occurred.
 	*/
-	enum ntrb_memdebug_Error ntrb_memdebug_view();
+	NTRB_DLL_VISIBILITY enum ntrb_memdebug_Error ntrb_memdebug_view();
 
 	/**
 	Allocates a new pointer with size_bytes bytes of space and keeps a record of the pointer, allocation size, callsite filename and line.
@@ -180,7 +181,7 @@ extern "C"{
 	  the allocated memory is provided in the return value, the allocation is logged to the record and a message is printed to stderr regarding the error.
 	- Else, the allocation is logged and no message is printed to stderr.
 	*/
-	void* _ntrb_memdebug_malloc(const size_t size_bytes, const char* const filename, const int line);
+	NTRB_DLL_VISIBILITY void* _ntrb_memdebug_malloc(const size_t size_bytes, const char* const filename, const int line);
 	
 	/**
 	Allocates a new pointer with elements x typesize bytes of space, set every byte to 0 and keeps a record of the pointer, allocation size, callsite filename and line.
@@ -195,14 +196,14 @@ extern "C"{
 	  the allocated memory is provided in the return value, the allocation is logged to the record and a message is printed to stderr regarding the error.
 	- Else, the allocation is logged and no message is printed to stderr.
 	*/
-	void* _ntrb_memdebug_calloc(const size_t elements, const size_t typesize, const char* const filename, const int line);
+	NTRB_DLL_VISIBILITY void* _ntrb_memdebug_calloc(const size_t elements, const size_t typesize, const char* const filename, const int line);
 	
 	/**
 	The callback for _ntrb_memdebug_realloc() when a reallocating or shrinking of a pointer not in the record.
 	
 	This prints a message to stderr.
 	*/
-	void _ntrb_memdebug_unresgistered_realloc_ptr_callback(const void* const realloced_ptr, const void* const requested_ptr);
+	NTRB_DLL_VISIBILITY void _ntrb_memdebug_unresgistered_realloc_ptr_callback(const void* const realloced_ptr, const void* const requested_ptr);
 
 	/**
 	Either allocates, reallocates or shrinks a pointer, and add or edit the record containers.
@@ -217,7 +218,7 @@ extern "C"{
 	
 	\param unregistered_ptr_callback A callback for when the function is requested to reallocate or shrink a pointer which is not in the record.
 	*/
-	void* _ntrb_memdebug_realloc(void* const ptr, const size_t size_bytes, const char* const filename, const int line, void (*unregistered_ptr_callback)(const void*, const void*));
+	NTRB_DLL_VISIBILITY void* _ntrb_memdebug_realloc(void* const ptr, const size_t size_bytes, const char* const filename, const int line, void (*unregistered_ptr_callback)(const void*, const void*));
 	
 	/**
 	Frees the passed pointer and delete its record from the containers.
@@ -229,19 +230,19 @@ extern "C"{
 	- passed a pointer which is not in the record: does not free the pointer and warns through stderr.
 	- If an error occurs while the _ntrb_memdebug_rwlock is requesting an unlock: a message will be printed in stderr but the record containers can be mutated.
 	*/
-	void _ntrb_memdebug_free(void* const ptr, const char* const filename, const int line);
+	NTRB_DLL_VISIBILITY void _ntrb_memdebug_free(void* const ptr, const char* const filename, const int line);
 
 	/**
 	Prints the record of unfreed pointers in the record, from allocation or reallocation. As the name suggests, it does not lock the rwlock when accessing the record containers. This is for internal use only.
 	*/
-	void _ntrb_memdebug_view_no_lock();
+	NTRB_DLL_VISIBILITY void _ntrb_memdebug_view_no_lock();
 
 	/**
 	Finds unused space between the data in the record container and tries to add the information to it.
 	
 	Returns true if there was an empty space and the function added the information to it. False if there was none and the information was not added.
 	*/
-	bool _ntrb_memdebug_add_element_to_unused_space(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
+	NTRB_DLL_VISIBILITY bool _ntrb_memdebug_add_element_to_unused_space(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
 	
 	/**
 	Adds the information provided to the record container.
@@ -250,7 +251,7 @@ extern "C"{
 	If there isn't, it tries adding it at the end of the container. And if the container fails to allocate memory for adding the information, the function returns false.
 	If the function successfully added the information to the record, whether it is added to the unused space or not, the function returns true.
 	*/
-	bool _ntrb_memdebug_add_element(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
+	NTRB_DLL_VISIBILITY bool _ntrb_memdebug_add_element(void* const ptr, const size_t size_bytes, const char* const filename, const int line);
 	
 	/**
 	Marks the space which i_element points to as unused.
@@ -260,7 +261,7 @@ extern "C"{
 	\param i_element Index of the data in the record container to mark as unused.
 	\param element_count The elements of _ntrb_memdebug_AllocData in _ntrb_memdebug_alloc_data.
 	*/
-	void _ntrb_memdebug_remove_element(const size_t i_element, const size_t element_count);
+	NTRB_DLL_VISIBILITY void _ntrb_memdebug_remove_element(const size_t i_element, const size_t element_count);
 	
 	/**
 	Returns the element index of the pointer in _ntrb_memdebug_alloc_data.
@@ -269,7 +270,7 @@ extern "C"{
 	
 	If the pointer is not in the container, it returns -1.
 	*/
-	int_least64_t _ntrb_memdebug_ptr_index(const void* const ptr);
+	NTRB_DLL_VISIBILITY int_least64_t _ntrb_memdebug_ptr_index(const void* const ptr);
 	
 	/**
 	Overwrites the data in the record container at i_element with the provided data.
@@ -278,7 +279,7 @@ extern "C"{
 		
 	This does not perform bounds check.
 	*/
-	void _ntrb_memdebug_replace_element(const size_t i_element, void* const ptr, const size_t size_bytes, const char* const filename, const int line);	
+	NTRB_DLL_VISIBILITY void _ntrb_memdebug_replace_element(const size_t i_element, void* const ptr, const size_t size_bytes, const char* const filename, const int line);	
 #else
 	#define ntrb_malloc(size_bytes) malloc(size_bytes)
 	#define ntrb_calloc(elements, typesize) calloc(elements, typesize)

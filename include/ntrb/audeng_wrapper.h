@@ -1,6 +1,7 @@
 #ifndef ntrb_audengwrapper_h
 #define ntrb_audengwrapper_h
 
+#include "export.h"
 #include "portaudio.h"
 
 /*
@@ -33,7 +34,7 @@ extern const unsigned long ntrb_std_frame_count;
 extern "C"{	
 #endif
 
-PaError ntrb_get_output_stream_params(PaStreamParameters* const output_params);
+NTRB_DLL_VISIBILITY PaError ntrb_get_output_stream_params(PaStreamParameters* const output_params);
 
 /**
 The function for the audio engine thread.
@@ -42,12 +43,12 @@ If any errors occur while initialising or uninitialising the audio engine, the e
 
 The function only returns NULL. You shouldn't check the return value, it's for conforming with pthread.
 */
-void* ntrb_run_audio_engine(void* const runtime_data_void);
+NTRB_DLL_VISIBILITY void* ntrb_run_audio_engine(void* const runtime_data_void);
 
 /**
 A function returning the amount of frames in a single millisecond of the argument
 */
-unsigned long ntrb_frames_for_msec(const unsigned long samplerate);
+NTRB_DLL_VISIBILITY unsigned long ntrb_frames_for_msec(const unsigned long samplerate);
 
 #ifdef __cplusplus
 };

@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"D:/Programs/msys64/home/Waffles/naturau-base/dependencies/portaudio/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

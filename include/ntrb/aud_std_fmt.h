@@ -20,6 +20,7 @@ A module providing functions converting unprocessed audio to the standard audio 
 And functions for loading audio and processing it.
 */
 
+#include "export.h"
 #include "AudioDatapoints.h"
 #include "AudioHeader.h"
 
@@ -28,9 +29,9 @@ And functions for loading audio and processing it.
 #include <stdio.h>
 #include <stdint.h>
 
-extern const uint32_t ntrb_std_samplerate;
-extern const uint8_t ntrb_std_audchannels;
-extern const PaSampleFormat ntrb_std_sample_fmt;
+NTRB_DLL_VISIBILITY extern const uint32_t ntrb_std_samplerate;
+NTRB_DLL_VISIBILITY extern const uint8_t ntrb_std_audchannels;
+NTRB_DLL_VISIBILITY extern const PaSampleFormat ntrb_std_sample_fmt;
 
 /**
 An enum for errors while converting audio to ntrb audio loop standard audio format.
@@ -53,7 +54,7 @@ The size of the output would be 2x of the int16.
 
 If the function failed to allocate memory for the return container, it returns failed_ntrb_AudioDatapoints.
 */
-ntrb_AudioDatapoints ntrb_AudioDatapoints_i16_to_f32(const ntrb_AudioDatapoints int16);
+NTRB_DLL_VISIBILITY ntrb_AudioDatapoints ntrb_AudioDatapoints_i16_to_f32(const ntrb_AudioDatapoints int16);
 
 /**
 Copies the (offset) channel of the datapoints, and separately allocate ntrb_AudioDatapoints for containing it.
@@ -68,7 +69,7 @@ The multichannel_aud must be encoded in float32 and has at least 2 channels.
   
 If the function failed to allocate memory for the return container, it returns failed_ntrb_AudioDatapoints.
 */
-ntrb_AudioDatapoints ntrb_split_as_mono(const ntrb_AudioDatapoints multichannel_aud, const size_t channels, const size_t offset);
+NTRB_DLL_VISIBILITY ntrb_AudioDatapoints ntrb_split_as_mono(const ntrb_AudioDatapoints multichannel_aud, const size_t channels, const size_t offset);
 
 /**
 Converts a mono channeled ntrb_AudioDatapoints to one with (dest_channels) and allocates the return ntrb_AudioDatapoints separately for containing it.
@@ -86,7 +87,7 @@ Where 0ch 1ch and 2ch of each frame is the same value.
 
 If the function failed to allocate memory for the return container, it returns failed_ntrb_AudioDatapoints.
 */
-ntrb_AudioDatapoints ntrb_mono_to_xchannels(const ntrb_AudioDatapoints orig, const size_t dest_channels);
+NTRB_DLL_VISIBILITY ntrb_AudioDatapoints ntrb_mono_to_xchannels(const ntrb_AudioDatapoints orig, const size_t dest_channels);
 
 /**
 Creates an ntrb_Audiodatapoint with each of the float32 datapoints of l_ch and r_ch interleaved.
@@ -96,7 +97,7 @@ For example: frame 0: 0l, 0r; frame 1: 1l, 1r, frame 2: 2l, 2r, etc...
 If l_ch.elem is not equal to r_ch.elem or it failed to allocate the return container, the function returns failed_ntrb_AudioDatapoints.
 
 */
-ntrb_AudioDatapoints ntrb_merge_to_stereo(const ntrb_AudioDatapoints l_ch, const ntrb_AudioDatapoints r_ch);
+NTRB_DLL_VISIBILITY ntrb_AudioDatapoints ntrb_merge_to_stereo(const ntrb_AudioDatapoints l_ch, const ntrb_AudioDatapoints r_ch);
 
 /**
 Converts a mono-channel float32 orig with orig_samplerate to an ntrb_AudioDatapoints with dest_samplerate. The return container is allocated separately.
@@ -105,14 +106,14 @@ This only is used for converting mono to mono, see ntrb_to_samplerate() for one 
 
 If the function failed to allocate the return container, it returns failed_ntrb_AudioDatapoints.
 */
-ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, const double orig_samplerate, const double dest_samplerate);
+NTRB_DLL_VISIBILITY ntrb_AudioDatapoints ntrb_to_samplerate_mono(const ntrb_AudioDatapoints orig, const double orig_samplerate, const double dest_samplerate);
 
 /**
 Converts a stereo float32 orig with orig_samplerate to an ntrb_AudioDatapoints with dest_samplerate. The return container is allocated separately.
 
 If the function failed to allocate the return container, it returns failed_ntrb_AudioDatapoints.
 */
-ntrb_AudioDatapoints ntrb_to_samplerate(const ntrb_AudioDatapoints orig, const uint32_t orig_samplerate, const uint32_t dest_samplerate);
+NTRB_DLL_VISIBILITY ntrb_AudioDatapoints ntrb_to_samplerate(const ntrb_AudioDatapoints orig, const uint32_t orig_samplerate, const uint32_t dest_samplerate);
 
 /**
 Returns a separately allocated ret_aud, which is orig converted to float32 stereo 48khz format.
@@ -121,7 +122,7 @@ Returns a separately allocated ret_aud, which is orig converted to float32 stere
 \param[in] orig
 \param[in] orig_header The header which comes with orig when reading an audio file.
 */
-enum ntrb_StdAudFmtConversionResult ntrb_to_standard_format(ntrb_AudioDatapoints* const ret_aud, const ntrb_AudioDatapoints orig, const ntrb_AudioHeader* const orig_header);
+NTRB_DLL_VISIBILITY enum ntrb_StdAudFmtConversionResult ntrb_to_standard_format(ntrb_AudioDatapoints* const ret_aud, const ntrb_AudioDatapoints orig, const ntrb_AudioHeader* const orig_header);
 
 #ifdef __cplusplus
 };

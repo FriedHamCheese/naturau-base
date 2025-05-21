@@ -19,6 +19,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 A module providing functions abstracting file reading.
 */
 
+#include "export.h"
 #include "SpanU8.h"
 #include <stdio.h>
 
@@ -39,7 +40,7 @@ extern "C"{
 #endif
 
 ///Returns the filesize in bytes. Returns -1 if an error occured.
-long int ntrb_get_filesize_bytes(FILE* const file);
+NTRB_DLL_VISIBILITY long int ntrb_get_filesize_bytes(FILE* const file);
 
 /**
 Reads the file contents from a file from the provided filename which the filename may be a relative path from the program callsite or an absolute filepath. Then allocates memory to the provided uninitialised ntrb_SpanU8 and writes the file contents to it. buffer->elem is set to the filesize of the file.
@@ -48,7 +49,7 @@ buffer must be an uninitialised ntrb_SpanU8.
 
 All errors guarantee the provided buffer is deallocated if the function allocates it.
 */
-enum ntrb_ReadFileResult ntrb_read_entire_file_rb(ntrb_SpanU8* const buffer, const char* filename);
+NTRB_DLL_VISIBILITY enum ntrb_ReadFileResult ntrb_read_entire_file_rb(ntrb_SpanU8* const buffer, const char* filename);
 
 /**
 Reads [remaining_filesize, bytes_to_read] bytes from *file.
@@ -65,7 +66,7 @@ If any errors occurred, the buffer contents will be freed.
   after successfully determining the remaining filesize, or an ferror occurs.
 \return ntrb_ReadFileResult_CallocError if an error occurred when attempting to allocate buffer.
 */
-enum ntrb_ReadFileResult ntrb_readsome_from_file_rb(ntrb_SpanU8* const buffer, FILE* const file, const size_t bytes_to_read);
+NTRB_DLL_VISIBILITY enum ntrb_ReadFileResult ntrb_readsome_from_file_rb(ntrb_SpanU8* const buffer, FILE* const file, const size_t bytes_to_read);
 
 #ifdef __cplusplus
 };

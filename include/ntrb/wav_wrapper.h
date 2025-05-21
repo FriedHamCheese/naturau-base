@@ -19,6 +19,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 A module for reading WAV files.
 */
 
+#include "export.h"
 #include "SpanU8.h"
 #include "AudioHeader.h"
 #include "AudioDatapoints.h"
@@ -39,7 +40,7 @@ Currently it supports paInt16 (1, 16) and paFloat32 (3, 32): the most common for
 \param WAV_audioFormat A 2 byte value after 8 bytes from the 'f' in "fmt " which indicates the format type of the sample.
 \param BitsPerSample A 2 byte value after 22 bytes from the 'f' in "fmt ", indicates how many bits are in a sample.
 */
-PaSampleFormat ntrb_WAV_PaSampleFormat(const uint16_t WAV_audioFormat, const uint16_t BitsPerSample);
+NTRB_DLL_VISIBILITY PaSampleFormat ntrb_WAV_PaSampleFormat(const uint16_t WAV_audioFormat, const uint16_t BitsPerSample);
 
 /**
 Iterates over each byte of file_buffer starting from RIFFchunkEnd to file_buffer.elem - 1
@@ -51,7 +52,7 @@ RIFFchunkEnd is always 12 bytes from file_buffer.ptr, so you'd just pass that in
 
 This is used in ntrb_AudioHeader_from_WAVfile().
 */
-size_t ntrb_getSubchunk1Start(const ntrb_SpanU8 file_buffer, const size_t RIFFchunkEnd);
+NTRB_DLL_VISIBILITY size_t ntrb_getSubchunk1Start(const ntrb_SpanU8 file_buffer, const size_t RIFFchunkEnd);
 
 /**
 Iterates over each byte of file_buffer starting from Subchunk1End to file_buffer.elem - 1
@@ -64,7 +65,7 @@ There may be extra data after 24 bytes which will be skipped, but these aren't i
 
 This is used in ntrb_AudioHeader_from_WAVfile().
 */
-size_t ntrb_getSubchunk2Start(const ntrb_SpanU8 file_buffer, const size_t Subchunk1End);
+NTRB_DLL_VISIBILITY size_t ntrb_getSubchunk2Start(const ntrb_SpanU8 file_buffer, const size_t Subchunk1End);
 
 /**
 An enum for possible errors while reading the WAV header file and converting to ntrb_AudioHeader.
@@ -89,11 +90,11 @@ Attempts to fetch and convert the WAV header data to ntrb_AudioHeader, get the o
 \param[out] audiodataOffset the offset of the first audio data byte from fileBuffer.elem.
 \param[out] audiodataSize the size of the audio data.
 */
-enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile(ntrb_AudioHeader* const returnArg, size_t* const audiodataOffset, size_t* const audiodataSize, const ntrb_SpanU8 fileBuffer);
+NTRB_DLL_VISIBILITY enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile(ntrb_AudioHeader* const returnArg, size_t* const audiodataOffset, size_t* const audiodataSize, const ntrb_SpanU8 fileBuffer);
 
-enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile_2(ntrb_AudioHeader* const returnArg, size_t* const audiodataOffset, size_t* const audiodataSize, const ntrb_SpanU8 fileBuffer);
+NTRB_DLL_VISIBILITY enum ntrb_AudioHeaderFromWAVFileStatus ntrb_AudioHeader_from_WAVfile_2(ntrb_AudioHeader* const returnArg, size_t* const audiodataOffset, size_t* const audiodataSize, const ntrb_SpanU8 fileBuffer);
 
-bool verify_WAV_out_of_bounds(const size_t audiodataOffset, const size_t audiodataSize, const size_t filesize);
+NTRB_DLL_VISIBILITY bool verify_WAV_out_of_bounds(const size_t audiodataOffset, const size_t audiodataSize, const size_t filesize);
 
 /**
 Returns a separately allocated buffer containing the audio data from wavfile.
@@ -104,7 +105,7 @@ Returns a separately allocated buffer containing the audio data from wavfile.
 
 You get two latter parameters from ntrb_AudioHeader_from_WAVfile().
 */
-ntrb_AudioDatapoints ntrb_get_WAV_audiodata(const ntrb_SpanU8 wavfile, const size_t audiodata_size, const size_t audiodata_offset);
+NTRB_DLL_VISIBILITY ntrb_AudioDatapoints ntrb_get_WAV_audiodata(const ntrb_SpanU8 wavfile, const size_t audiodata_size, const size_t audiodata_offset);
 
 #ifdef __cplusplus
 };

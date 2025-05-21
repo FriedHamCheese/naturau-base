@@ -19,6 +19,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 A module providing ntrb_SlicedStrings, a container for substrings; and the functions for manipulating it.
 */
 
+#include "export.h"
 #include <stddef.h>
 
 /**
@@ -40,14 +41,14 @@ If the object you recieve indicates failure from a function or memory allocation
 
 Defined in SlicedStrings.c
 */
-extern const ntrb_SlicedStrings failed_ntrb_SlicedStrings;
+NTRB_DLL_VISIBILITY extern const ntrb_SlicedStrings failed_ntrb_SlicedStrings;
 
 /**
 Maximum length of a substring, not including the null terminator. 
 
 Defined in SlicedStrings.c
 */
-extern const size_t ntrb_slice_string_max_len;
+NTRB_DLL_VISIBILITY extern const size_t ntrb_slice_string_max_len;
 
 #ifdef __cplusplus
 extern "C"{	
@@ -61,14 +62,14 @@ Typically you don't use this directly, it's for the methods in the module. But c
 
 Returns an object which the str_ptrs isn't NULL if successful. Else returns one with NULL.
 */
-ntrb_SlicedStrings ntrb_SlicedStrings_new(const size_t str_count);
+NTRB_DLL_VISIBILITY ntrb_SlicedStrings ntrb_SlicedStrings_new(const size_t str_count);
 
 /**
 Frees each of the char* in the object, then the char** of the object, set str_ptrs to NULL and elem to 0.
 
 If obj is NULL, the function does nothing. If obj->str_ptrs is NULL, it does nothing.
 */
-void ntrb_SlicedStrings_free(ntrb_SlicedStrings* const obj);
+NTRB_DLL_VISIBILITY void ntrb_SlicedStrings_free(ntrb_SlicedStrings* const obj);
 
 /**
 Returns the substrings which are separated by the separator argument in the provided string.
@@ -85,7 +86,7 @@ This function is a part of ntrb_SlicedStrings_slice_sep() and you should use tha
 Returns an object which the str_ptrs isn't NULL if successful. Else returns one with NULL.
 
 */
-ntrb_SlicedStrings ntrb_SlicedStrings_slice_without_trimming(const char* const str, const size_t str_len, const char separator);
+NTRB_DLL_VISIBILITY ntrb_SlicedStrings ntrb_SlicedStrings_slice_without_trimming(const char* const str, const size_t str_len, const char separator);
 
 /**
 Returns the substrings which are separated by the separator argument in the provided string.
@@ -98,7 +99,7 @@ If the separator is a null character, it returns failed_ntrb_SlicedStrings.
 
 Returns an object which the str_ptrs isn't NULL if successful. Else returns one with NULL.
 */
-ntrb_SlicedStrings ntrb_SlicedStrings_slice_sep(const char* const str, const size_t str_len, const char separator);
+NTRB_DLL_VISIBILITY ntrb_SlicedStrings ntrb_SlicedStrings_slice_sep(const char* const str, const size_t str_len, const char separator);
 
 /**
 Returns the substrings which are separated by a space character in the provided string.
@@ -108,7 +109,7 @@ Returns the substrings which are separated by a space character in the provided 
 
 Returns an object which the str_ptrs isn't NULL if successful. Else returns one with NULL.
 */
-ntrb_SlicedStrings ntrb_SlicedStrings_slice(const char* const str, const size_t str_len);
+NTRB_DLL_VISIBILITY ntrb_SlicedStrings ntrb_SlicedStrings_slice(const char* const str, const size_t str_len);
 
 /**
 Concatenates the strings in the object to a single, separately allocated string.
@@ -124,7 +125,7 @@ Concatenates the strings in the object to a single, separately allocated string.
 
 Returns the concatenated string which is separately allocated, NULL if allocation error occured.
 */
-char* ntrb_SlicedStrings_concat_strs(const ntrb_SlicedStrings slices, const size_t beg, const size_t end, const char separator);
+NTRB_DLL_VISIBILITY char* ntrb_SlicedStrings_concat_strs(const ntrb_SlicedStrings slices, const size_t beg, const size_t end, const char separator);
 
 #ifdef __cplusplus
 };

@@ -39,6 +39,7 @@ then add it in ntrb_AudioBuffer.source.
 \todo don't rely on code modifications for source support in 0.3
 */
 
+#include "export.h"
 #include "AudioHeader.h"
 #include "BufferSource_WAVfile.h"
 #include "BufferSource_FLACfile.h"
@@ -210,7 +211,7 @@ in the if(strcmp()) section of the code.
 For the specifications of the modification, refer to the Detailed Description part of AudioBuffer.h if viewed in Doxygen,
 else the very top comment of this file.
 */
-enum ntrb_AudioBufferNew_Error ntrb_AudioBuffer_new(ntrb_AudioBuffer* const ret, const char* const filename, const size_t stdaud_frame_count);
+NTRB_DLL_VISIBILITY enum ntrb_AudioBufferNew_Error ntrb_AudioBuffer_new(ntrb_AudioBuffer* const ret, const char* const filename, const size_t stdaud_frame_count);
 
 /**
 A function which uninitialises an ntrb_AudioBuffer object in *ret.
@@ -222,7 +223,7 @@ If it is equal, this indicates that the buffer loads from your source type and y
 For the specifications of the modification, refer to the Detailed Description part of AudioBuffer.h if viewed in Doxygen,
 else the very top comment of this file.
 */
-enum ntrb_AudioBufferFree_Error ntrb_AudioBuffer_free(ntrb_AudioBuffer* const obj);
+NTRB_DLL_VISIBILITY enum ntrb_AudioBufferFree_Error ntrb_AudioBuffer_free(ntrb_AudioBuffer* const obj);
 
 #ifdef __cplusplus
 };

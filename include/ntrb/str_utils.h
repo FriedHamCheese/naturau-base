@@ -13,6 +13,7 @@ naturau-base/ntrb is distributed in the hope that it will be useful, but WITHOUT
 You should have received a copy of the GNU Lesser General Public License along with naturau-base/ntrb. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "export.h"
 
 #include <stdio.h>
 
@@ -43,7 +44,7 @@ Gets a character from the provided FILE* and writes it to ret.
 
 If the return value is not ntrb_GetChar_OK and the return pointer is not written to if reached EOF or ferror.
 */
-enum ntrb_GetCharStatus ntrb_getc(FILE* const instream, char* const ret);
+NTRB_DLL_VISIBILITY enum ntrb_GetCharStatus ntrb_getc(FILE* const instream, char* const ret);
 
 /**
 Allocates the char* which ret points to with max_strlen + 1 bytes and write the contents of a line read from instream to it.
@@ -54,7 +55,7 @@ The string written to the char* will not contain a newline character, and if the
 - If an ferror is caught, the char* which was allocated by the function is deallocated and ntrb_GetChar_Ferror is returned from the function.
 - If an EOF is caught, the char* contains what the stream could read before reaching it and ntrb_GetChar_EOF is returned from the function.
 */
-enum ntrb_GetCharStatus ntrb_getsn(const size_t max_strlen, FILE* const instream, char** ret);
+NTRB_DLL_VISIBILITY enum ntrb_GetCharStatus ntrb_getsn(const size_t max_strlen, FILE* const instream, char** ret);
 
 /**
 Returns a separately allocated string which is a variant of untrimmed_str but has no separators next to each other.
@@ -63,9 +64,9 @@ Technically it just removes duplicate characters and only keep one. So uh ok.
 
 Returns NULL if the function failed to allocate the space for the string.
 */
-char* ntrb_trim_duplicate_separators(const char* const untrimmed_str, const size_t str_len, const char separator);
+NTRB_DLL_VISIBILITY char* ntrb_trim_duplicate_separators(const char* const untrimmed_str, const size_t str_len, const char separator);
 
-char* ntrb_trim_whitespace(const char* const untrimmed_str);
+NTRB_DLL_VISIBILITY char* ntrb_trim_whitespace(const char* const untrimmed_str);
 
 /**
 Gets the filetype from the argument.
@@ -76,7 +77,7 @@ and the function will return a separately allocated "filetype" string (without t
 Returns a valid string if the filetype exists. Else it returns NULL.
 So "filename." or "filename" is going to return NULL. ".filetype" does return "filetype" as the string.
 */
-char* ntrb_get_filetype(const char* const filename);
+NTRB_DLL_VISIBILITY char* ntrb_get_filetype(const char* const filename);
 
 #ifdef __cplusplus
 };
