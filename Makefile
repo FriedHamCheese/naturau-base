@@ -15,7 +15,7 @@ ifneq ($(NTRB_SHARED_LIBS),)
 		LD_SHARED_FLAGS := -shared -Wl,--out-implib,./bin/libntrb.a
 		LD_SHARED_OUTPUT := ./bin/libntrb.dll
 	else
-		LD_SHARED_FLAGS := -fPIC -shared
+		LD_SHARED_FLAGS := -fPIC -shared -Wl,--out-implib,./bin/libntrb.a
 		LD_SHARED_OUTPUT := ./bin/libntrb.so
 	endif
 	LD_OUTPUT := $(LD_SHARED_OUTPUT)
@@ -38,6 +38,7 @@ build: $(LD_OUTPUT)
 $(LD_SHARED_OUTPUT): $(OBJFILES) Makefile | $(OBJDIR)
 	@echo
 	$(CC) $(LD_SHARED_FLAGS) -o $@  $(OBJFILES) $(LDLIBS)
+	cp $(LD_SHARED_OUTPUT) ./
 
 %.o: %.c
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(HEADERFILES) Makefile | $(OBJDIR)
@@ -51,9 +52,6 @@ $(EXECDIR):
 .PHONY:
 clean:
 	rm -rf $(OBJDIR)
-	#rm -rf $(TESTEXEC)
-	#rm -rf $(TEST_OBJDIR)
-
 
 #Code for the /test folder
 #TEST_DIR := ./test
